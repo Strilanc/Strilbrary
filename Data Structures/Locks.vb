@@ -18,13 +18,21 @@ End Class
 Public Class Throttle
     Private ReadOnly cooldown As TimeSpan
     Private nextAction As Action
-    Private nextCallTime As Date
+    Private readyTime As Date
     Private running As Boolean
     Private ReadOnly lock As New Object()
 
+    <ContractInvariantMethod()> Protected Sub Invariant()
+        Contract.Invariant(nextAction IsNot Nothing)
+        Contract.Invariant(cooldown.Ticks >= 0)
+    End Sub
+
     Public Sub New(ByVal cooldown As TimeSpan)
+        Contract.Requires(cooldown.Ticks >= 0)
         Me.cooldown = cooldown
-        Me.nextCallTime = Now
+        Me.readyTime = Now
+        Me.nextAction = Sub()
+                        End Sub
     End Sub
     Public Sub SetActionToRun(ByVal action As Action)
         Contract.Requires(action IsNot Nothing)
@@ -36,17 +44,17 @@ Public Class Throttle
             running = True
         End SyncLock
 
-        If t >= nextCallTime Then
+        If t >= readyTime Then
             Execute()
         Else
-            FutureWait(nextCallTime - t).CallWhenReady(AddressOf Execute)
+            FutureWait(readyTime - t).CallWhenReady(AddressOf Execute)
         End If
     End Sub
     Private Sub Execute()
         Dim action As action
         SyncLock lock
             action = nextAction
-            nextCallTime = Now() + cooldown
+            readyTime = Now() + cooldown
             running = False
         End SyncLock
         Call action()

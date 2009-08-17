@@ -5,6 +5,11 @@
     Public NotInheritable Class Enumerable(Of T)
         Implements IEnumerable(Of T)
         Private ReadOnly generator As Func(Of IEnumerator(Of T))
+
+        <ContractInvariantMethod()> Protected Sub Invariant()
+            Contract.Invariant(generator IsNot Nothing)
+        End Sub
+
         Public Sub New(ByVal generator As Func(Of IEnumerator(Of T)))
             Contract.Requires(generator IsNot Nothing)
             Me.generator = generator

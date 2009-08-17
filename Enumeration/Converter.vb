@@ -32,6 +32,8 @@ Namespace Enumeration
             Contract.Ensures(Contract.Result(Of IEnumerator(Of Byte))() IsNot Nothing)
             Dim stream_ = stream
             Return New Enumerator(Of Byte)(Function(controller)
+                                               Contract.Requires(controller IsNot Nothing)
+                                               Contract.Assume(stream_ IsNot Nothing)
                                                Dim r = stream_.ReadByte()
                                                If r = -1 Then  Return controller.Break()
                                                Return CByte(r)
@@ -45,6 +47,9 @@ Namespace Enumeration
             Dim converter_ = converter
             Dim stream_ = stream
             Return New PushEnumerator(Of T)(Sub(sequenceT)
+                                                Contract.Requires(sequenceT IsNot Nothing)
+                                                Contract.Assume(stream_ IsNot Nothing)
+                                                Contract.Assume(converter_ IsNot Nothing)
                                                 Dim sequence = converter_.Convert(sequenceT)
                                                 While sequence.MoveNext
                                                     stream_.WriteByte(sequence.Current)
@@ -86,6 +91,11 @@ Namespace Enumeration
     Friend Class EnumeratorStream
         Inherits IO.Stream
         Private ReadOnly sequence As IEnumerator(Of Byte)
+
+        <ContractInvariantMethod()> Protected Sub Invariant()
+            Contract.Invariant(sequence IsNot Nothing)
+        End Sub
+
         Public Sub New(ByVal sequence As IEnumerator(Of Byte))
             Contract.Requires(sequence IsNot Nothing)
             Me.sequence = sequence
@@ -153,6 +163,11 @@ Namespace Enumeration
         Inherits IO.Stream
         Private ReadOnly pusher As PushEnumerator(Of Byte)
         Private closed As Boolean
+
+        <ContractInvariantMethod()> Protected Sub Invariant()
+            Contract.Invariant(pusher IsNot Nothing)
+        End Sub
+
         Public Sub New(ByVal pusher As PushEnumerator(Of Byte))
             Contract.Requires(pusher IsNot Nothing)
             Me.pusher = pusher
@@ -168,6 +183,12 @@ Namespace Enumeration
             If closed Then Throw New InvalidOperationException("Closed streams are not writable.")
             Dim index = 0
             pusher.Push(New Enumerator(Of Byte)(Function(controller)
+                                                    Contract.Requires(controller IsNot Nothing)
+                                                    Contract.Assume(index >= 0)
+                                                    Contract.Assume(buffer IsNot Nothing)
+                                                    Contract.Assume(offset >= 0)
+                                                    Contract.Assume(count >= 0)
+                                                    Contract.Assume(offset + count <= buffer.Length)
                                                     If index >= count Then  Return controller.Break()
                                                     index += 1
                                                     Return buffer(index + offset - 1)

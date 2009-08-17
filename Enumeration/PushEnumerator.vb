@@ -8,13 +8,30 @@
         Private ReadOnly sequenceQueue As New Queue(Of IEnumerator(Of T))
         Private ReadOnly coroutine As Coroutine
 
+        <ContractInvariantMethod()> Protected overrides Sub Invariant()
+            Contract.Invariant(coroutine IsNot Nothing)
+            Contract.Invariant(sequenceQueue IsNot Nothing)
+        End Sub
+
         Public Sub New(ByVal consumer As Action(Of IEnumerator(Of T)))
+            Contract.Assume(consumer IsNot Nothing)
+            'Contract.Requires(consumer IsNot Nothing) 'commented because events screw with Contracts and NotifyingDisposable has an event
+
+            Dim consumer_ = consumer
             Me.coroutine = New Coroutine(
                 Sub(coroutineController)
+                    Contract.Requires(coroutineController IsNot Nothing)
+                    Contract.Assume(consumer_ IsNot Nothing)
+
                     'Construct the blocking sequence
                     Dim curSubsequence As IEnumerator(Of T) = Nothing
                     Dim sequence = New Enumerator(Of T)(
                         Function(enumController)
+                            Contract.Requires(enumController IsNot Nothing)
+                            Contract.Assume(curSubsequence IsNot Nothing)
+                            Contract.Assume(coroutineController IsNot Nothing)
+                            Contract.Assume(sequenceQueue IsNot Nothing)
+
                             'Move to next element, and when current sequence runs out grab another one
                             While curSubsequence Is Nothing OrElse Not curSubsequence.MoveNext
                                 If sequenceQueue.Count <= 0 Then
@@ -34,7 +51,7 @@
                     )
 
                     'Consume the sequence
-                    Call consumer(sequence)
+                    Call consumer_(sequence)
                     'Dump any more pushed values
                     While sequence.MoveNext
                     End While

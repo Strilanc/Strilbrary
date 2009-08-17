@@ -114,6 +114,12 @@ End Class
 Public Class ByteSequenceBitBuffer
     Private ReadOnly buf As New BitBuffer
     Private ReadOnly sequence As IEnumerator(Of Byte)
+
+    <ContractInvariantMethod()> Protected Sub Invariant()
+        Contract.Invariant(buf IsNot Nothing)
+        Contract.Invariant(sequence IsNot Nothing)
+    End Sub
+
     Public Sub New(ByVal sequence As IEnumerator(Of Byte))
         Contract.Requires(sequence IsNot Nothing)
         Me.sequence = sequence
@@ -124,6 +130,7 @@ Public Class ByteSequenceBitBuffer
         End Get
     End Property
     Public Function TryBufferBits(ByVal numBits As Integer) As Boolean
+        Contract.Requires(numBits >= 0)
         While buf.NumBufferedBits < numBits
             If Not sequence.MoveNext Then Return False
             buf.QueueByte(sequence.Current())
@@ -131,6 +138,8 @@ Public Class ByteSequenceBitBuffer
         Return True
     End Function
     Public Function Take(ByVal numBits As Integer) As ULong
+        Contract.Requires(numBits >= 0)
+        Contract.Requires(numBits <= BitBuffer.MaxBits)
         If Not TryBufferBits(numBits) Then Throw New InvalidOperationException("Ran past end of sequence.")
         Return buf.Take(numBits)
     End Function

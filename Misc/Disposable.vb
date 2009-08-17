@@ -11,6 +11,10 @@ Public Class NotifyingDisposable
 
     Public Event Disposed() Implements INotifyingDisposable.Disposed
 
+    <ContractInvariantMethod()> Protected Overridable Sub Invariant()
+        Contract.Invariant(lockDisposed IsNot Nothing)
+    End Sub
+
     Public ReadOnly Property IsDisposed As Boolean Implements INotifyingDisposable.IsDisposed
         Get
             Return lockDisposed.WasAcquired

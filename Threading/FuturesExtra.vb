@@ -1,7 +1,7 @@
 ﻿Imports System.Threading
 
 Namespace Threading.Futures
-    Public Module FutureMethods
+    Public Module FutureCommon
         '''<summary>Returns a future which is ready after a specified amount of time.</summary>
         Public Function FutureWait(ByVal dt As TimeSpan) As IFuture
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
@@ -46,104 +46,6 @@ Namespace Threading.Futures
             If numFutures = 0 Then f.SetReady()
 
             Return f
-        End Function
-
-        '''<summary>Returns a future sequence for the outcomes of applying a futurizing function to a sequence.</summary>
-        <Extension()>
-        Public Function FutureMap(Of TDomain, TImage)(ByVal sequence As IEnumerable(Of TDomain),
-                                                      ByVal mappingFunction As Func(Of TDomain, IFuture(Of TImage))) As IFuture(Of IEnumerable(Of TImage))
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(mappingFunction IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of IEnumerable(Of TImage)))() IsNot Nothing)
-
-            Dim mappingFunction_ = mappingFunction
-            Dim futureVals = (From item In sequence Select mappingFunction_(item)).ToList()
-            Return FutureCompress(futureVals).EvalWhenReady(
-                                   Function() From item In futureVals Select item.Value)
-        End Function
-
-        '''<summary>Returns a future for the first value which is not filtered out of the sequence.</summary>
-        <Extension()>
-        Public Function FutureSelect(Of T)(ByVal sequence As IEnumerable(Of T),
-                                           ByVal filterFunction As Func(Of T, IFuture(Of Boolean))) As IFuture(Of Outcome(Of T))
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(filterFunction IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of Outcome(Of T)))() IsNot Nothing)
-
-            Dim enumerator = sequence.GetEnumerator
-            If Not enumerator.MoveNext Then Return Failure(Of T)("No matches").Futurize
-            Dim f = filterFunction(enumerator.Current)
-            Contract.Assume(f IsNot Nothing)
-            Dim filterFunction_ = filterFunction
-            Return f.EvalWhenValueReady(YCombinator(Of Boolean, IFuture(Of Outcome(Of T)))(
-                Function(self) Function(accept)
-                                   Do
-                                       If accept Then  Return Success(enumerator.Current, "Matched").Futurize
-                                       If Not enumerator.MoveNext Then  Return Failure(Of T)("No matches").Futurize
-                                       Dim futureAccept = filterFunction_(enumerator.Current)
-                                       Contract.Assume(futureAccept IsNot Nothing)
-                                       If Not futureAccept.IsReady Then  Return futureAccept.EvalWhenValueReady(self).Defuturize()
-                                       accept = futureAccept.Value
-                                   Loop
-                               End Function)).Defuturize()
-        End Function
-
-        '''<summary>Returns a future sequence for the values accepted by the filter.</summary>
-        <Extension()>
-        Public Function FutureFilter(Of T)(ByVal sequence As IEnumerable(Of T),
-                                           ByVal filterFunction As Func(Of T, IFuture(Of Boolean))) As IFuture(Of IEnumerable(Of T))
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(filterFunction IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of IEnumerable(Of T)))() IsNot Nothing)
-
-            Dim pairs = (From item In sequence Select value = item, futureIncluded = filterFunction(item)).ToList()
-            Return FutureCompress(From item In pairs Select item.futureIncluded).EvalWhenReady(
-                               Function() From item In pairs Where item.futureIncluded.Value Select item.value)
-        End Function
-
-        <Extension()>
-        Public Function FutureAggregate(Of T, V)(ByVal sequence As IEnumerable(Of T),
-                                                 ByVal aggregator As Func(Of V, T, IFuture(Of V)),
-                                                 Optional ByVal initialValue As V = Nothing) As IFuture(Of V)
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(aggregator IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of V))() IsNot Nothing)
-
-            Dim enumerator = sequence.GetEnumerator()
-            Dim aggregator_ = aggregator
-            Return YCombinator(Of V, IFuture(Of V))(
-                Function(self) Function(current)
-                                   If Not enumerator.MoveNext Then  Return current.Futurize
-                                   Return aggregator_(current, enumerator.Current).EvalWhenValueReady(self).Defuturize
-                               End Function)(initialValue)
-        End Function
-
-        '''<summary>Returns a future for the value obtained by recursively reducing the sequence.</summary>
-        <Extension()>
-        Public Function FutureReduce(Of T)(ByVal sequence As IEnumerable(Of T),
-                                           ByVal reductionFunction As Func(Of T, T, IFuture(Of T)),
-                                           Optional ByVal defaultValue As T = Nothing) As IFuture(Of T)
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(reductionFunction IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of T))() IsNot Nothing)
-
-            Dim reductionFunction_ = reductionFunction
-            Select Case sequence.CountUpTo(2)
-                Case 0
-                    Return defaultValue.Futurize
-                Case 1
-                    Return sequence.First.Futurize
-                Case Else
-                    Dim futurePartialReduction = sequence.EnumBlocks(2).FutureMap(
-                        Function(block)
-                            If block.Count = 1 Then  Return block(0).Futurize
-                            Return reductionFunction_(block(0), block(1))
-                        End Function
-                    )
-
-                    Return futurePartialReduction.EvalWhenValueReady(
-                                Function(partialReduction) partialReduction.FutureReduce(reductionFunction_)).Defuturize
-            End Select
         End Function
 
         <Extension()>

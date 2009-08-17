@@ -26,7 +26,7 @@ End Structure
 '''<remarks>Doesn't inherit from Outcome to allow implicit conversions from Outcome to Outcome(Of R), using CType.</remarks>
 Public Structure Outcome(Of R)
     Public ReadOnly succeeded As Boolean
-    Public ReadOnly _value As R
+    Public ReadOnly Value As R
     Private ReadOnly _message As String
     Public ReadOnly Property Message As String
         Get
@@ -49,7 +49,7 @@ Public Structure Outcome(Of R)
         If message Is Nothing Then Throw New ArgumentNullException("message")
         Me.succeeded = succeeded
         Me._message = message
-        Me._value = value
+        Me.Value = value
     End Sub
 
     Public Shared Widening Operator CType(ByVal out As Outcome(Of R)) As Outcome

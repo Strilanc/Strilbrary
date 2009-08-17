@@ -25,6 +25,10 @@ Namespace Threading.Futures
         Private ReadOnly lockReady As New OnetimeLock
         Public Event Readied() Implements IFuture.Readied
 
+        <ContractInvariantMethod()> Protected Sub Invariant()
+            Contract.Invariant(lockReady IsNot Nothing)
+        End Sub
+
         '''<summary>Returns true if the future is ready.</summary>
         Public ReadOnly Property IsReady() As Boolean Implements IFuture.IsReady
             Get
@@ -58,6 +62,10 @@ Namespace Threading.Futures
         Protected _value As R
         Protected ReadOnly lockReady As New OnetimeLock
         Public Event Readied() Implements IFuture.Readied
+
+        <ContractInvariantMethod()> Protected Sub Invariant()
+            Contract.Invariant(lockReady IsNot Nothing)
+        End Sub
 
         '''<summary>Returns true if the future is ready.</summary>
         Public ReadOnly Property IsReady() As Boolean Implements IFuture.IsReady

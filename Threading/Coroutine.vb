@@ -23,7 +23,16 @@ Namespace Threading
         Private ReadOnly lockProducer As New ManualResetEvent(initialState:=True)
         Private ReadOnly lockConsumer As New ManualResetEvent(initialState:=False)
 
+        <ContractInvariantMethod()> Protected Sub Invariant()
+            Contract.Invariant(lockDisposed IsNot Nothing)
+            Contract.Invariant(lockJoined IsNot Nothing)
+            Contract.Invariant(lockProducer IsNot Nothing)
+            Contract.Invariant(lockConsumer IsNot Nothing)
+        End Sub
+
         Public Sub New(ByVal coroutineAction As Action(Of ICoroutineController))
+            Contract.Assume(coroutineAction IsNot Nothing) 'changing to requires hit some sort of bug in 1.2 contracts
+
             Call ThreadedAction(
                 Sub()
                     lockJoined.WaitOne()

@@ -233,9 +233,15 @@ Public Module PoorlyCategorizedFunctions
 
     <Extension()>
     Public Function ReadBytes(ByVal stream As IO.Stream, ByVal length As Integer) As Byte()
+        Contract.Requires(stream IsNot Nothing)
+        Contract.Requires(length >= 0)
+        Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
         Dim buffer(0 To length - 1) As Byte
         length = stream.Read(buffer, 0, length)
-        If length < buffer.Length Then ReDim Preserve buffer(0 To length - 1)
+        If length < buffer.Length Then
+            ReDim Preserve buffer(0 To length - 1)
+            Contract.Assume(buffer IsNot Nothing)
+        End If
         Return buffer
     End Function
 
@@ -347,6 +353,7 @@ Public Module PoorlyCategorizedFunctions
         Dim f = New Future(Of PossibleException(Of Integer, Exception))
         Try
             stream.BeginRead(buffer, offset, count, Sub(ar)
+                                                        Contract.Requires(ar IsNot Nothing)
                                                         Try
                                                             f.SetValue(stream_.EndRead(ar))
                                                         Catch e As Exception

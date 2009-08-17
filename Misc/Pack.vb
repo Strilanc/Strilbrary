@@ -155,28 +155,6 @@ Public Module Pack
                 {"f"c, 15}, {"F"c, 15}}
 
     <Extension()> <Pure()>
-    Public Function ParseAsSignedHexNumber(ByVal chars As IEnumerable(Of Char), ByVal byteOrder As ByteOrder) As Long
-        Contract.Requires(chars IsNot Nothing)
-        If chars.FirstOrDefault = "-"c Then Return -ParseAsSignedHexNumber(chars.Skip(1), byteOrder)
-
-        Select Case byteOrder
-            Case byteOrder.LittleEndian
-                chars = chars.Reverse()
-            Case byteOrder.BigEndian
-                'no change needed
-            Case Else
-                Throw New ArgumentException("Unrecognized byte order.")
-        End Select
-
-        Dim val = 0L
-        For Each c In chars
-            If Not HexDictionary.ContainsKey(c) Then Throw New ArgumentException("Invalid character.", "chars")
-            val <<= 4
-            val += HexDictionary(c)
-        Next c
-        Return val
-    End Function
-    <Extension()> <Pure()>
     Public Function ParseAsUnsignedHexNumber(ByVal chars As IEnumerable(Of Char), ByVal byteOrder As ByteOrder) As ULong
         Contract.Requires(chars IsNot Nothing)
 

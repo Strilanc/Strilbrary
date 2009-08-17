@@ -41,10 +41,29 @@ Namespace Threading.Queueing
         Inherits BaseLockFreeConsumer(Of Node)
         Implements ICallQueue
         Public Class Node
-            Public ReadOnly action As Action
-            Public ReadOnly future As New future
+            Public ReadOnly _action As Action
+            Public ReadOnly _future As New future
+
+            Public ReadOnly Property Action As Action
+                Get
+                    Contract.Ensures(Contract.Result(Of Action)() IsNot Nothing)
+                    Return _action
+                End Get
+            End Property
+            Public ReadOnly Property Future As Future
+                Get
+                    Contract.Ensures(Contract.Result(Of future)() IsNot Nothing)
+                    Return _future
+                End Get
+            End Property
+            <ContractInvariantMethod()> Protected Sub Invariant()
+                Contract.Invariant(_action IsNot Nothing)
+                Contract.Invariant(_future IsNot Nothing)
+            End Sub
+
             Public Sub New(ByVal action As Action)
-                Me.action = action
+                Contract.Requires(action IsNot Nothing)
+                Me._action = action
             End Sub
         End Class
 
@@ -61,8 +80,8 @@ Namespace Threading.Queueing
         '''<summary>Runs queued calls until there are none left.</summary>
         Protected Overrides Sub Consume(ByVal item As Node)
             RunWithDebugTrap(Sub()
-                                 Call item.action()
-                                 Call item.future.SetReady()
+                                 Call item.Action()()
+                                 Call item.Future.SetReady()
                              End Sub, "Exception rose past {0}.Run()".Frmt(Me.GetType.Name))
         End Sub
     End Class

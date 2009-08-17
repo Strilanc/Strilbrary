@@ -103,6 +103,9 @@
             Dim blockSize_ = blockSize
             Return New Enumerator(Of IList(Of T))(
                 Function(controller)
+                    Contract.Requires(controller IsNot Nothing)
+                    Contract.Assume(sequence_ IsNot Nothing)
+                    Contract.Assume(blockSize_ > 0)
                     If Not sequence_.MoveNext Then  Return controller.Break()
 
                     Dim block = New List(Of T)(blockSize_)
@@ -123,10 +126,15 @@
             Contract.Requires(blockSize > 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of IList(Of T)))() IsNot Nothing)
             Dim blockSize_ = blockSize
-            Return sequence.Transform(Function(enumerator) EnumBlocks(enumerator, blockSize_))
+            Return sequence.Transform(Function(enumerator)
+                                          Contract.Requires(enumerator IsNot Nothing)
+                                          Contract.Assume(enumerator IsNot Nothing)
+                                          Contract.Assume(blockSize_ > 0)
+                                          Return EnumBlocks(enumerator, blockSize_)
+                                      End Function)
         End Function
 
-        '''<summary>Transforms an IEnumerable using a transformation function meant for an IEnumerator.</summary>
+            '''<summary>Transforms an IEnumerable using a transformation function meant for an IEnumerator.</summary>
         <Extension()> <Pure()>
         Public Function Transform(Of T, D)(ByVal sequence As IEnumerable(Of T),
                                            ByVal transformation As Func(Of IEnumerator(Of T), IEnumerator(Of D))) As IEnumerable(Of D)
@@ -135,17 +143,23 @@
             Contract.Ensures(Contract.Result(Of IEnumerable(Of D))() IsNot Nothing)
             Dim sequence_ = sequence
             Dim transformation_ = transformation
-            Return New Enumerable(Of D)(Function() transformation_(sequence_.GetEnumerator()))
+            Return New Enumerable(Of D)(Function()
+                                            Contract.Assume(transformation_ IsNot Nothing)
+                                            Contract.Assume(sequence_ IsNot Nothing)
+                                            Return transformation_(sequence_.GetEnumerator())
+                                        End Function)
         End Function
 
 #Region "IList"
-        '''<summary>Creates a list containing all the elements of an IList.</summary>
+            '''<summary>Creates a list containing all the elements of an IList.</summary>
         <Extension()> <Pure()>
         Public Function ToList(Of T)(ByVal list As IList(Of T)) As List(Of T)
             Contract.Requires(list IsNot Nothing)
             Contract.Ensures(Contract.Result(Of List(Of T))() IsNot Nothing)
             Dim ret As New List(Of T)(list.Count)
             For i = 0 To list.Count - 1
+                Contract.Assume(i >= 0)
+                Contract.Assume(i < list.Count)
                 ret.Add(list(i))
             Next i
             Return ret
@@ -158,6 +172,8 @@
             Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
             Dim ret(0 To list.Count - 1) As T
             For i = 0 To list.Count - 1
+                Contract.Assume(i >= 0)
+                Contract.Assume(i < list.Count)
                 ret(i) = list(i)
             Next i
             Return ret
@@ -168,8 +184,9 @@
         Public Function SubToArray(Of T)(ByVal list As IList(Of T), ByVal offset As Integer) As T()
             Contract.Requires(list IsNot Nothing)
             Contract.Requires(offset >= 0)
+            Contract.Requires(offset <= list.Count)
             Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
-            Return SubToArray(list, offset, list.Count - offset)
+            Return list.SubToArray(offset, list.Count - offset)
         End Function
 
         '''<summary>Creates an array containing a contiguous subset of the elements of an IList.</summary>
@@ -178,10 +195,12 @@
             Contract.Requires(list IsNot Nothing)
             Contract.Requires(offset >= 0)
             Contract.Requires(count >= 0)
+            Contract.Requires(count + offset <= list.Count)
             Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
-            If offset + count > list.Count Then Throw New ArgumentOutOfRangeException("count")
             Dim ret(0 To count - 1) As T
             For i = 0 To count - 1
+                Contract.Assume(i >= 0)
+                Contract.Assume(i < count)
                 ret(i) = list(i + offset)
             Next i
             Return ret
@@ -195,6 +214,8 @@
             Dim n = list.Count
             Dim ret(0 To n - 1) As T
             For i = 0 To n - 1
+                Contract.Assume(i >= 0)
+                Contract.Assume(i < n)
                 ret(i) = list(n - i - 1)
             Next i
             Return ret

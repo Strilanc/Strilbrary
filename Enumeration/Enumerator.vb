@@ -3,6 +3,7 @@
     ''' Allows an IEnumerator generator function to give special commands.
     ''' All methods should be used in a return statement, eg. "Return controller.break()".
     ''' </summary>
+    <ContractClass(GetType(ContractClassForIEnumeratorController(Of )))>
     Public Interface IEnumeratorController(Of T)
         '''<summary>No value is enumerated, but the generator is called again. Similar to a loop continue.</summary>
         Function Repeat() As T
@@ -12,11 +13,25 @@
         Function Sequence(ByVal enumerator As IEnumerator(Of T)) As T
     End Interface
 
+    <ContractClassFor(GetType(IEnumeratorController(Of )))>
+        Public Class ContractClassForIEnumeratorController(Of T)
+        Implements IEnumeratorController(Of T)
+        Public Function Break() As T Implements IEnumeratorController(Of T).Break
+        End Function
+        Public Function Repeat() As T Implements IEnumeratorController(Of T).Repeat
+        End Function
+        Public Function Sequence(ByVal enumerator As System.Collections.Generic.IEnumerator(Of T)) As T Implements IEnumeratorController(Of T).Sequence
+            Contract.Requires(enumerator IsNot Nothing)
+        End Function
+    End Class
+
     Public Module ExtensionsForIEnumeratorController
         '''<summary>Multiple values are enumerated before the generator is called again.</summary>
         <Extension()>
         Public Function Sequence(Of T)(ByVal controller As IEnumeratorController(Of T),
                                        ByVal enumerable As IEnumerable(Of T)) As T
+            Contract.Requires(controller IsNot Nothing)
+            Contract.Requires(enumerable IsNot Nothing)
             Return controller.Sequence(enumerable.GetEnumerator())
         End Function
     End Module
@@ -36,6 +51,10 @@
         Public Sub New(ByVal generator As Func(Of IEnumeratorController(Of T), T))
             Contract.Requires(generator IsNot Nothing)
             Me.generator = generator
+        End Sub
+
+        <ContractInvariantMethod()> Protected Sub Invariant()
+            Contract.Invariant(generator IsNot Nothing)
         End Sub
 
         Public Function MoveNext() As Boolean Implements IEnumerator(Of T).MoveNext

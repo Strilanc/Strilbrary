@@ -94,9 +94,12 @@ Public Class ViewableList(Of T)
     Private Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
         Dim nextIndex = 0
         Return New Enumerator(Of T)(Function(controller)
+                                        Contract.Requires(controller IsNot Nothing)
+                                        Contract.Assume(nextIndex >= 0)
                                         If nextIndex >= _length Then  Return controller.Break()
+                                        Dim e = Item(nextIndex)
                                         nextIndex += 1
-                                        Return items(offset + nextIndex - 1)
+                                        Return e
                                     End Function)
     End Function
     Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator

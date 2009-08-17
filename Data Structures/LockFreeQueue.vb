@@ -36,6 +36,11 @@ Public Class SingleConsumerLockFreeQueue(Of T)
         End Sub
     End Class
 
+    <ContractInvariantMethod()> Protected Sub Invariant()
+        Contract.Invariant(head IsNot Nothing)
+        Contract.Invariant(insertionPoint IsNot Nothing)
+    End Sub
+
     ''' <summary>
     ''' Begins adding new items to the queue.
     ''' The items may not be dequeueable when this method finishes, but eventually they will be.
@@ -87,6 +92,7 @@ Public Class SingleConsumerLockFreeQueue(Of T)
 
         'Append chain to previous chain
         Dim prevChainTail = Interlocked.Exchange(Me.insertionPoint, chainTail)
+        Contract.Assume(prevChainTail IsNot Nothing)
         prevChainTail.next = chainHead
     End Sub
     ''' <summary>
@@ -99,6 +105,7 @@ Public Class SingleConsumerLockFreeQueue(Of T)
     Public Sub BeginEnqueue(ByVal item As T)
         Dim chainOfOne = New Node(item)
         Dim prevChainTail = Interlocked.Exchange(Me.insertionPoint, chainOfOne)
+        Contract.Assume(prevChainTail IsNot Nothing)
         prevChainTail.next = chainOfOne
     End Sub
 
@@ -141,6 +148,10 @@ End Class
 Public MustInherit Class BaseLockFreeConsumer(Of T)
     Private ReadOnly queue As New SingleConsumerLockFreeQueue(Of T)
     Private running As Integer 'stores consumer state and is used as a semaphore
+
+    <ContractInvariantMethod()> Protected Sub Invariant()
+        Contract.Invariant(queue IsNot Nothing)
+    End Sub
 
     '''<summary>Enqueues an item to be consumed by the consumer.</summary>
     Protected Sub EnqueueConsume(ByVal item As T)
