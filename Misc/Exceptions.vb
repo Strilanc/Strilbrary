@@ -9,10 +9,10 @@ End Class
 
 <Serializable()>
 Public Class InvalidStateException
-    Inherits Exception
+    Inherits InvalidOperationException
     Public Sub New(Optional ByVal message As String = Nothing,
                    Optional ByVal innerException As Exception = Nothing)
-        MyBase.New(If(message, "Reached an invalid state."), innerException)
+        MyBase.New(If(message, "Reached an unexpected state."), innerException)
     End Sub
 End Class
 
@@ -25,13 +25,14 @@ Public Class UnreachableException
     End Sub
 End Class
 
-Public Class ImpossibleValueException(Of E)
+<Serializable()>
+Public Class ImpossibleValueException(Of T)
     Inherits UnreachableException
-    Public ReadOnly Value As E
-    Public Sub New(ByVal value As E,
+    Public ReadOnly Value As T
+    Public Sub New(ByVal value As T,
                    Optional ByVal message As String = Nothing,
                    Optional ByVal innerException As Exception = Nothing)
-        MyBase.new(If(message, "The {0} value ""{1}"" was not expected.".Frmt(GetType(E).Name,
+        MyBase.new(If(message, "The {0} value ""{1}"" was not expected.".Frmt(GetType(T).Name,
                                                                               If(value Is Nothing, "Nothing", value.ToString))),
                    innerException)
         Me.Value = value
@@ -40,8 +41,8 @@ End Class
 
 Public Module ExceptionExtensions
     <Extension()>
-    Public Function ValueShouldBeImpossibleException(Of E)(ByVal this As E) As ImpossibleValueException(Of E)
-        Return New ImpossibleValueException(Of E)(this)
+    Public Function ValueShouldBeImpossibleException(Of T)(ByVal this As T) As ImpossibleValueException(Of T)
+        Return New ImpossibleValueException(Of T)(this)
     End Function
 End Module
 
@@ -68,7 +69,7 @@ Public Structure PossibleException(Of T, E As Exception)
         Return New PossibleException(Of T, E)(exception)
     End Operator
     Public Overrides Function ToString() As String
-        Return "Value: {0}{1}Exception: {2}".Frmt(If(Value.IsNullReferenceGeneric, "Null", Value.ToString),
+        Return "Value: {0}{1}Exception: {2}".Frmt(If(Value Is Nothing, "Null", Value.ToString),
                                                   Environment.NewLine,
                                                   If(Exception Is Nothing, "Null", Exception.ToString))
     End Function
@@ -96,7 +97,7 @@ Public Structure PossibleException(Of T)
         Return New PossibleException(Of T)(exception)
     End Operator
     Public Overrides Function ToString() As String
-        Return "Value: {0}{1}Exception: {2}".Frmt(If(Value.IsNullReferenceGeneric, "Null", Value.ToString),
+        Return "Value: {0}{1}Exception: {2}".Frmt(If(Value Is Nothing, "Null", Value.ToString),
                                                   Environment.NewLine,
                                                   If(Exception Is Nothing, "Null", Exception.ToString))
     End Function

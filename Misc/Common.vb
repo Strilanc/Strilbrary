@@ -46,10 +46,10 @@ Public Module PoorlyCategorizedFunctions
     Public Function Between(Of T As IComparable(Of T))(ByVal value1 As T,
                                                        ByVal value2 As T,
                                                        ByVal value3 As T) As T
-        Contract.Requires(value1.IsNotNullReference())
-        Contract.Requires(value2.IsNotNullReference())
-        Contract.Requires(value3.IsNotNullReference())
-        Contract.Ensures(Contract.Result(Of T).IsNotNullReference)
+        Contract.Requires(value1 IsNot Nothing)
+        Contract.Requires(value2 IsNot Nothing)
+        Contract.Requires(value3 IsNot Nothing)
+        Contract.Ensures(Contract.Result(Of T)() IsNot Nothing)
         'recursive sort
         If value2.CompareTo(value1) > 0 Then Return Between(value2, value1, value3)
         If value2.CompareTo(value3) < 0 Then Return Between(value1, value3, value2)
@@ -130,7 +130,8 @@ Public Module PoorlyCategorizedFunctions
     End Function
     <Pure()> <Extension()>
     Public Function EnumValueIsDefined(Of T)(ByVal value As T) As Boolean
-        Return EnumValues(Of T).Contains(value)
+        Contract.Ensures(Contract.Result(Of Boolean)() = [Enum].IsDefined(GetType(T), value))
+        Return [Enum].IsDefined(GetType(T), value)
     End Function
 #End Region
 
@@ -172,7 +173,7 @@ Public Module PoorlyCategorizedFunctions
     Public Function Concat(Of T)(ByVal ParamArray arrays As T()()) As T()
         Contract.Requires(arrays IsNot Nothing)
         Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
-        Return Concat(CType(arrays, IEnumerable(Of T())))
+        Return Concat(DirectCast(arrays, IEnumerable(Of T())))
     End Function
     <Pure()>
     Public Function Concat(Of T)(ByVal arrays As IEnumerable(Of T())) As T()
@@ -329,17 +330,9 @@ Public Module PoorlyCategorizedFunctions
                            End Sub))
     End Sub
 
-    '''<summary>Returns true if T is a class type and arg is nothing.</summary>
-    <Extension()> <Pure()>
-    Public Function IsNullReferenceGeneric(Of T)(ByVal arg As T) As Boolean
-        Contract.Ensures(Contract.Result(Of Boolean)() = Object.ReferenceEquals(arg, Nothing))
-        Return Object.ReferenceEquals(arg, Nothing)
-    End Function
-    '''<summary>Returns true if T is a structure type or arg is not nothing.</summary>
-    <Extension()> <Pure()>
-    Public Function IsNotNullReference(Of T)(ByVal arg As T) As Boolean
-        Contract.Ensures(Contract.Result(Of Boolean)() = Not Object.ReferenceEquals(arg, Nothing))
-        Return Not Object.ReferenceEquals(arg, Nothing)
+    '''<summary>Returns true for reference types, false for struct types.</summary>
+    Public Function IsReferenceType(Of T)() As Boolean
+        Return DirectCast(Nothing, T) Is Nothing
     End Function
 
     <Extension()>

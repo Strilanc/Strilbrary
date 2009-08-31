@@ -7,6 +7,22 @@
             Return Not sequence.Any()
         End Function
 
+        '''<summary>Returns true if there are at least as many elements in the sequence as the specified minimum.</summary>
+        <Extension()> <Pure()>
+        Public Function CountIsAtLeast(Of T)(ByVal sequence As IEnumerable(Of T), ByVal min As Integer) As Boolean
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(min >= 0)
+            Return sequence.CountUpTo(min) >= min
+        End Function
+
+        '''<summary>Returns true if there are more elements in the sequence than the specified maximum.</summary>
+        <Extension()> <Pure()>
+        Public Function CountIsGreaterThan(Of T)(ByVal sequence As IEnumerable(Of T), ByVal max As Integer) As Boolean
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(max >= 0)
+            Return sequence.CountUpTo(max + 1) >= max + 1
+        End Function
+
         '''<summary>Counts the number of elements in a sequence, but stops once the specified maximum is reached.</summary>
         <Extension()> <Pure()>
         Public Function CountUpTo(Of T)(ByVal sequence As IEnumerable(Of T), ByVal maxCount As Integer) As Integer

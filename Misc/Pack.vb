@@ -10,7 +10,7 @@ Public Module Pack
     Public Function ToUInt64(ByVal data As IEnumerable(Of Byte),
                              ByVal byteOrder As ByteOrder) As UInt64
         Contract.Requires(data IsNot Nothing)
-        If data.Count > 8 Then Throw New ArgumentOutOfRangeException("Data has too many bytes.")
+        If data.CountIsGreaterThan(8) Then Throw New ArgumentOutOfRangeException("Data has too many bytes.")
         Dim val As ULong
         Select Case byteOrder
             Case byteOrder.LittleEndian
@@ -27,11 +27,18 @@ Public Module Pack
         Return val
     End Function
     <Extension()> <Pure()>
+    Public Function ToUInt16(ByVal data As IEnumerable(Of Byte),
+                             ByVal byteOrder As ByteOrder) As UInt16
+        Contract.Requires(data IsNot Nothing)
+        If data.CountIsGreaterThan(2) Then Throw New ArgumentOutOfRangeException("Data has too many bytes.")
+        Return CUShort(data.ToUInt64(byteOrder))
+    End Function
+    <Extension()> <Pure()>
     Public Function ToUInt32(ByVal data As IEnumerable(Of Byte),
                              ByVal byteOrder As ByteOrder) As UInt32
         Contract.Requires(data IsNot Nothing)
-        If data.Count > 4 Then Throw New ArgumentOutOfRangeException("Data has too many bytes.")
-        Return CUInt(ToUInt64(data, byteOrder))
+        If data.CountIsGreaterThan(4) Then Throw New ArgumentOutOfRangeException("Data has too many bytes.")
+        Return CUInt(data.ToUInt64(byteOrder))
     End Function
     <Extension()> Public Function Bytes(ByVal value As UShort,
                                         ByVal byteOrder As ByteOrder,

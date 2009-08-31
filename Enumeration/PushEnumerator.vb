@@ -28,7 +28,6 @@
                     Dim sequence = New Enumerator(Of T)(
                         Function(enumController)
                             Contract.Requires(enumController IsNot Nothing)
-                            Contract.Assume(curSubsequence IsNot Nothing)
                             Contract.Assume(coroutineController IsNot Nothing)
                             Contract.Assume(sequenceQueue IsNot Nothing)
 
@@ -46,6 +45,7 @@
                                 curSubsequence = sequenceQueue.Dequeue()
                             End While
 
+                            Contract.Assume(curSubsequence IsNot Nothing)
                             Return curSubsequence.Current
                         End Function
                     )

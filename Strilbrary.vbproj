@@ -19,6 +19,9 @@
     <OptionInfer>On</OptionInfer>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>HostBot_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
+    <TargetFrameworkProfile />
+    <LangVersion>
+    </LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
