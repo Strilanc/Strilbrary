@@ -92,6 +92,7 @@ Public Class SingleConsumerLockFreeQueue(Of T)
 
         'Append chain to previous chain
         Dim prevChainTail = Interlocked.Exchange(Me.insertionPoint, chainTail)
+        Contract.Assume(Me.insertionPoint IsNot Nothing)
         Contract.Assume(prevChainTail IsNot Nothing)
         prevChainTail.next = chainHead
     End Sub

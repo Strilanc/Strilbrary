@@ -1,5 +1,6 @@
 ﻿Namespace Enumeration
-    Public Module Extensions
+    Public Module LinqExtensions
+#Region "Count"
         '''<summary>Determines if a sequence has no elements.</summary>
         <Extension()> <Pure()>
         Public Function None(Of T)(ByVal sequence As IEnumerable(Of T)) As Boolean
@@ -7,7 +8,7 @@
             Return Not sequence.Any()
         End Function
 
-        '''<summary>Returns true if there are at least as many elements in the sequence as the specified minimum.</summary>
+        '''<summary>Determines if there are at least as many elements in the sequence as the specified minimum.</summary>
         <Extension()> <Pure()>
         Public Function CountIsAtLeast(Of T)(ByVal sequence As IEnumerable(Of T), ByVal min As Integer) As Boolean
             Contract.Requires(sequence IsNot Nothing)
@@ -15,12 +16,30 @@
             Return sequence.CountUpTo(min) >= min
         End Function
 
-        '''<summary>Returns true if there are more elements in the sequence than the specified maximum.</summary>
+        '''<summary>Determines if there are less elements in the sequence than the specified maximum.</summary>
         <Extension()> <Pure()>
-        Public Function CountIsGreaterThan(Of T)(ByVal sequence As IEnumerable(Of T), ByVal max As Integer) As Boolean
+        Public Function CountIsLessThan(Of T)(ByVal sequence As IEnumerable(Of T), ByVal max As Integer) As Boolean
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(max >= 0)
-            Return sequence.CountUpTo(max + 1) >= max + 1
+            Return sequence.CountUpTo(max) < max
+        End Function
+
+        '''<summary>Determines if there are at most as many elements in the sequence as the specified maximum.</summary>
+        <Extension()> <Pure()>
+        Public Function CountIsAtMost(Of T)(ByVal sequence As IEnumerable(Of T), ByVal max As Integer) As Boolean
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(max >= 0)
+            Contract.Requires(max < Int32.MaxValue)
+            Return sequence.CountUpTo(max + 1) <= max
+        End Function
+
+        '''<summary>Determines if there are more elements in the sequence than the specified minimum.</summary>
+        <Extension()> <Pure()>
+        Public Function CountIsGreaterThan(Of T)(ByVal sequence As IEnumerable(Of T), ByVal min As Integer) As Boolean
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(min >= 0)
+            Contract.Requires(min < Int32.MaxValue)
+            Return sequence.CountUpTo(min + 1) > min
         End Function
 
         '''<summary>Counts the number of elements in a sequence, but stops once the specified maximum is reached.</summary>
@@ -37,7 +56,9 @@
             End While
             Return count
         End Function
+#End Region
 
+#Region "Transformations"
         '''<summary>Determines the maximum element in a sequence based on the given comparison function.</summary>
         <Extension()> <Pure()>
         Public Function Max(Of T)(ByVal sequence As IEnumerable(Of T),
@@ -150,7 +171,7 @@
                                       End Function)
         End Function
 
-            '''<summary>Transforms an IEnumerable using a transformation function meant for an IEnumerator.</summary>
+        '''<summary>Transforms an IEnumerable using a transformation function meant for an IEnumerator.</summary>
         <Extension()> <Pure()>
         Public Function Transform(Of T, D)(ByVal sequence As IEnumerable(Of T),
                                            ByVal transformation As Func(Of IEnumerator(Of T), IEnumerator(Of D))) As IEnumerable(Of D)
@@ -165,17 +186,16 @@
                                             Return transformation_(sequence_.GetEnumerator())
                                         End Function)
         End Function
+#End Region
 
 #Region "IList"
-            '''<summary>Creates a list containing all the elements of an IList.</summary>
+        '''<summary>Creates a list containing all the elements of an IList.</summary>
         <Extension()> <Pure()>
         Public Function ToList(Of T)(ByVal list As IList(Of T)) As List(Of T)
             Contract.Requires(list IsNot Nothing)
             Contract.Ensures(Contract.Result(Of List(Of T))() IsNot Nothing)
             Dim ret As New List(Of T)(list.Count)
             For i = 0 To list.Count - 1
-                Contract.Assume(i >= 0)
-                Contract.Assume(i < list.Count)
                 ret.Add(list(i))
             Next i
             Return ret
@@ -188,8 +208,6 @@
             Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
             Dim ret(0 To list.Count - 1) As T
             For i = 0 To list.Count - 1
-                Contract.Assume(i >= 0)
-                Contract.Assume(i < list.Count)
                 ret(i) = list(i)
             Next i
             Return ret
@@ -211,12 +229,10 @@
             Contract.Requires(list IsNot Nothing)
             Contract.Requires(offset >= 0)
             Contract.Requires(count >= 0)
-            Contract.Requires(count + offset <= list.Count)
+            Contract.Requires(offset <= list.Count - count)
             Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
             Dim ret(0 To count - 1) As T
             For i = 0 To count - 1
-                Contract.Assume(i >= 0)
-                Contract.Assume(i < count)
                 ret(i) = list(i + offset)
             Next i
             Return ret

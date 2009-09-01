@@ -42,6 +42,12 @@ Public Module PoorlyCategorizedFunctions
         Return m + divisor
     End Function
 
+    <Extension()> <Pure()>
+    Public Function IsFinite(ByVal value As Double) As Boolean
+        Contract.Ensures(Contract.Result(Of Boolean)() = Not Double.IsInfinity(value) AndAlso Not Double.IsNaN(value))
+        Return Not Double.IsInfinity(value) AndAlso Not Double.IsNaN(value)
+    End Function
+
     <Pure()> <Extension()>
     Public Function Between(Of T As IComparable(Of T))(ByVal value1 As T,
                                                        ByVal value2 As T,
@@ -329,11 +335,6 @@ Public Module PoorlyCategorizedFunctions
                                    End Sub)
                            End Sub))
     End Sub
-
-    '''<summary>Returns true for reference types, false for struct types.</summary>
-    Public Function IsReferenceType(Of T)() As Boolean
-        Return DirectCast(Nothing, T) Is Nothing
-    End Function
 
     <Extension()>
     Public Function FutureRead(ByVal stream As IO.Stream,
