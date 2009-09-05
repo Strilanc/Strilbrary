@@ -7,8 +7,22 @@ End Enum
 
 Public Module Pack
     <Extension()> <Pure()>
+    Public Function ToUInt16(ByVal data As IEnumerable(Of Byte),
+                             Optional ByVal byteOrder As ByteOrder = Strilbrary.ByteOrder.LittleEndian) As UInt16
+        Contract.Requires(data IsNot Nothing)
+        If data.CountIsGreaterThan(2) Then Throw New ArgumentOutOfRangeException("Data has too many bytes.")
+        Return CUShort(data.ToUInt64(byteOrder))
+    End Function
+    <Extension()> <Pure()>
+    Public Function ToUInt32(ByVal data As IEnumerable(Of Byte),
+                             Optional ByVal byteOrder As ByteOrder = Strilbrary.ByteOrder.LittleEndian) As UInt32
+        Contract.Requires(data IsNot Nothing)
+        If data.CountIsGreaterThan(4) Then Throw New ArgumentOutOfRangeException("Data has too many bytes.")
+        Return CUInt(data.ToUInt64(byteOrder))
+    End Function
+    <Extension()> <Pure()>
     Public Function ToUInt64(ByVal data As IEnumerable(Of Byte),
-                             ByVal byteOrder As ByteOrder) As UInt64
+                             Optional ByVal byteOrder As ByteOrder = Strilbrary.ByteOrder.LittleEndian) As UInt64
         Contract.Requires(data IsNot Nothing)
         If data.CountIsGreaterThan(8) Then Throw New ArgumentOutOfRangeException("Data has too many bytes.")
         Dim val As ULong
@@ -18,7 +32,7 @@ Public Module Pack
             Case byteOrder.BigEndian
                 'no change required
             Case Else
-                Throw New ArgumentException("Unrecognized byte order.")
+                Throw byteOrder.ValueShouldBeImpossibleException
         End Select
         For Each b In data
             val <<= 8
@@ -26,38 +40,24 @@ Public Module Pack
         Next b
         Return val
     End Function
-    <Extension()> <Pure()>
-    Public Function ToUInt16(ByVal data As IEnumerable(Of Byte),
-                             ByVal byteOrder As ByteOrder) As UInt16
-        Contract.Requires(data IsNot Nothing)
-        If data.CountIsGreaterThan(2) Then Throw New ArgumentOutOfRangeException("Data has too many bytes.")
-        Return CUShort(data.ToUInt64(byteOrder))
-    End Function
-    <Extension()> <Pure()>
-    Public Function ToUInt32(ByVal data As IEnumerable(Of Byte),
-                             ByVal byteOrder As ByteOrder) As UInt32
-        Contract.Requires(data IsNot Nothing)
-        If data.CountIsGreaterThan(4) Then Throw New ArgumentOutOfRangeException("Data has too many bytes.")
-        Return CUInt(data.ToUInt64(byteOrder))
-    End Function
-    <Extension()> Public Function Bytes(ByVal value As UShort,
-                                        ByVal byteOrder As ByteOrder,
+    <Extension()> Public Function Bytes(ByVal value As UInt16,
+                                        Optional ByVal byteOrder As ByteOrder = Strilbrary.ByteOrder.LittleEndian,
                                         Optional ByVal size As Integer = 2) As Byte()
         Contract.Requires(size >= 0)
         Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
         Return CULng(value).Bytes(byteOrder, size)
     End Function
     <Extension()> <Pure()>
-    Public Function Bytes(ByVal value As UInteger,
-                          ByVal byteOrder As ByteOrder,
+    Public Function Bytes(ByVal value As UInt32,
+                          Optional ByVal byteOrder As ByteOrder = Strilbrary.ByteOrder.LittleEndian,
                           Optional ByVal size As Integer = 4) As Byte()
         Contract.Requires(size >= 0)
         Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
         Return CULng(value).Bytes(byteOrder, size)
     End Function
     <Extension()> <Pure()>
-    Public Function Bytes(ByVal value As ULong,
-                          ByVal byteOrder As ByteOrder,
+    Public Function Bytes(ByVal value As UInt64,
+                          Optional ByVal byteOrder As ByteOrder = Strilbrary.ByteOrder.LittleEndian,
                           Optional ByVal size As Integer = 8) As Byte()
         Contract.Requires(size >= 0)
         Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
@@ -73,7 +73,7 @@ Public Module Pack
             Case byteOrder.LittleEndian
                 Return data
             Case Else
-                Throw New ArgumentException("Unrecognized byte order.")
+                Throw byteOrder.ValueShouldBeImpossibleException
         End Select
     End Function
 
@@ -132,13 +132,14 @@ Public Module Pack
         Dim words = data.Split(" "c)
         Dim bb(0 To words.Length - 1) As Byte
         For i = 0 To words.Length - 1
-            bb(i) = CByte(ParseAsUnsignedHexNumber(words(i), ByteOrder.BigEndian))
+            bb(i) = CByte(words(i).ParseAsUnsignedHexNumber(ByteOrder.BigEndian))
         Next i
         Return bb
     End Function
 
     <Extension()> <Pure()>
-    Public Function ToBinary(ByVal value As ULong, Optional ByVal minLength As Integer = 8) As String
+    Public Function ToBinary(ByVal value As ULong,
+                             Optional ByVal minLength As Integer = 8) As String
         Contract.Requires(minLength >= 0)
         Contract.Requires(minLength <= 64)
         Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
@@ -171,7 +172,7 @@ Public Module Pack
             Case byteOrder.BigEndian
                 'no change needed
             Case Else
-                Throw New ArgumentException("Unrecognized byte order.")
+                Throw byteOrder.ValueShouldBeImpossibleException
         End Select
 
         Dim val = 0UL
@@ -180,5 +181,6 @@ Public Module Pack
             val <<= 4
             val += HexDictionary(c)
         Next c
+        Return val
     End Function
 End Module

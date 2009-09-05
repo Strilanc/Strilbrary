@@ -159,7 +159,7 @@
     <Compile Include="Enumeration\Converter.vb" />
     <Compile Include="Misc\Disposable.vb" />
     <Compile Include="Misc\Exceptions.vb" />
-    <Compile Include="Enumeration\EnumerationExtensions.vb" />
+    <Compile Include="Enumeration\LinqExtensions.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
