@@ -11,7 +11,7 @@ Public Class NotifyingDisposable
 
     Public Event Disposed() Implements INotifyingDisposable.Disposed
 
-    <ContractInvariantMethod()> Protected Overridable Sub Invariant()
+    <ContractInvariantMethod()> Private Sub ObjectInvariant()
         Contract.Invariant(lockDisposed IsNot Nothing)
     End Sub
 

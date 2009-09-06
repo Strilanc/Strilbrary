@@ -5,10 +5,14 @@ Namespace Streams
         Private ReadOnly streams As IEnumerator(Of IO.Stream)
         Private emptied As Boolean
 
+        <ContractInvariantMethod()> Protected Overrides Sub ObjectInvariant()
+            Contract.Invariant(streams IsNot Nothing)
+        End Sub
+
         Public Sub New(ByVal streams As IEnumerable(Of IO.Stream))
             Contract.Requires(streams IsNot Nothing)
-            If (From stream In streams Where stream Is Nothing).Any Then Throw New ArgumentException("streams contains a null member.")
-            If (From stream In streams Where Not stream.CanRead).Any Then Throw New ArgumentException("streams contains a non-readable member.")
+            If (From stream In streams
+                Where stream Is Nothing OrElse Not stream.CanRead).Any Then Throw New ArgumentException("streams contains a null or non-readable member.")
 
             Me.streams = streams.GetEnumerator()
             emptied = Not Me.streams.MoveNext()
@@ -17,6 +21,7 @@ Namespace Streams
         Public Overrides Function Read(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer) As Integer
             Dim t = 0
             While count > 0 And Not emptied
+                Contract.Assume(streams.Current IsNot Nothing)
                 Dim n = streams.Current().Read(buffer, offset, count)
                 t += n
                 count -= n
@@ -31,6 +36,7 @@ Namespace Streams
 
         Public Overrides Sub Close()
             Do Until emptied
+                Contract.Assume(streams.Current IsNot Nothing)
                 streams.Current.Close()
                 emptied = Not streams.MoveNext
             Loop

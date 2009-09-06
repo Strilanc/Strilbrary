@@ -8,7 +8,7 @@
         Private ReadOnly sequenceQueue As New Queue(Of IEnumerator(Of T))
         Private ReadOnly coroutine As Coroutine
 
-        <ContractInvariantMethod()> Protected overrides Sub Invariant()
+        <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(coroutine IsNot Nothing)
             Contract.Invariant(sequenceQueue IsNot Nothing)
         End Sub
@@ -28,7 +28,9 @@
                     Dim sequence = New Enumerator(Of T)(
                         Function(enumController)
                             Contract.Requires(enumController IsNot Nothing)
+                            Contract.Assume(enumController IsNot Nothing)
                             Contract.Assume(coroutineController IsNot Nothing)
+                            Contract.Assume(Me IsNot Nothing)
                             Contract.Assume(sequenceQueue IsNot Nothing)
 
                             'Move to next element, and when current sequence runs out grab another one
@@ -62,13 +64,13 @@
         ''' <summary>Adds more elements for the consumer, and blocks until they have been consumed.</summary>
         Public Sub Push(ByVal sequence As IEnumerator(Of T))
             Contract.Requires(sequence IsNot Nothing)
-            If finished Then Throw New InvalidOperationException("Can't push after PushDone.")
+            If finished Then Throw New InvalidOperationException("Can't push after Done.")
             sequenceQueue.Enqueue(sequence)
             coroutine.Continue()
         End Sub
         ''' <summary>Notifies the consumer that there are no elements, and blocks until the consumer finishes.</summary>
         Public Sub PushDone()
-            If finished Then Throw New InvalidOperationException("Can't push after PushDone.")
+            If finished Then Throw New InvalidOperationException("Can't push after Done.")
             finished = True
             coroutine.Continue()
         End Sub

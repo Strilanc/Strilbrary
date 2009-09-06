@@ -36,7 +36,7 @@ Public Class SingleConsumerLockFreeQueue(Of T)
         End Sub
     End Class
 
-    <ContractInvariantMethod()> Protected Sub Invariant()
+    <ContractInvariantMethod()> Private Sub ObjectInvariant()
         Contract.Invariant(head IsNot Nothing)
         Contract.Invariant(insertionPoint IsNot Nothing)
     End Sub
@@ -106,6 +106,7 @@ Public Class SingleConsumerLockFreeQueue(Of T)
     Public Sub BeginEnqueue(ByVal item As T)
         Dim chainOfOne = New Node(item)
         Dim prevChainTail = Interlocked.Exchange(Me.insertionPoint, chainOfOne)
+        Contract.Assume(Me.insertionPoint IsNot Nothing)
         Contract.Assume(prevChainTail IsNot Nothing)
         prevChainTail.next = chainOfOne
     End Sub
@@ -150,7 +151,7 @@ Public MustInherit Class BaseLockFreeConsumer(Of T)
     Private ReadOnly queue As New SingleConsumerLockFreeQueue(Of T)
     Private running As Integer 'stores consumer state and is used as a semaphore
 
-    <ContractInvariantMethod()> Protected Sub Invariant()
+    <ContractInvariantMethod()> Private Sub ObjectInvariant()
         Contract.Invariant(queue IsNot Nothing)
     End Sub
 

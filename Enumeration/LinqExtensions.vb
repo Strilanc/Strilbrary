@@ -79,10 +79,10 @@
         End Function
         '''<summary>Determines the element with the maximum output from a transformation function.</summary>
         <Pure()> <Extension()>
-        Public Function MaxPair(Of T, C As IComparable)(ByVal sequence As IEnumerable(Of T),
-                                                        ByVal transformation As Func(Of T, C),
-                                                        ByRef outElement As T,
-                                                        ByRef outImage As C) As Boolean
+        Public Function MaxPair(Of TSequence, TComparable As IComparable)(ByVal sequence As IEnumerable(Of TSequence),
+                                                                          ByVal transformation As Func(Of TSequence, TComparable),
+                                                                          ByRef outElement As TSequence,
+                                                                          ByRef outImage As TComparable) As Boolean
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(transformation IsNot Nothing)
             Dim any = False
@@ -136,19 +136,18 @@
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(blockSize > 0)
             Contract.Ensures(Contract.Result(Of IEnumerator(Of IList(Of T)))() IsNot Nothing)
-            Dim sequence_ = sequence
-            Dim blockSize_ = blockSize
             Return New Enumerator(Of IList(Of T))(
                 Function(controller)
                     Contract.Requires(controller IsNot Nothing)
-                    Contract.Assume(sequence_ IsNot Nothing)
-                    Contract.Assume(blockSize_ > 0)
-                    If Not sequence_.MoveNext Then  Return controller.Break()
+                    Contract.Assume(controller IsNot Nothing)
+                    Contract.Assume(sequence IsNot Nothing)
+                    Contract.Assume(blockSize > 0)
+                    If Not sequence.MoveNext Then  Return controller.Break()
 
-                    Dim block = New List(Of T)(blockSize_)
-                    block.Add(sequence_.Current())
-                    While block.Count < blockSize_ AndAlso sequence_.MoveNext
-                        block.Add(sequence_.Current)
+                    Dim block = New List(Of T)(blockSize)
+                    block.Add(sequence.Current())
+                    While block.Count < blockSize AndAlso sequence.MoveNext
+                        block.Add(sequence.Current)
                     End While
                     Return block
                 End Function
@@ -173,18 +172,16 @@
 
         '''<summary>Transforms an IEnumerable using a transformation function meant for an IEnumerator.</summary>
         <Extension()> <Pure()>
-        Public Function Transform(Of T, D)(ByVal sequence As IEnumerable(Of T),
-                                           ByVal transformation As Func(Of IEnumerator(Of T), IEnumerator(Of D))) As IEnumerable(Of D)
+        Public Function Transform(Of TIn, TOut)(ByVal sequence As IEnumerable(Of TIn),
+                                                ByVal transformation As Func(Of IEnumerator(Of TIn), IEnumerator(Of TOut))) As IEnumerable(Of TOut)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(transformation IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IEnumerable(Of D))() IsNot Nothing)
-            Dim sequence_ = sequence
-            Dim transformation_ = transformation
-            Return New Enumerable(Of D)(Function()
-                                            Contract.Assume(transformation_ IsNot Nothing)
-                                            Contract.Assume(sequence_ IsNot Nothing)
-                                            Return transformation_(sequence_.GetEnumerator())
-                                        End Function)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of TOut))() IsNot Nothing)
+            Return New Enumerable(Of TOut)(Function()
+                                               Contract.Assume(transformation IsNot Nothing)
+                                               Contract.Assume(sequence IsNot Nothing)
+                                               Return transformation(sequence.GetEnumerator())
+                                           End Function)
         End Function
 #End Region
 
@@ -246,8 +243,6 @@
             Dim n = list.Count
             Dim ret(0 To n - 1) As T
             For i = 0 To n - 1
-                Contract.Assume(i >= 0)
-                Contract.Assume(i < n)
                 ret(i) = list(n - i - 1)
             Next i
             Return ret

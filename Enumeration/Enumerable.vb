@@ -6,7 +6,7 @@
         Implements IEnumerable(Of T)
         Private ReadOnly generator As Func(Of IEnumerator(Of T))
 
-        <ContractInvariantMethod()> Protected Sub Invariant()
+        <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(generator IsNot Nothing)
         End Sub
 

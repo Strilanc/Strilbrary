@@ -1,14 +1,15 @@
 Imports System.Threading
 
 Namespace Threading
-    Public Module Common
+    Public Module ThreadingCommon
         Public Function ThreadedAction(ByVal action As Action) As IFuture
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Dim action_ = action 'avoid contract verification issue on hoisted arguments
             Dim f As New Future
             Call New Thread(Sub() RunWithDebugTrap(Sub()
-                                                       Call action_()
+                                                       Contract.Assume(action IsNot Nothing)
+                                                       Contract.Assume(f IsNot Nothing)
+                                                       Call action()
                                                        Call f.SetReady()
                                                    End Sub, "Exception rose past ThreadedAction.")).Start()
             Return f
@@ -16,19 +17,23 @@ Namespace Threading
         Public Function ThreadedFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Dim func_ = func 'avoid contract verification issue on hoisted arguments
             Dim f As New Future(Of TReturn)
-            ThreadedAction(Sub() f.SetValue(func_()))
+            ThreadedAction(Sub()
+                               Contract.Assume(func IsNot Nothing)
+                               Contract.Assume(f IsNot Nothing)
+                               f.SetValue(func())
+                           End Sub)
             Return f
         End Function
 
         Public Function ThreadPooledAction(ByVal action As Action) As IFuture
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Dim action_ = action 'avoid contract verification issue on hoisted arguments
             Dim f As New Future
             ThreadPool.QueueUserWorkItem(Sub() RunWithDebugTrap(Sub()
-                                                                    Call action_()
+                                                                    Contract.Assume(action IsNot Nothing)
+                                                                    Contract.Assume(f IsNot Nothing)
+                                                                    Call action()
                                                                     Call f.SetReady()
                                                                 End Sub, "Exception rose past ThreadPooledAction."))
             Return f
@@ -36,9 +41,12 @@ Namespace Threading
         Public Function ThreadPooledFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Dim func_ = func 'avoid contract verification issue on hoisted arguments
             Dim f As New Future(Of TReturn)
-            ThreadPooledAction(Sub() f.SetValue(func_()))
+            ThreadPooledAction(Sub()
+                                   Contract.Assume(func IsNot Nothing)
+                                   Contract.Assume(f IsNot Nothing)
+                                   f.SetValue(func())
+                               End Sub)
             Return f
         End Function
     End Module

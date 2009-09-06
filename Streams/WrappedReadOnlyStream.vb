@@ -2,7 +2,7 @@
     '''<summary>Wraps a substream, but forces writing and seeking calls to fail.</summary>
     Public MustInherit Class WrappedReadOnlyStream
         Inherits WrappedStream
-        Public Sub New(ByVal substream As IO.Stream)
+        Protected Sub New(ByVal substream As IO.Stream)
             MyBase.New(substream)
             Contract.Requires(substream IsNot Nothing)
         End Sub

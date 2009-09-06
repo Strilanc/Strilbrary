@@ -1,5 +1,4 @@
-﻿<Serializable()>
-Public Class OperationFailedException
+﻿Public Class OperationFailedException
     Inherits Exception
     Public Sub New(Optional ByVal message As String = Nothing,
                    Optional ByVal innerException As Exception = Nothing)
@@ -7,7 +6,6 @@ Public Class OperationFailedException
     End Sub
 End Class
 
-<Serializable()>
 Public Class InvalidStateException
     Inherits InvalidOperationException
     Public Sub New(Optional ByVal message As String = Nothing,
@@ -16,7 +14,6 @@ Public Class InvalidStateException
     End Sub
 End Class
 
-<Serializable()>
 Public Class UnreachableException
     Inherits InvalidStateException
     Public Sub New(Optional ByVal message As String = Nothing,
@@ -25,7 +22,6 @@ Public Class UnreachableException
     End Sub
 End Class
 
-<Serializable()>
 Public Class ImpossibleValueException(Of T)
     Inherits UnreachableException
     Public ReadOnly Value As T
@@ -47,26 +43,26 @@ Public Module ExceptionExtensions
 End Module
 
 <DebuggerDisplay("{ToString}")>
-Public Structure PossibleException(Of T, E As Exception)
-    Public ReadOnly Exception As E
-    Public ReadOnly Value As T
-    Public Sub New(ByVal value As T)
+Public Structure PossibleException(Of TValue, TException As Exception)
+    Public ReadOnly Exception As TException
+    Public ReadOnly Value As TValue
+    Public Sub New(ByVal value As TValue)
         Me.Value = value
     End Sub
-    Public Sub New(ByVal exception As E)
-        If exception Is Nothing Then Throw New ArgumentException("exception")
+    Public Sub New(ByVal exception As TException)
+        Contract.Requires(exception IsNot Nothing)
         Me.Exception = exception
     End Sub
-    Public Sub New(ByVal partialValue As T, ByVal exception As E)
-        If exception Is Nothing Then Throw New ArgumentException("exception")
+    Public Sub New(ByVal partialValue As TValue, ByVal exception As TException)
+        Contract.Requires(exception IsNot Nothing)
         Me.Value = partialValue
         Me.Exception = exception
     End Sub
-    Public Shared Widening Operator CType(ByVal value As T) As PossibleException(Of T, E)
-        Return New PossibleException(Of T, E)(value)
+    Public Shared Widening Operator CType(ByVal value As TValue) As PossibleException(Of TValue, TException)
+        Return New PossibleException(Of TValue, TException)(value)
     End Operator
-    Public Shared Widening Operator CType(ByVal exception As E) As PossibleException(Of T, E)
-        Return New PossibleException(Of T, E)(exception)
+    Public Shared Widening Operator CType(ByVal exception As TException) As PossibleException(Of TValue, TException)
+        Return New PossibleException(Of TValue, TException)(exception)
     End Operator
     Public Overrides Function ToString() As String
         Return "Value: {0}{1}Exception: {2}".Frmt(If(Value Is Nothing, "Null", Value.ToString),
@@ -75,26 +71,26 @@ Public Structure PossibleException(Of T, E As Exception)
     End Function
 End Structure
 <DebuggerDisplay("{ToString}")>
-Public Structure PossibleException(Of T)
+Public Structure PossibleException(Of TValue)
     Public ReadOnly Exception As Exception
-    Public ReadOnly Value As T
-    Public Sub New(ByVal value As T)
+    Public ReadOnly Value As TValue
+    Public Sub New(ByVal value As TValue)
         Me.Value = value
     End Sub
     Public Sub New(ByVal exception As Exception)
-        If exception Is Nothing Then Throw New ArgumentException("exception")
+        Contract.Requires(exception IsNot Nothing)
         Me.Exception = exception
     End Sub
-    Public Sub New(ByVal partialValue As T, ByVal exception As Exception)
-        If exception Is Nothing Then Throw New ArgumentException("exception")
+    Public Sub New(ByVal partialValue As TValue, ByVal exception As Exception)
+        Contract.Requires(exception IsNot Nothing)
         Me.Value = partialValue
         Me.Exception = exception
     End Sub
-    Public Shared Widening Operator CType(ByVal value As T) As PossibleException(Of T)
-        Return New PossibleException(Of T)(value)
+    Public Shared Widening Operator CType(ByVal value As TValue) As PossibleException(Of TValue)
+        Return New PossibleException(Of TValue)(value)
     End Operator
-    Public Shared Widening Operator CType(ByVal exception As Exception) As PossibleException(Of T)
-        Return New PossibleException(Of T)(exception)
+    Public Shared Widening Operator CType(ByVal exception As Exception) As PossibleException(Of TValue)
+        Return New PossibleException(Of TValue)(exception)
     End Operator
     Public Overrides Function ToString() As String
         Return "Value: {0}{1}Exception: {2}".Frmt(If(Value Is Nothing, "Null", Value.ToString),

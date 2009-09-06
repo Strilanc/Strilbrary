@@ -5,15 +5,13 @@ Namespace Enumeration
     Public Interface IConverter(Of In TInput, Out TOutput)
         Function Convert(ByVal sequence As IEnumerator(Of TInput)) As IEnumerator(Of TOutput)
     End Interface
-    Public Interface IConverter(Of T)
-        Inherits IConverter(Of T, T)
-    End Interface
 
     Public Module ExtensionsIConverter
-        <Extension()> Public Function Convert(Of T, R)(ByVal converter As IConverter(Of T, R), ByVal sequence As IEnumerable(Of T)) As IEnumerable(Of R)
+        <Extension()> Public Function Convert(Of TIn, TOut)(ByVal converter As IConverter(Of TIn, TOut),
+                                                            ByVal sequence As IEnumerable(Of TIn)) As IEnumerable(Of TOut)
             Contract.Requires(converter IsNot Nothing)
             Contract.Requires(sequence IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IEnumerable(Of R))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of TOut))() IsNot Nothing)
             Return sequence.Transform(AddressOf converter.Convert)
         End Function
 
@@ -30,11 +28,11 @@ Namespace Enumeration
         <Extension()> Public Function ToReadEnumerator(ByVal stream As IO.Stream) As IEnumerator(Of Byte)
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerator(Of Byte))() IsNot Nothing)
-            Dim stream_ = stream
             Return New Enumerator(Of Byte)(Function(controller)
                                                Contract.Requires(controller IsNot Nothing)
-                                               Contract.Assume(stream_ IsNot Nothing)
-                                               Dim r = stream_.ReadByte()
+                                               Contract.Assume(controller IsNot Nothing)
+                                               Contract.Assume(stream IsNot Nothing)
+                                               Dim r = stream.ReadByte()
                                                If r = -1 Then  Return controller.Break()
                                                Return CByte(r)
                                            End Function)
@@ -44,27 +42,26 @@ Namespace Enumeration
             Contract.Requires(converter IsNot Nothing)
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of PushEnumerator(Of T))() IsNot Nothing)
-            Dim converter_ = converter
-            Dim stream_ = stream
             Return New PushEnumerator(Of T)(Sub(sequenceT)
                                                 Contract.Requires(sequenceT IsNot Nothing)
-                                                Contract.Assume(stream_ IsNot Nothing)
-                                                Contract.Assume(converter_ IsNot Nothing)
-                                                Dim sequence = converter_.Convert(sequenceT)
+                                                Contract.Assume(sequenceT IsNot Nothing)
+                                                Contract.Assume(stream IsNot Nothing)
+                                                Contract.Assume(converter IsNot Nothing)
+                                                Dim sequence = converter.Convert(sequenceT)
                                                 While sequence.MoveNext
-                                                    stream_.WriteByte(sequence.Current)
+                                                    stream.WriteByte(sequence.Current)
                                                 End While
-                                                stream_.Close()
+                                                stream.Close()
                                             End Sub)
         End Function
 
-        <Extension()> Public Function ConvertReadOnlyStream(ByVal converter As IConverter(Of Byte), ByVal stream As IO.Stream) As IO.Stream
+        <Extension()> Public Function ConvertReadOnlyStream(ByVal converter As IConverter(Of Byte, Byte), ByVal stream As IO.Stream) As IO.Stream
             Contract.Requires(converter IsNot Nothing)
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
             Return converter.Convert(stream.ToReadEnumerator()).ToReadableStream()
         End Function
-        <Extension()> Public Function ConvertWriteOnlyStream(ByVal converter As IConverter(Of Byte), ByVal stream As IO.Stream) As IO.Stream
+        <Extension()> Public Function ConvertWriteOnlyStream(ByVal converter As IConverter(Of Byte, Byte), ByVal stream As IO.Stream) As IO.Stream
             Contract.Requires(converter IsNot Nothing)
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
@@ -92,7 +89,7 @@ Namespace Enumeration
         Inherits IO.Stream
         Private ReadOnly sequence As IEnumerator(Of Byte)
 
-        <ContractInvariantMethod()> Protected Sub Invariant()
+        <ContractInvariantMethod()> Private Shadows Sub ObjectInvariant()
             Contract.Invariant(sequence IsNot Nothing)
         End Sub
 
@@ -112,6 +109,10 @@ Namespace Enumeration
             Return sequence.Current
         End Function
         Public Overrides Function Read(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer) As Integer
+            Contract.Assume(buffer IsNot Nothing)
+            Contract.Assume(offset >= 0)
+            Contract.Assume(count >= 0)
+            Contract.Assume(offset + count <= buffer.Length)
             For n = 0 To count - 1
                 Dim r = ReadByte()
                 If r = -1 Then Return n
@@ -164,7 +165,7 @@ Namespace Enumeration
         Private ReadOnly pusher As PushEnumerator(Of Byte)
         Private closed As Boolean
 
-        <ContractInvariantMethod()> Protected Sub Invariant()
+        <ContractInvariantMethod()> Private Shadows Sub ObjectInvariant()
             Contract.Invariant(pusher IsNot Nothing)
         End Sub
 
@@ -184,6 +185,7 @@ Namespace Enumeration
             Dim index = 0
             pusher.Push(New Enumerator(Of Byte)(Function(controller)
                                                     Contract.Requires(controller IsNot Nothing)
+                                                    Contract.Assume(controller IsNot Nothing)
                                                     Contract.Assume(index >= 0)
                                                     Contract.Assume(buffer IsNot Nothing)
                                                     Contract.Assume(offset >= 0)

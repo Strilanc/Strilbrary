@@ -44,7 +44,6 @@ Public Module PoorlyCategorizedFunctions
 
     <Extension()> <Pure()>
     Public Function IsFinite(ByVal value As Double) As Boolean
-        Contract.Ensures(Contract.Result(Of Boolean)() = Not Double.IsInfinity(value) AndAlso Not Double.IsNaN(value))
         Return Not Double.IsInfinity(value) AndAlso Not Double.IsNaN(value)
     End Function
 
@@ -90,7 +89,7 @@ Public Module PoorlyCategorizedFunctions
         Contract.Requires(format IsNot Nothing)
         Contract.Requires(args IsNot Nothing)
         Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
-        Return String.Format(format, args)
+        Return String.Format(Globalization.CultureInfo.InvariantCulture, format, args)
     End Function
 #End Region
 
@@ -127,7 +126,7 @@ Public Module PoorlyCategorizedFunctions
     <Extension()>
     Public Function EnumTryParse(Of T)(ByVal value As String, ByVal ignoreCase As Boolean, ByRef ret As T) As Boolean
         For Each e In EnumValues(Of T)()
-            If String.Compare(value, e.ToString(), ignoreCase, Globalization.CultureInfo.InvariantCulture) = 0 Then
+            If String.Compare(value, e.ToString(), If(ignoreCase, StringComparison.Ordinal, StringComparison.OrdinalIgnoreCase)) = 0 Then
                 ret = e
                 Return True
             End If
@@ -136,7 +135,6 @@ Public Module PoorlyCategorizedFunctions
     End Function
     <Pure()> <Extension()>
     Public Function EnumValueIsDefined(Of T)(ByVal value As T) As Boolean
-        Contract.Ensures(Contract.Result(Of Boolean)() = [Enum].IsDefined(GetType(T), value))
         Return [Enum].IsDefined(GetType(T), value)
     End Function
 #End Region
@@ -168,12 +166,12 @@ Public Module PoorlyCategorizedFunctions
         Contract.Requires(array IsNot Nothing)
         Contract.Requires(offset >= 0)
         Contract.Requires(length >= 0)
+        Contract.Requires(offset + length <= array.Length)
         Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
-        If offset + length > array.Length Then Throw New ArgumentOutOfRangeException("offset + length")
 
-        Dim new_array(0 To length - 1) As T
-        System.Array.Copy(array, offset, new_array, 0, new_array.Length)
-        Return new_array
+        Dim newArray(0 To length - 1) As T
+        System.Array.Copy(array, offset, newArray, 0, newArray.Length)
+        Return newArray
     End Function
     <Pure()>
     Public Function Concat(Of T)(ByVal ParamArray arrays As T()()) As T()
@@ -185,16 +183,19 @@ Public Module PoorlyCategorizedFunctions
     Public Function Concat(Of T)(ByVal arrays As IEnumerable(Of T())) As T()
         Contract.Requires(arrays IsNot Nothing)
         Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
-        If (From array In arrays Where array Is Nothing).Any Then Throw New ArgumentNullException("array is null", "arrays")
+        If (From array In arrays Where array Is Nothing).Any Then Throw New ArgumentNullException("arrays", "array is null")
 
         Dim totalLength = 0
         For Each array In arrays
+            Contract.Assume(array IsNot Nothing)
             totalLength += array.Length
         Next array
 
         Dim flattenedArray(0 To totalLength - 1) As T
         Dim processingOffset = 0
         For Each array In arrays
+            Contract.Assume(array IsNot Nothing)
+            Contract.Assume(processingOffset + array.Length <= flattenedArray.Length)
             System.Array.Copy(array, 0, flattenedArray, processingOffset, array.Length)
             processingOffset += array.Length
         Next array
@@ -228,14 +229,33 @@ Public Module PoorlyCategorizedFunctions
         Contract.Requires(this IsNot Nothing)
         Contract.Requires(separator IsNot Nothing)
         Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
-        Dim this_ = this
-        Return String.Join(separator, (From arg In this_ Select (arg.ToString)).ToArray)
+        Dim words = From arg In this Select String.Concat(arg)
+        Contract.Assume(words IsNot Nothing)
+        Return String.Join(separator, words.ToArrayNonNull)
     End Function
     <Extension()> <Pure()>
     Public Function ToView(Of T)(ByVal this As IEnumerable(Of T)) As ViewableList(Of T)
         Contract.Requires(this IsNot Nothing)
         Contract.Ensures(Contract.Result(Of ViewableList(Of T))() IsNot Nothing)
-        Return New ViewableList(Of T)(this.ToArray)
+        Return New ViewableList(Of T)(this.ToArrayNonNull)
+    End Function
+
+    <Extension()> <Pure()>
+    Friend Function SkipNonNull(Of T)(ByVal this As IEnumerable(Of T), ByVal amount As Integer) As IEnumerable(Of T)
+        Contract.Requires(this IsNot Nothing)
+        Contract.Requires(amount >= 0)
+        Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
+        Dim res = this.Skip(amount)
+        Contract.Assume(res IsNot Nothing)
+        Return res
+    End Function
+    <Extension()> <Pure()>
+    Friend Function ToArrayNonNull(Of T)(ByVal this As IEnumerable(Of T)) As T()
+        Contract.Requires(this IsNot Nothing)
+        Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
+        Dim res = this.ToArray
+        Contract.Assume(res IsNot Nothing)
+        Return res
     End Function
 
     <Extension()>
@@ -245,6 +265,7 @@ Public Module PoorlyCategorizedFunctions
         Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
         Dim buffer(0 To length - 1) As Byte
         length = stream.Read(buffer, 0, length)
+        Contract.Assume(length >= 0)
         If length < buffer.Length Then
             ReDim Preserve buffer(0 To length - 1)
             Contract.Assume(buffer IsNot Nothing)
@@ -265,6 +286,7 @@ Public Module PoorlyCategorizedFunctions
             m *= 2
             ReDim Preserve bb(0 To m - 1)
         Loop
+        Contract.Assume(c >= 0)
         ReDim Preserve bb(0 To c - 1)
         Contract.Assume(bb IsNot Nothing)
         Return bb
@@ -294,8 +316,15 @@ Public Module PoorlyCategorizedFunctions
     Public Function YCombinator(Of TArg1, TReturn)(ByVal recursor As Func(Of Func(Of TArg1, TReturn), Func(Of TArg1, TReturn))) As Func(Of TArg1, TReturn)
         Contract.Requires(recursor IsNot Nothing)
         Contract.Ensures(Contract.Result(Of Func(Of TArg1, TReturn))() IsNot Nothing)
-        Dim recursor_ = recursor 'avoids hoisted argument contract verification flaw
-        Dim rec As RecursiveFunction(Of TArg1, TReturn) = Function(self) Function(arg1) recursor_(self(self))(arg1)
+        Dim rec As RecursiveFunction(Of TArg1, TReturn) = Function(self)
+                                                              Return Function(arg1)
+                                                                         Contract.Assume(self IsNot Nothing)
+                                                                         Contract.Assume(recursor IsNot Nothing)
+                                                                         Dim x = recursor(self(self))
+                                                                         Contract.Assume(x IsNot Nothing)
+                                                                         Return x(arg1)
+                                                                     End Function
+                                                          End Function
         Dim ret = rec(rec)
         Contract.Assume(ret IsNot Nothing)
         Return ret
@@ -305,8 +334,15 @@ Public Module PoorlyCategorizedFunctions
     Public Function YCombinator(ByVal recursor As Func(Of Action, Action)) As Action
         Contract.Requires(recursor IsNot Nothing)
         Contract.Ensures(Contract.Result(Of Action)() IsNot Nothing)
-        Dim recursor_ = recursor 'avoids hoisted argument contract verification flaw
-        Dim rec As RecursiveAction = Function(self) Sub() recursor_(self(self))()
+        Dim rec As RecursiveAction = Function(self)
+                                         Return Sub()
+                                                    Contract.Assume(recursor IsNot Nothing)
+                                                    Contract.Assume(self IsNot Nothing)
+                                                    Dim x = recursor(self(self))
+                                                    Contract.Assume(x IsNot Nothing)
+                                                    Call x()
+                                                End Sub
+                                     End Function
         Dim ret = rec(rec)
         Contract.Assume(ret IsNot Nothing)
         Return ret
@@ -316,8 +352,15 @@ Public Module PoorlyCategorizedFunctions
     Public Function YCombinator(Of TArg1)(ByVal recursor As Func(Of Action(Of TArg1), Action(Of TArg1))) As Action(Of TArg1)
         Contract.Requires(recursor IsNot Nothing)
         Contract.Ensures(Contract.Result(Of Action(Of TArg1))() IsNot Nothing)
-        Dim recursor_ = recursor 'avoids hoisted argument contract verification flaw
-        Dim rec As RecursiveAction(Of TArg1) = Function(self) Sub(arg1) recursor_(self(self))(arg1)
+        Dim rec As RecursiveAction(Of TArg1) = Function(self)
+                                                   Return Sub(arg1)
+                                                              Contract.Assume(recursor IsNot Nothing)
+                                                              Contract.Assume(self IsNot Nothing)
+                                                              Dim x = recursor(self(self))
+                                                              Contract.Assume(x IsNot Nothing)
+                                                              Call x(arg1)
+                                                          End Sub
+                                               End Function
         Dim ret = rec(rec)
         Contract.Assume(ret IsNot Nothing)
         Return ret
@@ -325,12 +368,24 @@ Public Module PoorlyCategorizedFunctions
 
     Public Sub FutureIterate(Of T)(ByVal producer As Func(Of IFuture(Of T)),
                                    ByVal consumer As Func(Of T, IFuture(Of Boolean)))
-        producer().CallWhenValueReady(YCombinator(Of T)(
+        Contract.Requires(producer IsNot Nothing)
+        Contract.Requires(consumer IsNot Nothing)
+
+        Dim q = producer()
+        Contract.Assume(q IsNot Nothing)
+        q.CallWhenValueReady(YCombinator(Of T)(
             Function(self) Sub(result)
-                               consumer(result).CallWhenValueReady(
+                               Contract.Assume(consumer IsNot Nothing)
+                               Dim c = consumer(result)
+                               Contract.Assume(c IsNot Nothing)
+                               c.CallWhenValueReady(
                                    Sub([continue])
+                                       Contract.Assume(self IsNot Nothing)
                                        If [continue] Then
-                                           producer().CallWhenValueReady(self)
+                                           Contract.Assume(producer IsNot Nothing)
+                                           Dim p = producer()
+                                           Contract.Assume(p IsNot Nothing)
+                                           p.CallWhenValueReady(self)
                                        End If
                                    End Sub)
                            End Sub))
@@ -343,13 +398,15 @@ Public Module PoorlyCategorizedFunctions
                                ByVal count As Integer) As IFuture(Of PossibleException(Of Integer, Exception))
         Contract.Requires(stream IsNot Nothing)
         Contract.Ensures(Contract.Result(Of IFuture(Of PossibleException(Of Integer, Exception)))() IsNot Nothing)
-        Dim stream_ = stream
         Dim f = New Future(Of PossibleException(Of Integer, Exception))
         Try
             stream.BeginRead(buffer, offset, count, Sub(ar)
                                                         Contract.Requires(ar IsNot Nothing)
+                                                        Contract.Assume(f IsNot Nothing)
+                                                        Contract.Assume(ar IsNot Nothing)
+                                                        Contract.Assume(stream IsNot Nothing)
                                                         Try
-                                                            f.SetValue(stream_.EndRead(ar))
+                                                            f.SetValue(stream.EndRead(ar))
                                                         Catch e As Exception
                                                             f.SetValue(e)
                                                         End Try
@@ -365,7 +422,13 @@ Public Class ExpensiveValue(Of T)
     Private func As Func(Of T)
     Private _value As T
     Private computed As Boolean
+
+    <ContractInvariantMethod()> Private Sub ObjectInvariant()
+        Contract.Invariant(computed OrElse func IsNot Nothing)
+    End Sub
+
     Public Sub New(ByVal func As Func(Of T))
+        Contract.Requires(func IsNot Nothing)
         Me.func = func
     End Sub
     Public Sub New(ByVal value As T)
@@ -382,38 +445,10 @@ Public Class ExpensiveValue(Of T)
         End Get
     End Property
     Public Shared Widening Operator CType(ByVal func As Func(Of T)) As ExpensiveValue(Of T)
+        Contract.Requires(func IsNot Nothing)
         Return New ExpensiveValue(Of T)(func)
     End Operator
     Public Shared Widening Operator CType(ByVal value As T) As ExpensiveValue(Of T)
         Return New ExpensiveValue(Of T)(value)
     End Operator
-End Class
-
-Public Class KeyPair
-    Private ReadOnly _value1 As Byte()
-    Private ReadOnly _value2 As Byte()
-    Public ReadOnly Property Value1 As Byte()
-        Get
-            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-            Return _value1
-        End Get
-    End Property
-    Public ReadOnly Property Value2 As Byte()
-        Get
-            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-            Return _value2
-        End Get
-    End Property
-
-    <ContractInvariantMethod()> Protected Sub Invariant()
-        Contract.Invariant(_value1 IsNot Nothing)
-        Contract.Invariant(_value2 IsNot Nothing)
-    End Sub
-
-    Public Sub New(ByVal value1 As Byte(), ByVal value2 As Byte())
-        Contract.Requires(value1 IsNot Nothing)
-        Contract.Requires(value2 IsNot Nothing)
-        Me._value1 = value1
-        Me._value2 = value2
-    End Sub
 End Class

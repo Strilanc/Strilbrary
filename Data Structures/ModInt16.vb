@@ -82,7 +82,7 @@
             Return Me.value = other.value
         End Function
         Public Overrides Function ToString() As String
-            Return value.ToString
+            Return value.ToString(Globalization.CultureInfo.InvariantCulture)
         End Function
 #End Region
 

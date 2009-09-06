@@ -3,45 +3,45 @@ Public Class BitBuffer
     Public Const MaxBits As Integer = 64
     Private buf As ULong 'bit storage
     Private _numBufferedBits As Integer 'number of stored bits
-    Public ReadOnly Property NumBufferedBits() As Integer
+    Public ReadOnly Property BufferedBitCount() As Integer
         Get
             Return _numBufferedBits
         End Get
     End Property
-    Public ReadOnly Property NumBufferedBytes() As Integer
+    Public ReadOnly Property BufferedByteCount() As Integer
         Get
             Return _numBufferedBits \ 8
         End Get
     End Property
 
 #Region "Base Operations"
-    Public Sub Queue(ByVal bits As ULong, ByVal numBits As Integer)
-        Contract.Requires(numBits >= 0)
-        Contract.Requires(numBits <= MaxBits)
-        If numBits > MaxBits - NumBufferedBits Then Throw New InvalidOperationException("Not enough capacity available.")
+    Public Sub Queue(ByVal bits As ULong, ByVal bitCount As Integer)
+        Contract.Requires(bitCount >= 0)
+        Contract.Requires(bitCount <= MaxBits)
+        If bitCount > MaxBits - BufferedBitCount Then Throw New InvalidOperationException("Not enough capacity available.")
         buf = buf Or (bits << _numBufferedBits)
-        _numBufferedBits += numBits
+        _numBufferedBits += bitCount
     End Sub
-    Public Sub Stack(ByVal bits As ULong, ByVal numBits As Integer)
-        Contract.Requires(numBits >= 0)
-        Contract.Requires(numBits <= MaxBits)
-        If numBits > MaxBits - NumBufferedBits Then Throw New InvalidOperationException("Not enough capacity available.")
-        buf <<= numBits
+    Public Sub Stack(ByVal bits As ULong, ByVal bitCount As Integer)
+        Contract.Requires(bitCount >= 0)
+        Contract.Requires(bitCount <= MaxBits)
+        If bitCount > MaxBits - BufferedBitCount Then Throw New InvalidOperationException("Not enough capacity available.")
+        buf <<= bitCount
         buf = buf Or bits
-        _numBufferedBits += numBits
+        _numBufferedBits += bitCount
     End Sub
-    Public Function Take(ByVal numBits As Integer) As ULong
-        Contract.Requires(numBits >= 0)
-        Contract.Requires(numBits <= MaxBits)
-        Take = Peek(numBits)
-        buf >>= numBits
-        _numBufferedBits -= numBits
+    Public Function Take(ByVal bitCount As Integer) As ULong
+        Contract.Requires(bitCount >= 0)
+        Contract.Requires(bitCount <= MaxBits)
+        Take = Peek(bitCount)
+        buf >>= bitCount
+        _numBufferedBits -= bitCount
     End Function
-    Public Function Peek(ByVal numBits As Integer) As ULong
-        Contract.Requires(numBits >= 0)
-        Contract.Requires(numBits <= MaxBits)
-        If numBits > NumBufferedBits Then Throw New InvalidOperationException("Not enough buffered buffered bits available.")
-        Peek = CULng(buf And ((1UL << numBits) - 1UL))
+    Public Function Peek(ByVal bitCount As Integer) As ULong
+        Contract.Requires(bitCount >= 0)
+        Contract.Requires(bitCount <= MaxBits)
+        If bitCount > BufferedBitCount Then Throw New InvalidOperationException("Not enough buffered buffered bits available.")
+        Peek = CULng(buf And ((1UL << bitCount) - 1UL))
     End Function
 
     Public Sub Clear()
@@ -115,7 +115,7 @@ Public Class ByteSequenceBitBuffer
     Private ReadOnly buf As New BitBuffer
     Private ReadOnly sequence As IEnumerator(Of Byte)
 
-    <ContractInvariantMethod()> Protected Sub Invariant()
+    <ContractInvariantMethod()> Private Sub ObjectInvariant()
         Contract.Invariant(buf IsNot Nothing)
         Contract.Invariant(sequence IsNot Nothing)
     End Sub
@@ -124,24 +124,24 @@ Public Class ByteSequenceBitBuffer
         Contract.Requires(sequence IsNot Nothing)
         Me.sequence = sequence
     End Sub
-    Public ReadOnly Property NumBufferedBits As Integer
+    Public ReadOnly Property BufferedBitCount As Integer
         Get
-            Return buf.NumBufferedBits
+            Return buf.BufferedBitCount
         End Get
     End Property
-    Public Function TryBufferBits(ByVal numBits As Integer) As Boolean
-        Contract.Requires(numBits >= 0)
-        While buf.NumBufferedBits < numBits
+    Public Function TryBufferBits(ByVal bitCount As Integer) As Boolean
+        Contract.Requires(bitCount >= 0)
+        While buf.BufferedBitCount < bitCount
             If Not sequence.MoveNext Then Return False
             buf.QueueByte(sequence.Current())
         End While
         Return True
     End Function
-    Public Function Take(ByVal numBits As Integer) As ULong
-        Contract.Requires(numBits >= 0)
-        Contract.Requires(numBits <= BitBuffer.MaxBits)
-        If Not TryBufferBits(numBits) Then Throw New InvalidOperationException("Ran past end of sequence.")
-        Return buf.Take(numBits)
+    Public Function Take(ByVal bitCount As Integer) As ULong
+        Contract.Requires(bitCount >= 0)
+        Contract.Requires(bitCount <= BitBuffer.MaxBits)
+        If Not TryBufferBits(bitCount) Then Throw New InvalidOperationException("Ran past end of sequence.")
+        Return buf.Take(bitCount)
     End Function
     Public Function TakeBit() As Boolean
         Return Take(1) <> 0

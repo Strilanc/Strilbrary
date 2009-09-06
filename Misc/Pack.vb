@@ -10,25 +10,26 @@ Public Module Pack
     Public Function ToUInt16(ByVal data As IEnumerable(Of Byte),
                              Optional ByVal byteOrder As ByteOrder = Strilbrary.ByteOrder.LittleEndian) As UInt16
         Contract.Requires(data IsNot Nothing)
-        If data.CountIsGreaterThan(2) Then Throw New ArgumentOutOfRangeException("Data has too many bytes.")
+        If data.CountIsGreaterThan(2) Then Throw New ArgumentOutOfRangeException("data", "Data has too many bytes.")
         Return CUShort(data.ToUInt64(byteOrder))
     End Function
     <Extension()> <Pure()>
     Public Function ToUInt32(ByVal data As IEnumerable(Of Byte),
                              Optional ByVal byteOrder As ByteOrder = Strilbrary.ByteOrder.LittleEndian) As UInt32
         Contract.Requires(data IsNot Nothing)
-        If data.CountIsGreaterThan(4) Then Throw New ArgumentOutOfRangeException("Data has too many bytes.")
+        If data.CountIsGreaterThan(4) Then Throw New ArgumentOutOfRangeException("data", "Data has too many bytes.")
         Return CUInt(data.ToUInt64(byteOrder))
     End Function
     <Extension()> <Pure()>
     Public Function ToUInt64(ByVal data As IEnumerable(Of Byte),
                              Optional ByVal byteOrder As ByteOrder = Strilbrary.ByteOrder.LittleEndian) As UInt64
         Contract.Requires(data IsNot Nothing)
-        If data.CountIsGreaterThan(8) Then Throw New ArgumentOutOfRangeException("Data has too many bytes.")
+        If data.CountIsGreaterThan(8) Then Throw New ArgumentOutOfRangeException("data", "Data has too many bytes.")
         Dim val As ULong
         Select Case byteOrder
             Case byteOrder.LittleEndian
                 data = data.Reverse
+                Contract.Assume(data IsNot Nothing)
             Case byteOrder.BigEndian
                 'no change required
             Case Else
@@ -66,7 +67,7 @@ Public Module Pack
             data(i) = CByte(value And CULng(&HFF))
             value >>= 8
         Next i
-        If value <> 0 Then Throw New ArgumentOutOfRangeException("The specified value won't fit in the specified number of bytes.")
+        If value <> 0 Then Throw New ArgumentOutOfRangeException("value", "The specified value won't fit in the specified number of bytes.")
         Select Case byteOrder
             Case byteOrder.BigEndian
                 Return data.Reverse.ToArray
@@ -115,6 +116,7 @@ Public Module Pack
         For Each b In data
             If s.Length > 0 Then s.Append(separator)
             Dim h = Hex(b)
+            Contract.Assume(h IsNot Nothing)
             For i = 1 To minWordLength - h.Length
                 s.Append("0"c)
             Next i
@@ -132,7 +134,8 @@ Public Module Pack
         Dim words = data.Split(" "c)
         Dim bb(0 To words.Length - 1) As Byte
         For i = 0 To words.Length - 1
-            bb(i) = CByte(words(i).ParseAsUnsignedHexNumber(ByteOrder.BigEndian))
+            Contract.Assume(words(i) IsNot Nothing)
+            bb(i) = CByte(words(i).FromHexToUInt64(ByteOrder.BigEndian))
         Next i
         Return bb
     End Function
@@ -163,12 +166,13 @@ Public Module Pack
                 {"f"c, 15}, {"F"c, 15}}
 
     <Extension()> <Pure()>
-    Public Function ParseAsUnsignedHexNumber(ByVal chars As IEnumerable(Of Char), ByVal byteOrder As ByteOrder) As ULong
+    Public Function FromHexToUInt64(ByVal chars As IEnumerable(Of Char), ByVal byteOrder As ByteOrder) As ULong
         Contract.Requires(chars IsNot Nothing)
 
         Select Case byteOrder
             Case byteOrder.LittleEndian
                 chars = chars.Reverse()
+                Contract.Assume(chars IsNot Nothing)
             Case byteOrder.BigEndian
                 'no change needed
             Case Else

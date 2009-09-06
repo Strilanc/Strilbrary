@@ -8,7 +8,7 @@ Namespace Threading.Queueing
     <ContractClassFor(GetType(ICallQueue))>
     Public Class ContractClassForICallQueue
         Implements ICallQueue
-        Public Function QueueAction(ByVal action As Action) As Futures.IFuture Implements ICallQueue.QueueAction
+        Public Function QueueAction(ByVal action As Action) As IFuture Implements ICallQueue.QueueAction
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
             Return Nothing
@@ -18,13 +18,17 @@ Namespace Threading.Queueing
     Public Module ExtensionsForICallQueue
         '''<summary>Queues a function to be run and returns a future for the function's eventual output.</summary>
         <Extension()>
-        Public Function QueueFunc(Of R)(ByVal queue As ICallQueue, ByVal func As Func(Of R)) As IFuture(Of R)
+        Public Function QueueFunc(Of TReturn)(ByVal queue As ICallQueue,
+                                              ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of R))() IsNot Nothing)
-            Dim func_ = func
-            Dim f As New Future(Of R)
-            queue.QueueAction(Sub() f.SetValue(func_()))
+            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
+            Dim f As New Future(Of TReturn)
+            queue.QueueAction(Sub()
+                                  Contract.Assume(f IsNot Nothing)
+                                  Contract.Assume(func IsNot Nothing)
+                                  f.SetValue(func())
+                              End Sub)
             Return f
         End Function
     End Module
@@ -56,7 +60,7 @@ Namespace Threading.Queueing
                     Return _future
                 End Get
             End Property
-            <ContractInvariantMethod()> Protected Sub Invariant()
+            <ContractInvariantMethod()> Private Sub ObjectInvariant()
                 Contract.Invariant(_action IsNot Nothing)
                 Contract.Invariant(_future IsNot Nothing)
             End Sub
@@ -80,6 +84,7 @@ Namespace Threading.Queueing
         '''<summary>Runs queued calls until there are none left.</summary>
         Protected Overrides Sub Consume(ByVal item As Node)
             RunWithDebugTrap(Sub()
+                                 Contract.Assume(item IsNot Nothing)
                                  Call item.Action()()
                                  Call item.Future.SetReady()
                              End Sub, "Exception rose past {0}.Run()".Frmt(Me.GetType.Name))
@@ -90,6 +95,11 @@ Namespace Threading.Queueing
     Public NotInheritable Class InvokedCallQueue
         Inherits BaseLockFreeCallQueue
         Private ReadOnly control As Control
+
+        <ContractInvariantMethod()> Private Sub ObjectInvariant()
+            Contract.Invariant(control IsNot Nothing)
+        End Sub
+
         Public Sub New(ByVal control As Control)
             Contract.Requires(control IsNot Nothing)
             Me.control = control

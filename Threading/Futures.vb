@@ -10,13 +10,13 @@ Namespace Threading.Futures
     End Interface
 
     '''<summary>Represents a thread-safe read-only class that fires an event when its value becomes ready.</summary>
-    Public Interface IFuture(Of Out R)
+    Public Interface IFuture(Of Out TValue)
         Inherits IFuture
         ''' <summary>
         ''' Returns the future's value.
         ''' Throws an InvalidOperationException if the value isn't ready yet.
         ''' </summary>
-        ReadOnly Property Value() As R
+        ReadOnly Property Value() As TValue
     End Interface
 
     '''<summary>A thread-safe class that fires an event when it becomes ready.</summary>
@@ -25,7 +25,7 @@ Namespace Threading.Futures
         Private ReadOnly lockReady As New OnetimeLock
         Public Event Readied() Implements IFuture.Readied
 
-        <ContractInvariantMethod()> Protected Sub Invariant()
+        <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(lockReady IsNot Nothing)
         End Sub
 
@@ -57,13 +57,13 @@ Namespace Threading.Futures
     End Class
 
     '''<summary>A thread-safe class that fires an event when its value becomes ready.</summary>
-    Public Class Future(Of R)
-        Implements IFuture(Of R)
-        Protected _value As R
+    Public Class Future(Of TValue)
+        Implements IFuture(Of TValue)
+        Protected _value As TValue
         Protected ReadOnly lockReady As New OnetimeLock
         Public Event Readied() Implements IFuture.Readied
 
-        <ContractInvariantMethod()> Protected Sub Invariant()
+        <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(lockReady IsNot Nothing)
         End Sub
 
@@ -78,7 +78,7 @@ Namespace Threading.Futures
         '''Returns the future's value.
         '''Throws an InvalidOperationException if the value isn't ready yet.
         '''</summary>
-        Public ReadOnly Property Value() As R Implements IFuture(Of R).Value
+        Public ReadOnly Property Value() As TValue Implements IFuture(Of TValue).Value
             Get
                 If Not IsReady Then Throw New InvalidOperationException("Attempted to get a future value before it was ready.")
                 Return _value
@@ -89,7 +89,7 @@ Namespace Threading.Futures
         ''' Sets the future's value and makes the future ready.
         ''' Throws a InvalidOperationException if the future was already ready.
         ''' </summary>
-        Public Sub SetValue(ByVal value As R)
+        Public Sub SetValue(ByVal value As TValue)
             If Not TrySetValue(value) Then
                 Throw New InvalidOperationException("Future readied more than once.")
             End If
@@ -98,7 +98,7 @@ Namespace Threading.Futures
         ''' Sets the future's value and makes the future ready.
         ''' Fails if the future was already ready.
         ''' </summary>
-        Public Function TrySetValue(ByVal value As R) As Boolean
+        Public Function TrySetValue(ByVal value As TValue) As Boolean
             If Not lockReady.TryAcquire Then Return False
             Me._value = value
             RaiseEvent Readied()
@@ -114,79 +114,94 @@ Namespace Threading.Futures
             Contract.Requires(future IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Dim _future = future 'avoids contract verification problems with hoisted arguments
-            Dim _action = action
 
             Dim lock = New OnetimeLock()
             Dim f = New Future()
             Dim callback As IFuture.ReadiedEventHandler
             callback = Sub() ThreadPool.QueueUserWorkItem(Sub()
+                                                              Contract.Assume(f IsNot Nothing)
+                                                              Contract.Assume(action IsNot Nothing)
+                                                              Contract.Assume(future IsNot Nothing)
+                                                              Contract.Assume(lock IsNot Nothing)
                                                               If lock.TryAcquire Then 'only run once
-                                                                  RemoveHandler _future.Readied, callback
-                                                                  Call RunWithDebugTrap(_action, "Future callback")
+                                                                  RemoveHandler future.Readied, callback
+                                                                  Call RunWithDebugTrap(action, "Future callback")
                                                                   f.SetReady()
                                                               End If
                                                           End Sub)
 
-            AddHandler _future.Readied, callback
-            If _future.IsReady Then Call callback() 'in case the future was already ready
+            AddHandler future.Readied, callback
+            If future.IsReady Then Call callback() 'in case the future was already ready
 
             Return f
         End Function
 
         '''<summary>Passes the future's value to an action once ready, and returns a future for the action's completion.</summary>
         <Extension()>
-        Public Function CallWhenValueReady(Of A1)(ByVal future As IFuture(Of A1),
-                                                  ByVal action As Action(Of A1)) As IFuture
+        Public Function CallWhenValueReady(Of TArg1)(ByVal future As IFuture(Of TArg1),
+                                                     ByVal action As Action(Of TArg1)) As IFuture
             Contract.Requires(future IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Dim future_ = future 'avoids contract verification problems with hoisted arguments
-            Dim action_ = action
-            Return future_.CallWhenReady(Sub() action_(future_.Value))
+            Return future.CallWhenReady(Sub()
+                                            Contract.Assume(action IsNot Nothing)
+                                            Contract.Assume(future IsNot Nothing)
+                                            action(future.Value)
+                                        End Sub)
         End Function
 
         '''<summary>Runs a function once the future is ready, and returns a future for the function's return value.</summary>
         <Extension()>
-        Public Function EvalWhenReady(Of R)(ByVal future As IFuture,
-                                            ByVal func As Func(Of R)) As IFuture(Of R)
+        Public Function EvalWhenReady(Of TReturn)(ByVal future As IFuture,
+                                                  ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
             Contract.Requires(future IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of R))() IsNot Nothing)
-            Dim func_ = func 'avoids contract verification problems with hoisted arguments
-            Dim f As New Future(Of R)
-            future.CallWhenReady(Sub() f.SetValue(func_()))
+            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
+            Dim f As New Future(Of TReturn)
+            future.CallWhenReady(Sub()
+                                     Contract.Assume(func IsNot Nothing)
+                                     Contract.Assume(f IsNot Nothing)
+                                     f.SetValue(func())
+                                 End Sub)
             Return f
         End Function
 
         '''<summary>Passes the future's value to a function once ready, and returns a future for the function's return value.</summary>
         <Extension()>
-        Public Function EvalWhenValueReady(Of A1, R)(ByVal future As IFuture(Of A1),
-                                                     ByVal func As Func(Of A1, R)) As IFuture(Of R)
+        Public Function EvalWhenValueReady(Of TArg, TReturn)(ByVal future As IFuture(Of TArg),
+                                                             ByVal func As Func(Of TArg, TReturn)) As IFuture(Of TReturn)
             Contract.Requires(future IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of R))() IsNot Nothing)
-            Dim future_ = future 'avoids contract verification problems with hoisted arguments
-            Dim func_ = func
-            Return future_.EvalWhenReady(Function() func_(future_.Value))
+            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
+            Return future.EvalWhenReady(Function()
+                                            Contract.Assume(func IsNot Nothing)
+                                            Contract.Assume(future IsNot Nothing)
+                                            Return func(future.Value)
+                                        End Function)
         End Function
 
         '''<summary>Wraps a normal value as an instantly ready future.</summary>
         <Extension()>
-        Public Function Futurize(Of R)(ByVal value As R) As IFuture(Of R)
-            Contract.Ensures(Contract.Result(Of IFuture(Of R))() IsNot Nothing)
-            Dim f = New Future(Of R)
+        Public Function Futurize(Of TValue)(ByVal value As TValue) As IFuture(Of TValue)
+            Contract.Ensures(Contract.Result(Of IFuture(Of TValue))() IsNot Nothing)
+            Dim f = New Future(Of TValue)
             f.SetValue(value)
             Return f
         End Function
 
         '''<summary>Returns a future for the final value of a future of a future.</summary>
         <Extension()>
-        Public Function Defuturize(Of R)(ByVal futureFutureValue As IFuture(Of IFuture(Of R))) As IFuture(Of R)
+        Public Function Defuturize(Of TValue)(ByVal futureFutureValue As IFuture(Of IFuture(Of TValue))) As IFuture(Of TValue)
             Contract.Requires(futureFutureValue IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of R))() IsNot Nothing)
-            Dim f = New Future(Of R)
-            futureFutureValue.CallWhenValueReady(Sub(futureValue) futureValue.CallWhenValueReady(Sub(value) f.SetValue(value)))
+            Contract.Ensures(Contract.Result(Of IFuture(Of TValue))() IsNot Nothing)
+            Dim f = New Future(Of TValue)
+            futureFutureValue.CallWhenValueReady(Sub(futureValue)
+                                                     Contract.Assume(futureValue IsNot Nothing)
+                                                     futureValue.CallWhenValueReady(Sub(value)
+                                                                                        Contract.Assume(f IsNot Nothing)
+                                                                                        f.SetValue(value)
+                                                                                    End Sub)
+                                                 End Sub)
             Return f
         End Function
 
@@ -196,7 +211,13 @@ Namespace Threading.Futures
             Contract.Requires(futureFuture IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
             Dim f = New Future
-            futureFuture.CallWhenValueReady(Sub(future) future.CallWhenReady(Sub() f.SetReady()))
+            futureFuture.CallWhenValueReady(Sub(future)
+                                                Contract.Assume(future IsNot Nothing)
+                                                future.CallWhenReady(Sub()
+                                                                         Contract.Assume(f IsNot Nothing)
+                                                                         f.SetReady()
+                                                                     End Sub)
+                                            End Sub)
             Return f
         End Function
     End Module

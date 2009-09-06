@@ -22,7 +22,7 @@ Public Class Throttle
     Private running As Boolean
     Private ReadOnly lock As New Object()
 
-    <ContractInvariantMethod()> Protected Sub Invariant()
+    <ContractInvariantMethod()> Private Sub ObjectInvariant()
         Contract.Invariant(nextAction IsNot Nothing)
         Contract.Invariant(cooldown.Ticks >= 0)
     End Sub

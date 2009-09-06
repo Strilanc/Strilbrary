@@ -7,10 +7,10 @@
         Implements IComparable(Of FiniteDouble)
         Implements IEquatable(Of FiniteDouble)
 
-        Private ReadOnly Value As Double
+        Public ReadOnly Value As Double
         Public Sub New(ByVal value As Double)
-            Contract.Requires(value.IsFinite())
             Contract.Ensures(Me.Value = value)
+            Contract.Assume(value.IsFinite()) '[not a Requires because the static verifier is horrible at proving things about doubles]
             Me.Value = value
         End Sub
 
@@ -28,7 +28,7 @@
             Return New FiniteDouble(leftOperand.Value * rightOperand.Value)
         End Operator
         Public Shared Operator /(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As FiniteDouble
-            Contract.Requires(rightOperand <> 0)
+            Contract.Requires(rightOperand.Value <> 0)
             Return New FiniteDouble(leftOperand.Value / rightOperand.Value)
         End Operator
         Public Shared Operator ^(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As FiniteDouble
@@ -44,34 +44,27 @@
 
 #Region "Comparisons"
         Public Shared Operator =(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As Boolean
-            Contract.Ensures(Contract.Result(Of Boolean)() = (leftOperand.Value = rightOperand.Value))
             Return leftOperand.Value = rightOperand.Value
         End Operator
         Public Shared Operator <>(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As Boolean
-            Contract.Ensures(Contract.Result(Of Boolean)() = (leftOperand.Value <> rightOperand.Value))
             Return leftOperand.Value <> rightOperand.Value
         End Operator
         Public Shared Operator >(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As Boolean
-            Contract.Ensures(Contract.Result(Of Boolean)() = (leftOperand.Value > rightOperand.Value))
             Return leftOperand.Value > rightOperand.Value
         End Operator
         Public Shared Operator <(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As Boolean
-            Contract.Ensures(Contract.Result(Of Boolean)() = (leftOperand.Value < rightOperand.Value))
             Return leftOperand.Value < rightOperand.Value
         End Operator
         Public Shared Operator <=(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As Boolean
-            Contract.Ensures(Contract.Result(Of Boolean)() = (leftOperand.Value <= rightOperand.Value))
             Return leftOperand.Value <= rightOperand.Value
         End Operator
         Public Shared Operator >=(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As Boolean
-            Contract.Ensures(Contract.Result(Of Boolean)() = (leftOperand.Value >= rightOperand.Value))
             Return leftOperand.Value >= rightOperand.Value
         End Operator
 #End Region
 
 #Region "Conversions"
         Public Shared Widening Operator CType(ByVal value As FiniteDouble) As Double
-            Contract.Ensures(Contract.Result(Of Double)() = value.Value)
             Return value.Value
         End Operator
         Public Shared Narrowing Operator CType(ByVal value As Double) As FiniteDouble
@@ -99,7 +92,7 @@
             Return Me.Value.GetHashCode()
         End Function
         Public Overrides Function ToString() As String
-            Return Value.ToString
+            Return Value.ToString(Globalization.CultureInfo.InvariantCulture)
         End Function
 #End Region
 
@@ -112,24 +105,28 @@
         Public Shared Function Max(ByVal values As IEnumerable(Of FiniteDouble)) As FiniteDouble
             Contract.Requires(values IsNot Nothing)
             Contract.Requires(values.Any)
-            Return Max(values.First, values.Skip(1).ToArray())
+            Return Max(values.First, values.SkipNonNull(1).ToArrayNonNull())
         End Function
         Public Shared Function Min(ByVal values As IEnumerable(Of FiniteDouble)) As FiniteDouble
             Contract.Requires(values IsNot Nothing)
             Contract.Requires(values.Any)
-            Return Min(values.First, values.Skip(1).ToArray())
+            Return Min(values.First, values.SkipNonNull(1).ToArrayNonNull())
         End Function
-        Public Shared Function Min(ByVal val As FiniteDouble, ByVal ParamArray values() As FiniteDouble) As FiniteDouble
+        Public Shared Function Min(ByVal initialValue As FiniteDouble, ByVal ParamArray values() As FiniteDouble) As FiniteDouble
+            Contract.Requires(values IsNot Nothing)
+            Dim value = initialValue
             For Each e In values
-                If e < val Then val = e
+                If e < value Then value = e
             Next e
-            Return val
+            Return value
         End Function
-        Public Shared Function Max(ByVal val As FiniteDouble, ByVal ParamArray values() As FiniteDouble) As FiniteDouble
+        Public Shared Function Max(ByVal initialValue As FiniteDouble, ByVal ParamArray values() As FiniteDouble) As FiniteDouble
+            Contract.Requires(values IsNot Nothing)
+            Dim value = initialValue
             For Each e In values
-                If e > val Then val = e
+                If e > value Then value = e
             Next e
-            Return val
+            Return value
         End Function
         Public ReadOnly Property Ceiling() As FiniteDouble
             Get

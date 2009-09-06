@@ -14,6 +14,8 @@ Namespace Threading.Futures
             Else
                 Dim timer = New Timers.Timer(ds)
                 AddHandler timer.Elapsed, Sub()
+                                              Contract.Assume(f IsNot Nothing)
+                                              Contract.Assume(timer IsNot Nothing)
                                               timer.Dispose()
                                               f.SetReady()
                                           End Sub
@@ -35,6 +37,7 @@ Namespace Threading.Futures
 
             Dim notify = Sub()
                              If Interlocked.Increment(numReady) >= numFutures Then
+                                 Contract.Assume(f IsNot Nothing)
                                  Call f.SetReady()
                              End If
                          End Sub
@@ -56,48 +59,60 @@ Namespace Threading.Futures
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Dim _queue = queue 'avoids contract verification problems with hoisted arguments
-            Dim _action = action
-            Return future.EvalWhenReady(Function() _queue.QueueAction(_action)).Defuturize
+            Return future.EvalWhenReady(Function()
+                                            Contract.Assume(queue IsNot Nothing)
+                                            Contract.Assume(action IsNot Nothing)
+                                            Return queue.QueueAction(action)
+                                        End Function).Defuturize
         End Function
 
         <Extension()>
-        Public Function QueueCallWhenValueReady(Of A1)(ByVal future As IFuture(Of A1),
-                                                       ByVal queue As ICallQueue,
-                                                       ByVal action As Action(Of A1)) As IFuture
+        Public Function QueueCallWhenValueReady(Of TArg)(ByVal future As IFuture(Of TArg),
+                                                         ByVal queue As ICallQueue,
+                                                         ByVal action As Action(Of TArg)) As IFuture
             Contract.Requires(future IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Dim _queue = queue 'avoids contract verification problems with hoisted arguments
-            Dim _action = action
-            Return future.EvalWhenValueReady(Function(result) _queue.QueueAction(Sub() _action(result))).Defuturize
+            Return future.EvalWhenValueReady(Function(result)
+                                                 Contract.Assume(queue IsNot Nothing)
+                                                 Return queue.QueueAction(Sub()
+                                                                              Contract.Assume(action IsNot Nothing)
+                                                                              action(result)
+                                                                          End Sub)
+                                             End Function).Defuturize
         End Function
 
         <Extension()>
-        Public Function QueueEvalWhenReady(Of R)(ByVal future As IFuture,
-                                                 ByVal queue As ICallQueue,
-                                                 ByVal func As Func(Of R)) As IFuture(Of R)
+        Public Function QueueEvalWhenReady(Of TReturn)(ByVal future As IFuture,
+                                                       ByVal queue As ICallQueue,
+                                                       ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
             Contract.Requires(future IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of R))() IsNot Nothing)
-            Dim _queue = queue 'avoids contract verification problems with hoisted arguments
-            Dim _func = func
-            Return future.EvalWhenReady(Function() _queue.QueueFunc(_func)).Defuturize
+            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
+            Return future.EvalWhenReady(Function()
+                                            Contract.Assume(queue IsNot Nothing)
+                                            Contract.Assume(func IsNot Nothing)
+                                            Return queue.QueueFunc(func)
+                                        End Function).Defuturize
         End Function
 
         <Extension()>
-        Public Function QueueEvalWhenValueReady(Of A1, R)(ByVal future As IFuture(Of A1),
-                                                          ByVal queue As ICallQueue,
-                                                          ByVal func As Func(Of A1, R)) As IFuture(Of R)
+        Public Function QueueEvalWhenValueReady(Of TArg, TReturn)(ByVal future As IFuture(Of TArg),
+                                                                  ByVal queue As ICallQueue,
+                                                                  ByVal func As Func(Of TArg, TReturn)) As IFuture(Of TReturn)
             Contract.Requires(future IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of R))() IsNot Nothing)
-            Dim _queue = queue 'avoids contract verification problems with hoisted arguments
-            Dim _func = func
-            Return future.EvalWhenValueReady(Function(result) _queue.QueueFunc(Function() _func(result))).Defuturize
+            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
+            Return future.EvalWhenValueReady(Function(result)
+                                                 Contract.Assume(queue IsNot Nothing)
+                                                 Return queue.QueueFunc(Function()
+                                                                            Contract.Assume(func IsNot Nothing)
+                                                                            Return func(result)
+                                                                        End Function)
+                                             End Function).Defuturize
         End Function
     End Module
 End Namespace

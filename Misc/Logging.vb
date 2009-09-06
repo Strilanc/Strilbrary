@@ -1,5 +1,5 @@
 Namespace Logging
-    Public Enum LogMessageTypes
+    Public Enum LogMessageType
         Typical
         DataEvent
         DataParsed
@@ -10,9 +10,13 @@ Namespace Logging
     End Enum
 
     Public Class Logger
-        Public Event LoggedMessage(ByVal type As LogMessageTypes, ByVal message As ExpensiveValue(Of String))
+        Public Event LoggedMessage(ByVal type As LogMessageType, ByVal message As ExpensiveValue(Of String))
         Public Event LoggedFutureMessage(ByVal placeholder As String, ByVal message As IFuture(Of Outcome))
         Private ReadOnly ref As ICallQueue
+
+        <ContractInvariantMethod()> Private Sub ObjectInvariant()
+            Contract.Invariant(ref IsNot Nothing)
+        End Sub
 
         Public Sub New(Optional ByVal ref As ICallQueue = Nothing)
             Me.ref = If(ref, New ThreadPooledCallQueue())
@@ -20,15 +24,19 @@ Namespace Logging
 
         Public Sub FutureLog(ByVal placeholder As String, ByVal message As IFuture(Of Outcome))
             ref.QueueAction(Sub()
+                                Contract.Assume(Me IsNot Nothing)
                                 RaiseEvent LoggedFutureMessage(placeholder, message)
                             End Sub)
         End Sub
-        Public Sub Log(ByVal message As ExpensiveValue(Of String), ByVal messageType As LogMessageTypes)
+        Public Sub Log(ByVal message As ExpensiveValue(Of String), ByVal messageType As LogMessageType)
+            Contract.Requires(message IsNot Nothing)
             ref.QueueAction(Sub()
+                                Contract.Assume(Me IsNot Nothing)
                                 RaiseEvent LoggedMessage(messageType, message)
                             End Sub)
         End Sub
-        Public Sub Log(ByVal message As Func(Of String), ByVal messageType As LogMessageTypes)
+        Public Sub Log(ByVal message As Func(Of String), ByVal messageType As LogMessageType)
+            Contract.Requires(message IsNot Nothing)
             Log(New ExpensiveValue(Of String)(message), messageType)
         End Sub
     End Class
@@ -36,7 +44,7 @@ Namespace Logging
     '''<summary>Implements a simple way to log unexpected exceptions.</summary>
     '''<remarks>One of those rare cases where a global is appropriate.</remarks>
     Public Module UnexpectedExceptionLogging
-        Public Event CaughtUnexpectedException(ByVal context As String, ByVal e As Exception)
+        Public Event CaughtUnexpectedException(ByVal context As String, ByVal exception As Exception)
         Private ReadOnly ref As ICallQueue = New ThreadPooledCallQueue
 
         Public Function GenerateUnexpectedExceptionDescription(ByVal context As String, ByVal exception As Exception) As String
@@ -49,8 +57,10 @@ Namespace Logging
             'exception information
             For inner_recurse = 0 To 10
                 'info
-                message += Environment.NewLine + "Exception Type: " + exception.GetType.Name
-                message += Environment.NewLine + "Exception Message: " + exception.Message
+                Dim type = exception.GetType
+                Contract.Assume(type IsNot Nothing)
+                message += Environment.NewLine + "Exception Type: {0}".Frmt(type.Name)
+                message += Environment.NewLine + "Exception Message: {1}".Frmt(exception.Message)
                 If exception.StackTrace IsNot Nothing Then
                     message += Environment.NewLine + "Stack Trace: " + Environment.NewLine + indent(exception.StackTrace.ToString())
                 Else

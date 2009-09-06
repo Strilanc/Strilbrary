@@ -4,9 +4,13 @@ Namespace Threading
     Public Interface ICoroutineController
         Sub Yield()
     End Interface
-    Public Interface ICoroutineController(Of R)
-        Sub Yield(ByVal value As R)
+    Public Interface ICoroutineController(Of TReturn)
+        Sub Yield(ByVal value As TReturn)
     End Interface
+    Public Enum CoroutineOutcome
+        Continuing
+        Finished
+    End Enum
 
     ''' <summary>
     ''' Allows action which effectively yield control at multiple points in their execution.
@@ -23,7 +27,7 @@ Namespace Threading
         Private ReadOnly lockProducer As New ManualResetEvent(initialState:=True)
         Private ReadOnly lockConsumer As New ManualResetEvent(initialState:=False)
 
-        <ContractInvariantMethod()> Protected Sub Invariant()
+        <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(lockDisposed IsNot Nothing)
             Contract.Invariant(lockJoined IsNot Nothing)
             Contract.Invariant(lockProducer IsNot Nothing)
@@ -31,11 +35,14 @@ Namespace Threading
         End Sub
 
         Public Sub New(ByVal coroutineAction As Action(Of ICoroutineController))
-            Contract.Assume(coroutineAction IsNot Nothing) 'changing to requires hit some sort of bug in 1.2 contracts
+            Contract.Assume(coroutineAction IsNot Nothing)
 
             Call ThreadedAction(
                 Sub()
-                    lockJoined.WaitOne()
+                    Contract.Assume(Me IsNot Nothing)
+                    Contract.Assume(lockJoined IsNot Nothing)
+                    Contract.Assume(coroutineAction IsNot Nothing)
+                    Me.lockJoined.WaitOne()
 
                     Try
                         coroutineAction(Me)
@@ -50,11 +57,7 @@ Namespace Threading
             )
         End Sub
 
-        Public Enum ContinueOutcome
-            Continuing
-            Finished
-        End Enum
-        Public Function [Continue]() As ContinueOutcome
+        Public Function [Continue]() As CoroutineOutcome
             If lockDisposed.WasAcquired Then Throw New ObjectDisposedException(Me.GetType.Name)
 
             lockProducer.Reset()
@@ -65,10 +68,10 @@ Namespace Threading
             End If
             lockProducer.WaitOne()
 
-            If exception IsNot Nothing Then Throw New Exception("Coroutine threw an exception.", exception)
-            If finished Then Return ContinueOutcome.Finished
+            If exception IsNot Nothing Then Throw New InvalidOperationException("Coroutine threw an exception.", exception)
+            If finished Then Return CoroutineOutcome.Finished
             If lockDisposed.WasAcquired Then Throw New ObjectDisposedException(Me.GetType.Name)
-            Return ContinueOutcome.Continuing
+            Return CoroutineOutcome.Continuing
         End Function
         Private Sub [Yield]() Implements ICoroutineController.Yield
             If lockDisposed.WasAcquired Then Throw New ObjectDisposedException(Me.GetType.Name)
@@ -96,43 +99,37 @@ Namespace Threading
     ''' <summary>
     ''' Allows functions which effectively yield values at multiple points in their execution.
     ''' </summary>
-    Public NotInheritable Class Coroutine(Of R)
-        Implements ICoroutineController(Of R)
-        Implements IEnumerator(Of R)
+    Public NotInheritable Class Coroutine(Of TReturn)
+        Implements ICoroutineController(Of TReturn)
+        Implements IEnumerator(Of TReturn)
         Private coroutineContinuer As Coroutine
         Private coroutineYielder As ICoroutineController
-        Private cur As R
+        Private cur As TReturn
 
-        Public Sub New(ByVal coroutineFunction As Action(Of ICoroutineController(Of R)))
-            Contract.Requires(coroutineFunction IsNot Nothing)
-            Dim cofunction_ = coroutineFunction
+        <ContractInvariantMethod()> Protected Sub ObjectInvariant()
+            Contract.Invariant(coroutineContinuer IsNot Nothing)
+        End Sub
+
+        Public Sub New(ByVal coroutineFunction As Action(Of ICoroutineController(Of TReturn)))
+            'Contract.Requires(coroutineFunction IsNot Nothing)
             Me.coroutineContinuer = New Coroutine(Sub(yielder)
+                                                      Contract.Assume(Me IsNot Nothing)
+                                                      Contract.Assume(coroutineFunction IsNot Nothing)
                                                       Me.coroutineYielder = yielder
-                                                      Call cofunction_(Me)
+                                                      Call coroutineFunction(Me)
                                                   End Sub)
         End Sub
 
-        Private Sub [Yield](ByVal value As R) Implements ICoroutineController(Of R).Yield
+        Private Sub [Yield](ByVal value As TReturn) Implements ICoroutineController(Of TReturn).Yield
+            Contract.Assume(Me.coroutineYielder IsNot Nothing)
             cur = value
             coroutineYielder.Yield()
         End Sub
 
-        Public Enum ContinueOutcome
-            ProducedValue
-            Finished
-        End Enum
-        Public Function [Continue]() As ContinueOutcome
-            Dim c = coroutineContinuer.Continue()
-            Select Case c
-                Case Coroutine.ContinueOutcome.Continuing
-                    Return ContinueOutcome.ProducedValue
-                Case Coroutine.ContinueOutcome.Finished
-                    Return ContinueOutcome.Finished
-                Case Else
-                    Throw c.ValueShouldBeImpossibleException()
-            End Select
+        Public Function [Continue]() As CoroutineOutcome
+            Return coroutineContinuer.Continue()
         End Function
-        Public ReadOnly Property Current() As R Implements IEnumerator(Of R).Current
+        Public ReadOnly Property Current() As TReturn Implements IEnumerator(Of TReturn).Current
             Get
                 Return cur
             End Get
@@ -144,11 +141,11 @@ Namespace Threading
             End Get
         End Property
 
-        Public Function MoveNext() As Boolean Implements IEnumerator(Of R).MoveNext
-            Return Me.Continue = ContinueOutcome.ProducedValue
+        Public Function MoveNext() As Boolean Implements IEnumerator(Of TReturn).MoveNext
+            Return Me.Continue() = CoroutineOutcome.Continuing
         End Function
 
-        Public Sub Reset() Implements IEnumerator(Of R).Reset
+        Public Sub Reset() Implements IEnumerator(Of TReturn).Reset
             Throw New NotSupportedException()
         End Sub
 

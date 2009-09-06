@@ -31,11 +31,11 @@ End Class
 Public Class ViewableList(Of T)
     Implements IReadableList(Of T)
     Implements IEnumerable(Of T)
-    Protected ReadOnly items As IList(Of T)
-    Protected ReadOnly offset As Integer
-    Protected ReadOnly _length As Integer
+    Private ReadOnly items As IList(Of T)
+    Private ReadOnly offset As Integer
+    Private ReadOnly _length As Integer
 
-    <ContractInvariantMethod()> Protected Sub Invariant()
+    <ContractInvariantMethod()> Private Sub ObjectInvariant()
         Contract.Invariant(offset >= 0)
         Contract.Invariant(_length >= 0)
         Contract.Invariant(offset + _length <= items.Count)
@@ -65,12 +65,15 @@ Public Class ViewableList(Of T)
 
     Default Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
         Get
+            Contract.Assume(index + offset < items.Count)
             Return items(index + offset)
         End Get
     End Property
 
     Public ReadOnly Property Length As Integer Implements IReadableList(Of T).Length
         Get
+            Contract.Ensures(Contract.Result(Of Integer)() >= 0)
+            Contract.Ensures(Contract.Result(Of Integer)() = Me._length)
             Return _length
         End Get
     End Property
@@ -88,15 +91,17 @@ Public Class ViewableList(Of T)
         Contract.Requires(relativeLength >= 0)
         Contract.Requires(relativeOffset + relativeLength <= Me.Length)
         Contract.Ensures(Contract.Result(Of ViewableList(Of T))() IsNot Nothing)
-        Return New ViewableList(Of T)(items, relativeOffset, relativeLength, offset, Length)
+        Return New ViewableList(Of T)(items, relativeOffset, relativeLength, offset, Me.Length)
     End Function
 
     Private Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
         Dim nextIndex = 0
         Return New Enumerator(Of T)(Function(controller)
                                         Contract.Requires(controller IsNot Nothing)
+                                        Contract.Assume(controller IsNot Nothing)
+                                        Contract.Assume(Me IsNot Nothing)
                                         Contract.Assume(nextIndex >= 0)
-                                        If nextIndex >= _length Then  Return controller.Break()
+                                        If nextIndex >= Me.Length Then  Return controller.Break()
                                         Dim e = Item(nextIndex)
                                         nextIndex += 1
                                         Return e

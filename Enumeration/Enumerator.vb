@@ -53,7 +53,7 @@
             Me.generator = generator
         End Sub
 
-        <ContractInvariantMethod()> Protected Sub Invariant()
+        <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(generator IsNot Nothing)
         End Sub
 
