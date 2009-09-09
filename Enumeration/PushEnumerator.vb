@@ -3,7 +3,7 @@
     ''' Reverses the direction of an enumerator, allowing you to push values instead of pulling them.
     ''' </summary>
     Public NotInheritable Class PushEnumerator(Of T)
-        Inherits NotifyingDisposable
+        Inherits FutureDisposable
         Private finished As Boolean
         Private ReadOnly sequenceQueue As New Queue(Of IEnumerator(Of T))
         Private ReadOnly coroutine As Coroutine
@@ -35,6 +35,9 @@
 
                             'Move to next element, and when current sequence runs out grab another one
                             While curSubsequence Is Nothing OrElse Not curSubsequence.MoveNext
+                                If curSubsequence IsNot Nothing Then
+                                    curSubsequence.Dispose()
+                                End If
                                 If sequenceQueue.Count <= 0 Then
                                     'Wait for more elements
                                     Call coroutineController.Yield()
@@ -75,8 +78,8 @@
             coroutine.Continue()
         End Sub
 
-        Protected Overrides Sub Dispose(ByVal disposing As Boolean)
-            If disposing Then
+        Protected Overrides Sub PerformDispose(ByVal finalizing As Boolean)
+            If Not finalizing Then
                 coroutine.Dispose()
             End If
         End Sub

@@ -114,5 +114,105 @@ Namespace Threading.Futures
                                                                         End Function)
                                              End Function).Defuturize
         End Function
+
+        Public Sub FutureIterate(Of T)(ByVal producer As Func(Of IFuture(Of T)),
+                                       ByVal consumer As Func(Of T, IFuture(Of Boolean)))
+            Contract.Requires(producer IsNot Nothing)
+            Contract.Requires(consumer IsNot Nothing)
+
+            Dim q = producer()
+            Contract.Assume(q IsNot Nothing)
+            q.CallWhenValueReady(YCombinator(Of T)(
+                Function(self) Sub(result)
+                                   Contract.Assume(consumer IsNot Nothing)
+                                   Dim c = consumer(result)
+                                   Contract.Assume(c IsNot Nothing)
+                                   c.CallWhenValueReady(
+                                       Sub([continue])
+                                           Contract.Assume(self IsNot Nothing)
+                                           If [continue] Then
+                                               Contract.Assume(producer IsNot Nothing)
+                                               Dim p = producer()
+                                               Contract.Assume(p IsNot Nothing)
+                                               p.CallWhenValueReady(self)
+                                           End If
+                                       End Sub)
+                               End Sub))
+        End Sub
+
+        <Extension()>
+        <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
+        Public Function FutureRead(ByVal stream As IO.Stream,
+                                           ByVal buffer() As Byte,
+                                           ByVal offset As Integer,
+                                           ByVal count As Integer) As IFuture(Of PossibleException(Of Integer, Exception))
+            Contract.Requires(stream IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IFuture(Of PossibleException(Of Integer, Exception)))() IsNot Nothing)
+            Dim f = New Future(Of PossibleException(Of Integer, Exception))
+            Try
+                stream.BeginRead(buffer, offset, count, Sub(ar)
+                                                            Contract.Requires(ar IsNot Nothing)
+                                                            Contract.Assume(f IsNot Nothing)
+                                                            Contract.Assume(ar IsNot Nothing)
+                                                            Contract.Assume(stream IsNot Nothing)
+                                                            Try
+                                                                f.SetValue(stream.EndRead(ar))
+                                                            Catch e As Exception
+                                                                f.SetValue(e)
+                                                            End Try
+                                                        End Sub, Nothing)
+            Catch e As Exception
+                f.SetValue(e)
+            End Try
+            Return f
+        End Function
+
+        Public Function ThreadedAction(ByVal action As Action) As IFuture
+            Contract.Requires(action IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
+            Dim f As New Future
+            Call New Thread(Sub() RunWithDebugTrap(Sub()
+                                                       Contract.Assume(action IsNot Nothing)
+                                                       Contract.Assume(f IsNot Nothing)
+                                                       Call action()
+                                                       Call f.SetReady()
+                                                   End Sub, "Exception rose past ThreadedAction.")).Start()
+            Return f
+        End Function
+        Public Function ThreadedFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
+            Contract.Requires(func IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
+            Dim f As New Future(Of TReturn)
+            ThreadedAction(Sub()
+                               Contract.Assume(func IsNot Nothing)
+                               Contract.Assume(f IsNot Nothing)
+                               f.SetValue(func())
+                           End Sub)
+            Return f
+        End Function
+
+        Public Function ThreadPooledAction(ByVal action As Action) As IFuture
+            Contract.Requires(action IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
+            Dim f As New Future
+            ThreadPool.QueueUserWorkItem(Sub() RunWithDebugTrap(Sub()
+                                                                    Contract.Assume(action IsNot Nothing)
+                                                                    Contract.Assume(f IsNot Nothing)
+                                                                    Call action()
+                                                                    Call f.SetReady()
+                                                                End Sub, "Exception rose past ThreadPooledAction."))
+            Return f
+        End Function
+        Public Function ThreadPooledFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
+            Contract.Requires(func IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
+            Dim f As New Future(Of TReturn)
+            ThreadPooledAction(Sub()
+                                   Contract.Assume(func IsNot Nothing)
+                                   Contract.Assume(f IsNot Nothing)
+                                   f.SetValue(func())
+                               End Sub)
+            Return f
+        End Function
     End Module
 End Namespace

@@ -39,20 +39,21 @@
     <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
     <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
     <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
-    <CodeContractsRunCodeAnalysis>False</CodeContractsRunCodeAnalysis>
+    <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
     <CodeContractsBuildReferenceAssembly>False</CodeContractsBuildReferenceAssembly>
     <CodeContractsNonNullObligations>False</CodeContractsNonNullObligations>
-    <CodeContractsBoundsObligations>False</CodeContractsBoundsObligations>
-    <CodeContractsArithmeticObligations>False</CodeContractsArithmeticObligations>
+    <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
+    <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
     <CodeContractsLibPaths />
     <CodeContractsPlatformPath />
     <CodeContractsExtraAnalysisOptions />
     <CodeContractsBaseLineFile />
     <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
-    <CodeContractsRunInBackground>False</CodeContractsRunInBackground>
+    <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
     <CodeContractsShowSquigglies>False</CodeContractsShowSquigglies>
     <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
     <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
@@ -70,20 +71,21 @@
     <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
     <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
     <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
-    <CodeContractsRunCodeAnalysis>False</CodeContractsRunCodeAnalysis>
+    <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
     <CodeContractsBuildReferenceAssembly>False</CodeContractsBuildReferenceAssembly>
     <CodeContractsNonNullObligations>False</CodeContractsNonNullObligations>
-    <CodeContractsBoundsObligations>False</CodeContractsBoundsObligations>
-    <CodeContractsArithmeticObligations>False</CodeContractsArithmeticObligations>
+    <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
+    <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
     <CodeContractsLibPaths />
     <CodeContractsPlatformPath />
     <CodeContractsExtraAnalysisOptions />
     <CodeContractsBaseLineFile />
     <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
-    <CodeContractsRunInBackground>False</CodeContractsRunInBackground>
+    <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
     <CodeContractsShowSquigglies>False</CodeContractsShowSquigglies>
     <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
     <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -103,6 +105,7 @@
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="Strilbrary.Enumeration" />
+    <Import Include="Strilbrary.Exceptions" />
     <Import Include="Strilbrary.Logging" />
     <Import Include="Strilbrary.Threading" />
     <Import Include="Strilbrary.Threading.Futures" />
@@ -120,14 +123,18 @@
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="CustomDictionary.xml" />
-    <Compile Include="Data Structures\BitBuffer.vb" />
-    <Compile Include="Data Structures\ModByte.vb" />
-    <Compile Include="Data Structures\ModInt16.vb" />
-    <Compile Include="Data Structures\FiniteDouble.vb" />
-    <Compile Include="Data Structures\LockFreeQueue.vb" />
-    <Compile Include="Data Structures\Locks.vb" />
-    <Compile Include="Data Structures\ModInt32.vb" />
-    <Compile Include="Data Structures\ViewableList.vb" />
+    <Compile Include="Exceptions\Exception Types.vb" />
+    <Compile Include="Exceptions\Exception Extensions.vb" />
+    <Compile Include="Misc\BitBuffer.vb" />
+    <Compile Include="Misc\Throttle.vb" />
+    <Compile Include="Numerics\ModByte.vb" />
+    <Compile Include="Numerics\ModInt16.vb" />
+    <Compile Include="Numerics\FiniteDouble.vb" />
+    <Compile Include="Threading\Queueing\AbstractLockFreeConsumer.vb" />
+    <Compile Include="Threading\Queueing\SingleConsumerLockFreeQueue.vb" />
+    <Compile Include="Threading\OneTimeLock.vb" />
+    <Compile Include="Numerics\ModInt32.vb" />
+    <Compile Include="Misc\ViewableList.vb" />
     <Compile Include="Enumeration\Enumerable.vb" />
     <Compile Include="Enumeration\Enumerator.vb" />
     <Compile Include="Enumeration\PushEnumerator.vb" />
@@ -135,10 +142,9 @@
     <Compile Include="Streams\ReadOnlyStream.vb" />
     <Compile Include="Streams\WrappedReadOnlyStream.vb" />
     <Compile Include="Threading\Coroutine.vb" />
-    <Compile Include="Threading\ThreadingCommon.vb" />
-    <Compile Include="Threading\Futures.vb" />
-    <Compile Include="Threading\FuturesExtra.vb" />
-    <Compile Include="Threading\Queueing.vb" />
+    <Compile Include="Threading\Futures\Futures.vb" />
+    <Compile Include="Threading\Futures\FuturesExtra.vb" />
+    <Compile Include="Threading\Queueing\CallQueue.vb" />
     <Compile Include="Misc\Logging.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -161,8 +167,8 @@
     <Compile Include="Streams\ZLibStream.vb" />
     <Compile Include="Misc\Common.vb" />
     <Compile Include="Enumeration\Converter.vb" />
-    <Compile Include="Misc\Disposable.vb" />
-    <Compile Include="Misc\Exceptions.vb" />
+    <Compile Include="Threading\Futures\FutureDisposable.vb" />
+    <Compile Include="Exceptions\Possible Exception.vb" />
     <Compile Include="Enumeration\LinqExtensions.vb" />
   </ItemGroup>
   <ItemGroup>

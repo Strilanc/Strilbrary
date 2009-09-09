@@ -8,6 +8,7 @@
                                      ByVal leaveOpen As Boolean) As IO.Stream
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
+
             Select Case mode
                 Case IO.Compression.CompressionMode.Decompress
                     stream.ReadByte()
@@ -16,8 +17,9 @@
                     stream.WriteByte(120)
                     stream.WriteByte(156)
                 Case Else
-                    Throw mode.ValueShouldBeImpossibleException()
+                    Throw mode.MakeArgumentValueException("mode")
             End Select
+
             Return New IO.Compression.DeflateStream(stream, mode, leaveOpen)
         End Function
         Public Sub New(ByVal substream As IO.Stream,

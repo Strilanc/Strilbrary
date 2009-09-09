@@ -17,23 +17,23 @@ Namespace Threading
     ''' </summary>
     ''' <remarks>Uses locks and an alternate thread. Not very lightweight.</remarks>
     Public NotInheritable Class Coroutine
-        Implements IDisposable
+        Inherits FutureDisposable
         Implements ICoroutineController
         Private started As Boolean
         Private finished As Boolean
-        Private exception As Exception
-        Private ReadOnly lockDisposed As New OnetimeLock()
+        Private coexception As Exception
         Private ReadOnly lockJoined As New ManualResetEvent(initialState:=False)
         Private ReadOnly lockProducer As New ManualResetEvent(initialState:=True)
         Private ReadOnly lockConsumer As New ManualResetEvent(initialState:=False)
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
-            Contract.Invariant(lockDisposed IsNot Nothing)
+            Contract.Invariant(coexception Is Nothing OrElse finished)
             Contract.Invariant(lockJoined IsNot Nothing)
             Contract.Invariant(lockProducer IsNot Nothing)
             Contract.Invariant(lockConsumer IsNot Nothing)
         End Sub
 
+        <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
         Public Sub New(ByVal coroutineAction As Action(Of ICoroutineController))
             Contract.Assume(coroutineAction IsNot Nothing)
 
@@ -47,18 +47,21 @@ Namespace Threading
                     Try
                         coroutineAction(Me)
                     Catch ex As Exception
-                        If lockDisposed.WasAcquired Then  LogUnexpectedException("Coroutine threw an exception after being disposed.", ex)
-                        exception = ex
+                        coexception = ex
                     End Try
 
+                    If FutureDisposed.State = FutureState.Ready Then
+                        coexception = New ObjectDisposedException(Me.GetType.Name, coexception)
+                    End If
                     finished = True
-                    Dispose()
+                    lockProducer.Set()
+                    lockConsumer.Set()
                 End Sub
             )
         End Sub
 
         Public Function [Continue]() As CoroutineOutcome
-            If lockDisposed.WasAcquired Then Throw New ObjectDisposedException(Me.GetType.Name)
+            CheckNotDisposed()
 
             lockProducer.Reset()
             lockConsumer.Set()
@@ -68,31 +71,35 @@ Namespace Threading
             End If
             lockProducer.WaitOne()
 
-            If exception IsNot Nothing Then Throw New InvalidOperationException("Coroutine threw an exception.", exception)
-            If finished Then Return CoroutineOutcome.Finished
-            If lockDisposed.WasAcquired Then Throw New ObjectDisposedException(Me.GetType.Name)
-            Return CoroutineOutcome.Continuing
+            If coexception IsNot Nothing Then Throw New InvalidOperationException("Coroutine threw an exception.", coexception)
+            If finished Then
+                Dispose()
+                Return CoroutineOutcome.Finished
+            Else
+                CheckNotDisposed()
+                Return CoroutineOutcome.Continuing
+            End If
         End Function
         Private Sub [Yield]() Implements ICoroutineController.Yield
-            If lockDisposed.WasAcquired Then Throw New ObjectDisposedException(Me.GetType.Name)
+            CheckNotDisposed()
 
             lockConsumer.Reset()
             lockProducer.Set()
             lockConsumer.WaitOne()
 
-            If lockDisposed.WasAcquired Then Throw New ObjectDisposedException(Me.GetType.Name)
+            CheckNotDisposed()
         End Sub
 
-        Public Sub Dispose() Implements IDisposable.Dispose
-            If lockDisposed.TryAcquire Then
-                lockProducer.Set()
-                lockConsumer.Set()
-                GC.SuppressFinalize(Me)
+        Private Sub CheckNotDisposed()
+            If FutureDisposed.State = FutureState.Ready Then Throw New ObjectDisposedException(Me.GetType.Name)
+        End Sub
+
+        Protected Overrides Sub PerformDispose(ByVal finalizing As Boolean)
+            If Not finalizing Then
+                lockProducer.Dispose()
+                lockConsumer.Dispose()
+                lockJoined.Dispose()
             End If
-        End Sub
-
-        Protected Overrides Sub Finalize()
-            Dispose()
         End Sub
     End Class
 

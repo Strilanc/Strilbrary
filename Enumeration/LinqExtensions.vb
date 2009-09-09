@@ -191,11 +191,11 @@
         Public Function ToList(Of T)(ByVal list As IList(Of T)) As List(Of T)
             Contract.Requires(list IsNot Nothing)
             Contract.Ensures(Contract.Result(Of List(Of T))() IsNot Nothing)
-            Dim ret As New List(Of T)(list.Count)
+            Dim newList As New List(Of T)(list.Count)
             For i = 0 To list.Count - 1
-                ret.Add(list(i))
+                newList.Add(list(i))
             Next i
-            Return ret
+            Return newList
         End Function
 
         '''<summary>Creates an array containing all the elements of an IList.</summary>
@@ -203,11 +203,11 @@
         Public Function ToArray(Of T)(ByVal list As IList(Of T)) As T()
             Contract.Requires(list IsNot Nothing)
             Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
-            Dim ret(0 To list.Count - 1) As T
+            Dim newArray(0 To list.Count - 1) As T
             For i = 0 To list.Count - 1
-                ret(i) = list(i)
+                newArray(i) = list(i)
             Next i
-            Return ret
+            Return newArray
         End Function
 
         '''<summary>Creates an array containing all the elements of an IList.</summary>

@@ -1,12 +1,19 @@
 Imports System.Threading
 
 Namespace Threading.Futures
+    Public Enum FutureState
+        '''<summary>The future was not ready, but now may or may not be ready.</summary>
+        Unknown
+        '''<summary>The future is definitely and permanently ready.</summary>
+        Ready
+    End Enum
+
     '''<summary>Represents a thread-safe read-only class that fires an event when it becomes ready.</summary>
     Public Interface IFuture
         '''<summary>Raised when the future becomes ready.</summary>
         Event Readied()
-        '''<summary>Returns true if the future is ready.</summary>
-        ReadOnly Property IsReady() As Boolean
+        '''<summary>Returns the future's state.</summary>
+        ReadOnly Property State() As FutureState
     End Interface
 
     '''<summary>Represents a thread-safe read-only class that fires an event when its value becomes ready.</summary>
@@ -29,10 +36,10 @@ Namespace Threading.Futures
             Contract.Invariant(lockReady IsNot Nothing)
         End Sub
 
-        '''<summary>Returns true if the future is ready.</summary>
-        Public ReadOnly Property IsReady() As Boolean Implements IFuture.IsReady
+        '''<summary>Returns the future's state.</summary>
+        Public ReadOnly Property State() As FutureState Implements IFuture.state
             Get
-                Return lockReady.WasAcquired
+                Return If(lockReady.State = OnetimeLockState.Acquired, FutureState.Ready, FutureState.Unknown)
             End Get
         End Property
 
@@ -67,10 +74,10 @@ Namespace Threading.Futures
             Contract.Invariant(lockReady IsNot Nothing)
         End Sub
 
-        '''<summary>Returns true if the future is ready.</summary>
-        Public ReadOnly Property IsReady() As Boolean Implements IFuture.IsReady
+        '''<summary>Returns the future's state.</summary>
+        Public ReadOnly Property State() As FutureState Implements IFuture.state
             Get
-                Return lockReady.WasAcquired
+                Return If(lockReady.State = OnetimeLockState.Acquired, FutureState.Ready, FutureState.Unknown)
             End Get
         End Property
 
@@ -80,7 +87,7 @@ Namespace Threading.Futures
         '''</summary>
         Public ReadOnly Property Value() As TValue Implements IFuture(Of TValue).Value
             Get
-                If Not IsReady Then Throw New InvalidOperationException("Attempted to get a future value before it was ready.")
+                If State <> FutureState.Ready Then Throw New InvalidOperationException("Attempted to get a future value before it was ready.")
                 Return _value
             End Get
         End Property
@@ -117,21 +124,25 @@ Namespace Threading.Futures
 
             Dim lock = New OnetimeLock()
             Dim f = New Future()
-            Dim callback As IFuture.ReadiedEventHandler
-            callback = Sub() ThreadPool.QueueUserWorkItem(Sub()
-                                                              Contract.Assume(f IsNot Nothing)
-                                                              Contract.Assume(action IsNot Nothing)
-                                                              Contract.Assume(future IsNot Nothing)
-                                                              Contract.Assume(lock IsNot Nothing)
-                                                              If lock.TryAcquire Then 'only run once
-                                                                  RemoveHandler future.Readied, callback
-                                                                  Call RunWithDebugTrap(action, "Future callback")
-                                                                  f.SetReady()
-                                                              End If
-                                                          End Sub)
+            Dim handler As IFuture.ReadiedEventHandler
+            handler = Sub() ThreadPool.QueueUserWorkItem(Sub()
+                                                             Contract.Assume(f IsNot Nothing)
+                                                             Contract.Assume(action IsNot Nothing)
+                                                             Contract.Assume(future IsNot Nothing)
+                                                             Contract.Assume(lock IsNot Nothing)
+                                                             If lock.TryAcquire Then 'only run once
+                                                                 RemoveHandler future.Readied, handler
+                                                                 Call RunWithDebugTrap(action, "Future callback")
+                                                                 f.SetReady()
+                                                             End If
+                                                         End Sub)
 
-            AddHandler future.Readied, callback
-            If future.IsReady Then Call callback() 'in case the future was already ready
+            AddHandler future.Readied, handler
+            If future.State = FutureState.Ready Then
+                'If the future was already ready, this will ensure the handler is called
+                'If the future just became ready after adding the handler, this will be an ignored duplicated call
+                Call handler()
+            End If
 
             Return f
         End Function

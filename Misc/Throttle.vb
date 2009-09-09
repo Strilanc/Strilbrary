@@ -1,20 +1,5 @@
 ﻿Imports System.Threading
 
-'''<summary>A lock which can only be acquired once, and never released.</summary>
-Public Class OnetimeLock
-    Private acquired As Integer
-
-    Public Function TryAcquire() As Boolean
-        Return Interlocked.Exchange(acquired, 1) = 0
-    End Function
-
-    Public ReadOnly Property WasAcquired As Boolean
-        Get
-            Return acquired <> 0
-        End Get
-    End Property
-End Class
-
 Public Class Throttle
     Private ReadOnly cooldown As TimeSpan
     Private nextAction As Action

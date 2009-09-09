@@ -33,7 +33,7 @@ Public Module Pack
             Case byteOrder.BigEndian
                 'no change required
             Case Else
-                Throw byteOrder.ValueShouldBeImpossibleException
+                Throw byteOrder.MakeArgumentValueException("byteOrder")
         End Select
         For Each b In data
             val <<= 8
@@ -74,7 +74,7 @@ Public Module Pack
             Case byteOrder.LittleEndian
                 Return data
             Case Else
-                Throw byteOrder.ValueShouldBeImpossibleException
+                Throw byteOrder.MakeArgumentValueException("byteOrder")
         End Select
     End Function
 
@@ -176,7 +176,7 @@ Public Module Pack
             Case byteOrder.BigEndian
                 'no change needed
             Case Else
-                Throw byteOrder.ValueShouldBeImpossibleException
+                Throw byteOrder.MakeArgumentValueException("byteOrder")
         End Select
 
         Dim val = 0UL

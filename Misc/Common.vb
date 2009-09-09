@@ -91,10 +91,20 @@ Public Module PoorlyCategorizedFunctions
         Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
         Return String.Format(Globalization.CultureInfo.InvariantCulture, format, args)
     End Function
+    <Extension()> <Pure()>
+    Public Function StringJoin(Of T)(ByVal this As IEnumerable(Of T), ByVal separator As String) As String
+        Contract.Requires(this IsNot Nothing)
+        Contract.Requires(separator IsNot Nothing)
+        Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
+        Dim words = From arg In this Select String.Concat(arg)
+        Contract.Assume(words IsNot Nothing)
+        Return String.Join(separator, words.ToArrayNonNull)
+    End Function
 #End Region
 
 #Region "Enums"
     <Pure()> <Extension()>
+    <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
     Public Function EnumFlagsToString(Of T)(ByVal enumValue As T) As String
         Dim v = CULng(CType(enumValue, Object))
         If v = 0 Then Return enumValue.ToString
@@ -210,6 +220,7 @@ Public Module PoorlyCategorizedFunctions
         value2 = vt
     End Sub
 
+    <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
     Public Sub RunWithDebugTrap(ByVal action As Action, ByVal context As String)
         Contract.Requires(action IsNot Nothing)
         Contract.Requires(context IsNot Nothing)
@@ -225,21 +236,13 @@ Public Module PoorlyCategorizedFunctions
         End If
     End Sub
     <Extension()> <Pure()>
-    Public Function StringJoin(Of T)(ByVal this As IEnumerable(Of T), ByVal separator As String) As String
-        Contract.Requires(this IsNot Nothing)
-        Contract.Requires(separator IsNot Nothing)
-        Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
-        Dim words = From arg In this Select String.Concat(arg)
-        Contract.Assume(words IsNot Nothing)
-        Return String.Join(separator, words.ToArrayNonNull)
-    End Function
-    <Extension()> <Pure()>
     Public Function ToView(Of T)(ByVal this As IEnumerable(Of T)) As ViewableList(Of T)
         Contract.Requires(this IsNot Nothing)
         Contract.Ensures(Contract.Result(Of ViewableList(Of T))() IsNot Nothing)
         Return New ViewableList(Of T)(this.ToArrayNonNull)
     End Function
 
+#Region "Temporary"
     <Extension()> <Pure()>
     Friend Function SkipNonNull(Of T)(ByVal this As IEnumerable(Of T), ByVal amount As Integer) As IEnumerable(Of T)
         Contract.Requires(this IsNot Nothing)
@@ -257,6 +260,7 @@ Public Module PoorlyCategorizedFunctions
         Contract.Assume(res IsNot Nothing)
         Return res
     End Function
+#End Region
 
     <Extension()>
     Public Function ReadBytes(ByVal stream As IO.Stream, ByVal length As Integer) As Byte()
@@ -364,57 +368,6 @@ Public Module PoorlyCategorizedFunctions
         Dim ret = rec(rec)
         Contract.Assume(ret IsNot Nothing)
         Return ret
-    End Function
-
-    Public Sub FutureIterate(Of T)(ByVal producer As Func(Of IFuture(Of T)),
-                                   ByVal consumer As Func(Of T, IFuture(Of Boolean)))
-        Contract.Requires(producer IsNot Nothing)
-        Contract.Requires(consumer IsNot Nothing)
-
-        Dim q = producer()
-        Contract.Assume(q IsNot Nothing)
-        q.CallWhenValueReady(YCombinator(Of T)(
-            Function(self) Sub(result)
-                               Contract.Assume(consumer IsNot Nothing)
-                               Dim c = consumer(result)
-                               Contract.Assume(c IsNot Nothing)
-                               c.CallWhenValueReady(
-                                   Sub([continue])
-                                       Contract.Assume(self IsNot Nothing)
-                                       If [continue] Then
-                                           Contract.Assume(producer IsNot Nothing)
-                                           Dim p = producer()
-                                           Contract.Assume(p IsNot Nothing)
-                                           p.CallWhenValueReady(self)
-                                       End If
-                                   End Sub)
-                           End Sub))
-    End Sub
-
-    <Extension()>
-    Public Function FutureRead(ByVal stream As IO.Stream,
-                               ByVal buffer() As Byte,
-                               ByVal offset As Integer,
-                               ByVal count As Integer) As IFuture(Of PossibleException(Of Integer, Exception))
-        Contract.Requires(stream IsNot Nothing)
-        Contract.Ensures(Contract.Result(Of IFuture(Of PossibleException(Of Integer, Exception)))() IsNot Nothing)
-        Dim f = New Future(Of PossibleException(Of Integer, Exception))
-        Try
-            stream.BeginRead(buffer, offset, count, Sub(ar)
-                                                        Contract.Requires(ar IsNot Nothing)
-                                                        Contract.Assume(f IsNot Nothing)
-                                                        Contract.Assume(ar IsNot Nothing)
-                                                        Contract.Assume(stream IsNot Nothing)
-                                                        Try
-                                                            f.SetValue(stream.EndRead(ar))
-                                                        Catch e As Exception
-                                                            f.SetValue(e)
-                                                        End Try
-                                                    End Sub, Nothing)
-        Catch e As Exception
-            f.SetValue(e)
-        End Try
-        Return f
     End Function
 End Module
 
