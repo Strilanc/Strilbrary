@@ -1,5 +1,3 @@
-Imports System.Threading
-
 Namespace Threading.Futures
     Public Enum FutureState
         '''<summary>The future was not ready, but now may or may not be ready.</summary>
@@ -27,7 +25,7 @@ Namespace Threading.Futures
     End Interface
 
     '''<summary>A thread-safe class that fires an event when it becomes ready.</summary>
-    Public Class Future
+    Public NotInheritable Class Future
         Implements IFuture
         Private ReadOnly lockReady As New OnetimeLock
         Public Event Readied() Implements IFuture.Readied
@@ -64,10 +62,10 @@ Namespace Threading.Futures
     End Class
 
     '''<summary>A thread-safe class that fires an event when its value becomes ready.</summary>
-    Public Class Future(Of TValue)
+    Public NotInheritable Class Future(Of TValue)
         Implements IFuture(Of TValue)
-        Protected _value As TValue
-        Protected ReadOnly lockReady As New OnetimeLock
+        Private _value As TValue
+        Private ReadOnly lockReady As New OnetimeLock
         Public Event Readied() Implements IFuture.Readied
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
@@ -125,17 +123,19 @@ Namespace Threading.Futures
             Dim lock = New OnetimeLock()
             Dim f = New Future()
             Dim handler As IFuture.ReadiedEventHandler
-            handler = Sub() ThreadPool.QueueUserWorkItem(Sub()
-                                                             Contract.Assume(f IsNot Nothing)
-                                                             Contract.Assume(action IsNot Nothing)
-                                                             Contract.Assume(future IsNot Nothing)
-                                                             Contract.Assume(lock IsNot Nothing)
-                                                             If lock.TryAcquire Then 'only run once
-                                                                 RemoveHandler future.Readied, handler
-                                                                 Call RunWithDebugTrap(action, "Future callback")
-                                                                 f.SetReady()
-                                                             End If
-                                                         End Sub)
+            handler = Sub() System.Threading.ThreadPool.QueueUserWorkItem(
+                Sub()
+                    Contract.Assume(f IsNot Nothing)
+                    Contract.Assume(action IsNot Nothing)
+                    Contract.Assume(future IsNot Nothing)
+                    Contract.Assume(lock IsNot Nothing)
+                    If lock.TryAcquire Then 'only run once
+                        RemoveHandler future.Readied, handler
+                        Call RunWithDebugTrap(action, "Future callback")
+                        f.SetReady()
+                    End If
+                End Sub
+            )
 
             AddHandler future.Readied, handler
             If future.State = FutureState.Ready Then

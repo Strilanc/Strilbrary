@@ -9,7 +9,7 @@ Namespace Threading
     End Enum
 
     '''<summary>A thread-safe lock which can be acquired once, and never released.</summary>
-    Public Class OnetimeLock
+    Public NotInheritable Class OnetimeLock
         Private acquired As Integer
 
         Public Function TryAcquire() As Boolean

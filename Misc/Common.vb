@@ -235,12 +235,6 @@ Public Module PoorlyCategorizedFunctions
             End Try
         End If
     End Sub
-    <Extension()> <Pure()>
-    Public Function ToView(Of T)(ByVal this As IEnumerable(Of T)) As ViewableList(Of T)
-        Contract.Requires(this IsNot Nothing)
-        Contract.Ensures(Contract.Result(Of ViewableList(Of T))() IsNot Nothing)
-        Return New ViewableList(Of T)(this.ToArrayNonNull)
-    End Function
 
 #Region "Temporary"
     <Extension()> <Pure()>
@@ -314,6 +308,12 @@ Public Module PoorlyCategorizedFunctions
         Contract.Ensures(Contract.Result(Of ViewableList(Of T))() IsNot Nothing)
         Return New ViewableList(Of T)(list)
     End Function
+    <Extension()> <Pure()>
+    Public Function ToView(Of T)(ByVal this As IEnumerable(Of T)) As ViewableList(Of T)
+        Contract.Requires(this IsNot Nothing)
+        Contract.Ensures(Contract.Result(Of ViewableList(Of T))() IsNot Nothing)
+        Return New ViewableList(Of T)(this.ToArrayNonNull)
+    End Function
 
     Private Delegate Function RecursiveFunction(Of TArg1, TReturn)(ByVal self As RecursiveFunction(Of TArg1, TReturn)) As Func(Of TArg1, TReturn)
     <Pure()>
@@ -371,7 +371,7 @@ Public Module PoorlyCategorizedFunctions
     End Function
 End Module
 
-Public Class ExpensiveValue(Of T)
+Public NotInheritable Class ExpensiveValue(Of T)
     Private func As Func(Of T)
     Private _value As T
     Private computed As Boolean

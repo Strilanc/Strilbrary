@@ -14,7 +14,7 @@
     End Interface
 
     <ContractClassFor(GetType(IEnumeratorController(Of )))>
-        Public Class ContractClassForIEnumeratorController(Of T)
+    Public NotInheritable Class ContractClassForIEnumeratorController(Of T)
         Implements IEnumeratorController(Of T)
         Public Function Break() As T Implements IEnumeratorController(Of T).Break
         End Function

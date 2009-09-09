@@ -5,7 +5,7 @@ Public Interface IReadableList(Of Out T)
     Default ReadOnly Property Item(ByVal index As Integer) As T
 End Interface
 <ContractClassFor(GetType(IReadableList(Of )))>
-Public Class ContractClassForIReadableList(Of T)
+Public NotInheritable Class ContractClassForIReadableList(Of T)
     Implements IReadableList(Of T)
     Default Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
         Get
@@ -28,7 +28,7 @@ Public Class ContractClassForIReadableList(Of T)
     End Function
 End Class
 
-Public Class ViewableList(Of T)
+Public NotInheritable Class ViewableList(Of T)
     Implements IReadableList(Of T)
     Implements IEnumerable(Of T)
     Private ReadOnly items As IList(Of T)

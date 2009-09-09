@@ -6,7 +6,7 @@ Namespace Threading.Queueing
         Function QueueAction(ByVal action As Action) As IFuture
     End Interface
     <ContractClassFor(GetType(ICallQueue))>
-    Public Class ContractClassForICallQueue
+    Public NotInheritable Class ContractClassForICallQueue
         Implements ICallQueue
         Public Function QueueAction(ByVal action As Action) As IFuture Implements ICallQueue.QueueAction
             Contract.Requires(action IsNot Nothing)
@@ -44,7 +44,7 @@ Namespace Threading.Queueing
     Public MustInherit Class AbstractLockFreeCallQueue
         Inherits AbstractLockFreeConsumer(Of Node)
         Implements ICallQueue
-        Public Class Node
+        Public NotInheritable Class Node
             Public ReadOnly _action As Action
             Public ReadOnly _future As New future
 

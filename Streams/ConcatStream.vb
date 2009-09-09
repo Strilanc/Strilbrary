@@ -1,6 +1,6 @@
 Namespace Streams
     '''<summary>A read-only stream which reads through the contents of multiple readable streams.</summary>
-    Public Class ConcatStream
+    Public NotInheritable Class ConcatStream
         Inherits ReadOnlyStream
         Private ReadOnly streams As IEnumerator(Of IO.Stream)
         Private emptied As Boolean

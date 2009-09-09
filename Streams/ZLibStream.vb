@@ -1,6 +1,6 @@
 ﻿Namespace Streams
     '''<summary>A DeflateStream with two magic bytes preceding the compressed data.</summary>
-    Public Class ZLibStream
+    Public NotInheritable Class ZLibStream
         Inherits WrappedStream
 
         Private Shared Function wrap(ByVal stream As IO.Stream,

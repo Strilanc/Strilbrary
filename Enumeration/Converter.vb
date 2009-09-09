@@ -76,7 +76,7 @@ Namespace Enumeration
     End Module
 
     <ContractClassFor(GetType(IConverter(Of ,)))>
-    Public Class ContractClassForIConverter(Of TInput, TOutput)
+    Public NotInheritable Class ContractClassForIConverter(Of TInput, TOutput)
         Implements IConverter(Of TInput, TOutput)
         Public Function Convert(ByVal sequence As IEnumerator(Of TInput)) As IEnumerator(Of TOutput) Implements IConverter(Of TInput, TOutput).Convert
             Contract.Requires(sequence IsNot Nothing)
@@ -85,7 +85,7 @@ Namespace Enumeration
         End Function
     End Class
 
-    Friend Class EnumeratorStream
+    Friend NotInheritable Class EnumeratorStream
         Inherits IO.Stream
         Private ReadOnly sequence As IEnumerator(Of Byte)
 

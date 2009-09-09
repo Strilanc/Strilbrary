@@ -14,7 +14,7 @@ Namespace Threading.Queueing
     ''' - Latency between BeginEnqueue finishing and the item being enqueued can be delayed arbitrarily by slowing down only one of the producers.
     ''' - (How does this compare to CAS-based implementations in terms of average throughput? It should be higher?)
     ''' </remarks>
-    Public Class SingleConsumerLockFreeQueue(Of T)
+    Public NotInheritable Class SingleConsumerLockFreeQueue(Of T)
         ''' <summary>
         ''' Owned by the consumer.
         ''' This node is the end marker of the consumed nodes.

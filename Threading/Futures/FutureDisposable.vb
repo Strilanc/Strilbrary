@@ -7,7 +7,7 @@
     End Interface
 
     <ContractClassFor(GetType(IFutureDisposable))>
-    Friend NotInheritable Class ContractClassForIFutureDisposable
+    Public NotInheritable Class ContractClassForIFutureDisposable
         Implements IFutureDisposable
         Public ReadOnly Property FutureDisposed As Threading.Futures.IFuture Implements IFutureDisposable.FutureDisposed
             Get
@@ -15,6 +15,7 @@
                 Throw New InvalidOperationException
             End Get
         End Property
+        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")>
         Public Sub Dispose() Implements IDisposable.Dispose
             Throw New InvalidOperationException
         End Sub

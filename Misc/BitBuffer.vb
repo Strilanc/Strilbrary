@@ -1,5 +1,5 @@
 '''<summary>Stores up to maxBits bits and provides methods to add and extract bits for common types.</summary>
-Public Class BitBuffer
+Public NotInheritable Class BitBuffer
     Public Const MaxBits As Integer = 64
     Private buf As ULong 'bit storage
     Private _numBufferedBits As Integer 'number of stored bits
@@ -111,7 +111,7 @@ Public Class BitBuffer
 #End Region
 End Class
 
-Public Class ByteSequenceBitBuffer
+Public NotInheritable Class ByteSequenceBitBuffer
     Private ReadOnly buf As New BitBuffer
     Private ReadOnly sequence As IEnumerator(Of Byte)
 

@@ -1,6 +1,6 @@
 ﻿Imports System.Threading
 
-Public Class Throttle
+Public NotInheritable Class Throttle
     Private ReadOnly cooldown As TimeSpan
     Private nextAction As Action
     Private readyTime As Date

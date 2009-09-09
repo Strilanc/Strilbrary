@@ -9,7 +9,7 @@ Namespace Logging
         Positive
     End Enum
 
-    Public Class Logger
+    Public NotInheritable Class Logger
         Public Event LoggedMessage(ByVal type As LogMessageType, ByVal message As ExpensiveValue(Of String))
         Public Event LoggedFutureMessage(ByVal placeholder As String, ByVal message As IFuture(Of Outcome))
         Private ReadOnly ref As ICallQueue
