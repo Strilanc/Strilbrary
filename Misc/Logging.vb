@@ -60,7 +60,7 @@ Namespace Logging
                 Dim type = exception.GetType
                 Contract.Assume(type IsNot Nothing)
                 message += Environment.NewLine + "Exception Type: {0}".Frmt(type.Name)
-                message += Environment.NewLine + "Exception Message: {1}".Frmt(exception.Message)
+                message += Environment.NewLine + "Exception Message: {0}".Frmt(exception.Message)
                 If exception.StackTrace IsNot Nothing Then
                     message += Environment.NewLine + "Stack Trace: " + Environment.NewLine + indent(exception.StackTrace.ToString())
                 Else
