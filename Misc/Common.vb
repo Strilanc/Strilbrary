@@ -150,16 +150,6 @@ Public Module PoorlyCategorizedFunctions
 #End Region
 
 #Region "Arrays"
-    <Pure()> <Extension()>
-    Public Function ArraysEqual(Of T As IComparable(Of T))(ByVal array1() As T, ByVal array2() As T) As Boolean
-        Contract.Requires(array1 IsNot Nothing)
-        Contract.Requires(array2 IsNot Nothing)
-        If array1.Length <> array2.Length Then Return False
-        For i = 0 To array1.Length - 1
-            If array1(i).CompareTo(array2(i)) <> 0 Then Return False
-        Next i
-        Return True
-    End Function
     <Extension()> <Pure()>
     Public Function SubArray(Of T)(ByVal array As T(), ByVal offset As Integer) As T()
         Contract.Requires(array IsNot Nothing)
@@ -372,7 +362,7 @@ Public Module PoorlyCategorizedFunctions
 End Module
 
 Public NotInheritable Class ExpensiveValue(Of T)
-    Private func As Func(Of T)
+    Private ReadOnly func As Func(Of T)
     Private _value As T
     Private computed As Boolean
 

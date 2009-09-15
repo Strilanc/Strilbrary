@@ -28,7 +28,7 @@
 
     '''<summary>Indicates an internal value expected to be impossible has been encountered.</summary>
     Public Class ImpossibleValueException(Of T)
-        Inherits UnreachableException
+        Inherits InvalidStateException
         Public ReadOnly Value As T
         Public Sub New(ByVal value As T,
                        Optional ByVal message As String = Nothing,
@@ -36,6 +36,15 @@
             MyBase.new(If(message, "The {0} value ""{1}"" was not expected.".Frmt(GetType(T).Name, String.Concat(value))),
                        innerException)
             Me.Value = value
+        End Sub
+    End Class
+
+    '''<summary>Indicates the program entered an infinite loop but the problem was caught and the loop aborted.</summary>
+    Public Class InfiniteLoopException
+        Inherits InvalidStateException
+        Public Sub New(Optional ByVal message As String = Nothing,
+                       Optional ByVal innerException As Exception = Nothing)
+            MyBase.New(If(message, "Detected and aborted an infinite loop."), innerException)
         End Sub
     End Class
 

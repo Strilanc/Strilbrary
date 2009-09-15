@@ -160,7 +160,7 @@ Namespace Enumeration
 #End Region
     End Class
 
-    Friend Class PushEnumeratorStream
+    Friend NotInheritable Class PushEnumeratorStream
         Inherits IO.Stream
         Private ReadOnly pusher As PushEnumerator(Of Byte)
         Private closed As Boolean

@@ -58,6 +58,31 @@
         End Function
 #End Region
 
+#Region "Comparisons"
+        '''<summary>Determines if the items in two sequences are equivalent and in the same order.</summary>
+        <Pure()> <Extension()>
+        Public Function HasSameItemsAs(Of T As IEquatable(Of T))(ByVal this As IEnumerable(Of T), ByVal sequence As IEnumerable(Of T)) As Boolean
+            Contract.Requires(this IsNot Nothing)
+            Contract.Requires(sequence IsNot Nothing)
+
+            Dim otherEnumerator = sequence.GetEnumerator()
+            For Each element In this
+                'Fewer elements in other sequence?
+                If Not otherEnumerator.MoveNext Then Return False
+                'Different element from other sequence?
+                If element Is Nothing Then
+                    If otherEnumerator.Current IsNot Nothing Then Return False
+                Else
+                    If Not element.Equals(otherEnumerator.Current) Then Return False
+                End If
+            Next element
+            'More elements in other sequence?
+            If otherEnumerator.MoveNext Then Return False
+
+            Return True
+        End Function
+#End Region
+
 #Region "Transformations"
         '''<summary>Determines the maximum element in a sequence based on the given comparison function.</summary>
         <Extension()> <Pure()>
@@ -246,6 +271,26 @@
                 ret(i) = list(n - i - 1)
             Next i
             Return ret
+        End Function
+
+        '''<summary>Determines if the items in two lists are equivalent and in the same order.</summary>
+        <Pure()> <Extension()>
+        Public Function HasSameItemsAs(Of T As IEquatable(Of T))(ByVal this As IList(Of T), ByVal list As IList(Of T)) As Boolean
+            Contract.Requires(this IsNot Nothing)
+            Contract.Requires(list IsNot Nothing)
+
+            If this.Count <> list.Count Then Return False
+            For i = 0 To this.Count - 1
+                'Compare element
+                Dim e1 = this(i), e2 = list(i)
+                If e1 Is Nothing Then
+                    If e2 IsNot Nothing Then Return False
+                Else
+                    If Not e1.Equals(e2) Then Return False
+                End If
+            Next i
+
+            Return True
         End Function
 #End Region
     End Module

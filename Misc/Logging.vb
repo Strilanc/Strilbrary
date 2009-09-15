@@ -71,11 +71,11 @@ Namespace Logging
                 If exception Is Nothing Then Exit For
                 message += Environment.NewLine + "[Inner Exception]"
             Next inner_recurse
-            'wrapper formating
-            message = "UNEXPECTED EXCEPTION:" + Environment.NewLine + indent(message)
-            message = New String("!"c, 20) + Environment.NewLine + message
-            message += Environment.NewLine + New String("!"c, 20)
-            Return message
+
+            Return New String("!"c, 20) + Environment.NewLine +
+                   "UNEXPECTED EXCEPTION:" + Environment.NewLine +
+                   Indent(message) + Environment.NewLine +
+                   New String("!"c, 20)
         End Function
 
         Public Sub LogUnexpectedException(ByVal context As String, ByVal exception As Exception)

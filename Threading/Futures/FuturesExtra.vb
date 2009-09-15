@@ -31,24 +31,24 @@ Namespace Threading.Futures
             Contract.Requires(futures IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
 
-            Dim f As New Future()
+            Dim result As New Future()
             Dim numReady = 0
             Dim numFutures = futures.Count
 
+            'Become ready once all input futures are ready
             Dim notify = Sub()
                              If Interlocked.Increment(numReady) >= numFutures Then
-                                 Contract.Assume(f IsNot Nothing)
-                                 Call f.SetReady()
+                                 Contract.Assume(result IsNot Nothing)
+                                 Call result.SetReady()
                              End If
                          End Sub
-
             For Each future In futures
                 Contract.Assume(future IsNot Nothing)
                 future.CallWhenReady(notify)
             Next future
-            If numFutures = 0 Then f.SetReady()
+            If numFutures = 0 Then result.SetReady()
 
-            Return f
+            Return result
         End Function
 
         <Extension()>
