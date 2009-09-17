@@ -1,15 +1,15 @@
-﻿Namespace Threading.Futures
+﻿Namespace Threading
     '''<summary>Represents an object which makes its future thread-safe disposal available as a future.</summary>
     <ContractClass(GetType(ContractClassForIFutureDisposable))>
         Public Interface IFutureDisposable
         Inherits IDisposable
-        ReadOnly Property FutureDisposed As ifuture
+        ReadOnly Property FutureDisposed As IFuture
     End Interface
 
     <ContractClassFor(GetType(IFutureDisposable))>
     Public NotInheritable Class ContractClassForIFutureDisposable
         Implements IFutureDisposable
-        Public ReadOnly Property FutureDisposed As Threading.Futures.IFuture Implements IFutureDisposable.FutureDisposed
+        Public ReadOnly Property FutureDisposed As IFuture Implements IFutureDisposable.FutureDisposed
             Get
                 Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
                 Throw New InvalidOperationException

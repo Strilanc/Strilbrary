@@ -1,4 +1,4 @@
-Namespace Threading.Queueing
+Namespace Threading
     '''<summary>Describes a thread-safe call queue for non-blocking calls.</summary>
     <ContractClass(GetType(ContractClassForICallQueue))>
     Public Interface ICallQueue
@@ -46,7 +46,7 @@ Namespace Threading.Queueing
         Implements ICallQueue
         Public NotInheritable Class Node
             Public ReadOnly _action As Action
-            Public ReadOnly _future As New future
+            Public ReadOnly _future As New Future
 
             Public ReadOnly Property Action As Action
                 Get
@@ -56,7 +56,7 @@ Namespace Threading.Queueing
             End Property
             Public ReadOnly Property Future As Future
                 Get
-                    Contract.Ensures(Contract.Result(Of future)() IsNot Nothing)
+                    Contract.Ensures(Contract.Result(Of Future)() IsNot Nothing)
                     Return _future
                 End Get
             End Property
@@ -78,16 +78,16 @@ Namespace Threading.Queueing
         Public Function QueueAction(ByVal action As Action) As IFuture Implements ICallQueue.QueueAction
             Dim item = New Node(action)
             EnqueueConsume(item)
-            Return item.future
+            Return item.Future
         End Function
 
         '''<summary>Runs queued calls until there are none left.</summary>
         Protected Overrides Sub Consume(ByVal item As Node)
-            RunWithDebugTrap(Sub()
-                                 Contract.Assume(item IsNot Nothing)
-                                 Call item.Action()()
-                                 Call item.Future.SetReady()
-                             End Sub, "Exception rose past {0}.Run()".Frmt(Me.GetType.Name))
+            RunWithUnexpectedExceptionTrap(Sub()
+                                               Contract.Assume(item IsNot Nothing)
+                                               Call item.Action()()
+                                               Call item.Future.SetReady()
+                                           End Sub, "Exception rose past {0}.Run()".Frmt(Me.GetType.Name))
         End Sub
     End Class
 

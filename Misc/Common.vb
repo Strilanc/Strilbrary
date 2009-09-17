@@ -7,62 +7,6 @@ Imports System.IO
 
 '''<summary>A smattering of functions and other stuff that hasn't been placed in more reasonable groups yet.</summary>
 Public Module PoorlyCategorizedFunctions
-#Region "Numbers"
-    <Extension()> <Pure()>
-    Public Function ReversedByteOrder(ByVal value As UInteger) As UInteger
-        Dim reversedValue = 0UI
-        For i = 0 To 3
-            reversedValue <<= 8
-            reversedValue = reversedValue Or (value And CUInt(&HFF))
-            value >>= 8
-        Next i
-        Return reversedValue
-    End Function
-    <Extension()> <Pure()>
-    Public Function ReversedByteOrder(ByVal value As ULong) As ULong
-        Dim reversedValue = 0UL
-        For i = 0 To 7
-            reversedValue <<= 8
-            reversedValue = reversedValue Or (value And CULng(&HFF))
-            value >>= 8
-        Next i
-        Return reversedValue
-    End Function
-
-    '''<summary>Returns the smallest multiple of n that is not less than i. Formally: min {x in Z | x = 0 (mod n), x >= i}</summary>
-    <Pure()>
-    Public Function ModCeiling(ByVal value As Integer, ByVal divisor As Integer) As Integer
-        Contract.Requires(divisor > 0)
-        If value Mod divisor = 0 Then Return value
-        Dim m = (value \ divisor) * divisor
-        If value < 0 Then Return m
-        If m > Integer.MaxValue - divisor Then
-            Throw New InvalidOperationException("The result will not fit into an Int32.")
-        End If
-        Return m + divisor
-    End Function
-
-    <Extension()> <Pure()>
-    Public Function IsFinite(ByVal value As Double) As Boolean
-        Return Not Double.IsInfinity(value) AndAlso Not Double.IsNaN(value)
-    End Function
-
-    <Pure()> <Extension()>
-    Public Function Between(Of T As IComparable(Of T))(ByVal value1 As T,
-                                                       ByVal value2 As T,
-                                                       ByVal value3 As T) As T
-        Contract.Requires(value1 IsNot Nothing)
-        Contract.Requires(value2 IsNot Nothing)
-        Contract.Requires(value3 IsNot Nothing)
-        Contract.Ensures(Contract.Result(Of T)() IsNot Nothing)
-        'recursive sort
-        If value2.CompareTo(value1) > 0 Then Return Between(value2, value1, value3)
-        If value2.CompareTo(value3) < 0 Then Return Between(value1, value3, value2)
-        'median
-        Return value2
-    End Function
-#End Region
-
 #Region "Strings"
     <Pure()> <Extension()>
     Public Function Padded(ByVal text As String,
@@ -204,6 +148,21 @@ Public Module PoorlyCategorizedFunctions
     End Function
 #End Region
 
+    <Pure()> <Extension()>
+    Public Function Between(Of T As IComparable(Of T))(ByVal value1 As T,
+                                                       ByVal value2 As T,
+                                                       ByVal value3 As T) As T
+        Contract.Requires(value1 IsNot Nothing)
+        Contract.Requires(value2 IsNot Nothing)
+        Contract.Requires(value3 IsNot Nothing)
+        Contract.Ensures(Contract.Result(Of T)() IsNot Nothing)
+        'recursive sort
+        If value2.CompareTo(value1) > 0 Then Return Between(value2, value1, value3)
+        If value2.CompareTo(value3) < 0 Then Return Between(value1, value3, value2)
+        'median
+        Return value2
+    End Function
+
     Public Sub Swap(Of T)(ByRef value1 As T, ByRef value2 As T)
         Dim vt = value1
         value1 = value2
@@ -211,19 +170,14 @@ Public Module PoorlyCategorizedFunctions
     End Sub
 
     <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
-    Public Sub RunWithDebugTrap(ByVal action As Action, ByVal context As String)
+    Friend Sub RunWithUnexpectedExceptionTrap(ByVal action As Action, ByVal context As String)
         Contract.Requires(action IsNot Nothing)
         Contract.Requires(context IsNot Nothing)
-
-        If My.Settings.IsDebugMode Then
+        Try
             Call action()
-        Else
-            Try
-                Call action()
-            Catch e As Exception
-                LogUnexpectedException("{0} threw an unhandled exception.".Frmt(context), e)
-            End Try
-        End If
+        Catch e As Exception
+            LogUnexpectedException("{0} threw an unhandled exception.".Frmt(context), e)
+        End Try
     End Sub
 
 #Region "Temporary"
@@ -292,6 +246,7 @@ Public Module PoorlyCategorizedFunctions
     Public Function Milliseconds(ByVal quantity As Integer) As TimeSpan
         Return New TimeSpan(0, 0, 0, 0, quantity)
     End Function
+
     <Extension()> <Pure()>
     Public Function ToView(Of T)(ByVal list As IList(Of T)) As ViewableList(Of T)
         Contract.Requires(list IsNot Nothing)
@@ -360,38 +315,3 @@ Public Module PoorlyCategorizedFunctions
         Return ret
     End Function
 End Module
-
-Public NotInheritable Class ExpensiveValue(Of T)
-    Private ReadOnly func As Func(Of T)
-    Private _value As T
-    Private computed As Boolean
-
-    <ContractInvariantMethod()> Private Sub ObjectInvariant()
-        Contract.Invariant(computed OrElse func IsNot Nothing)
-    End Sub
-
-    Public Sub New(ByVal func As Func(Of T))
-        Contract.Requires(func IsNot Nothing)
-        Me.func = func
-    End Sub
-    Public Sub New(ByVal value As T)
-        Me._value = value
-        Me.computed = True
-    End Sub
-    Public ReadOnly Property Value As T
-        Get
-            If Not computed Then
-                computed = True
-                _value = func()
-            End If
-            Return _value
-        End Get
-    End Property
-    Public Shared Widening Operator CType(ByVal func As Func(Of T)) As ExpensiveValue(Of T)
-        Contract.Requires(func IsNot Nothing)
-        Return New ExpensiveValue(Of T)(func)
-    End Operator
-    Public Shared Widening Operator CType(ByVal value As T) As ExpensiveValue(Of T)
-        Return New ExpensiveValue(Of T)(value)
-    End Operator
-End Class

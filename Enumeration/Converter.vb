@@ -35,7 +35,8 @@ Namespace Enumeration
                                                Dim r = stream.ReadByte()
                                                If r = -1 Then  Return controller.Break()
                                                Return CByte(r)
-                                           End Function)
+                                           End Function,
+                                           AddressOf stream.Dispose)
         End Function
         <Extension()> Public Function ToWritePushEnumerator(Of T)(ByVal stream As IO.Stream,
                                                                   ByVal converter As IConverter(Of T, Byte)) As PushEnumerator(Of T)
@@ -52,7 +53,8 @@ Namespace Enumeration
                                                     stream.WriteByte(sequence.Current)
                                                 End While
                                                 stream.Close()
-                                            End Sub)
+                                            End Sub,
+                                            AddressOf stream.Dispose)
         End Function
 
         <Extension()> Public Function ConvertReadOnlyStream(ByVal converter As IConverter(Of Byte, Byte), ByVal stream As IO.Stream) As IO.Stream
@@ -88,6 +90,7 @@ Namespace Enumeration
     Friend NotInheritable Class EnumeratorStream
         Inherits IO.Stream
         Private ReadOnly sequence As IEnumerator(Of Byte)
+        Private closed As Boolean
 
         <ContractInvariantMethod()> Private Shadows Sub ObjectInvariant()
             Contract.Invariant(sequence IsNot Nothing)
@@ -120,6 +123,14 @@ Namespace Enumeration
             Next n
             Return count
         End Function
+
+        Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+            If disposing AndAlso Not closed Then
+                closed = True
+                sequence.Dispose()
+            End If
+            MyBase.Dispose(disposing)
+        End Sub
 
 #Region "Not Supported"
         Public Overrides ReadOnly Property CanSeek As Boolean
@@ -198,12 +209,13 @@ Namespace Enumeration
                                                 End Function))
         End Sub
 
-        Public Overrides Sub Close()
-            If closed Then Return
-            pusher.PushDone()
-            pusher.Dispose()
-            MyBase.Close()
-            closed = True
+        Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+            If disposing AndAlso Not closed Then
+                closed = True
+                pusher.PushDone()
+                pusher.Dispose()
+            End If
+            MyBase.Dispose(disposing)
         End Sub
 
 #Region "Not Supported"

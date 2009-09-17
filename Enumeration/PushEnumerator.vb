@@ -7,16 +7,19 @@
         Private finished As Boolean
         Private ReadOnly sequenceQueue As New Queue(Of IEnumerator(Of T))
         Private ReadOnly coroutine As Coroutine
+        Private ReadOnly disposer As action
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(coroutine IsNot Nothing)
             Contract.Invariant(sequenceQueue IsNot Nothing)
         End Sub
 
-        Public Sub New(ByVal consumer As Action(Of IEnumerator(Of T)))
+        Public Sub New(ByVal consumer As Action(Of IEnumerator(Of T)),
+                       Optional ByVal disposer As action = Nothing)
             Contract.Assume(consumer IsNot Nothing)
             'Contract.Requires(consumer IsNot Nothing) 'commented because events screw with Contracts and NotifyingDisposable has an event
 
+            Me.disposer = disposer
             Dim consumer_ = consumer
             Me.coroutine = New Coroutine(
                 Sub(coroutineController)
@@ -80,6 +83,7 @@
 
         Protected Overrides Sub PerformDispose(ByVal finalizing As Boolean)
             If Not finalizing Then
+                If disposer IsNot Nothing Then Call disposer()
                 coroutine.Dispose()
             End If
         End Sub

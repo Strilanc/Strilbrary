@@ -107,9 +107,8 @@
     <Import Include="Strilbrary.Enumeration" />
     <Import Include="Strilbrary.Exceptions" />
     <Import Include="Strilbrary.Logging" />
+    <Import Include="Strilbrary.Numerics" />
     <Import Include="Strilbrary.Threading" />
-    <Import Include="Strilbrary.Threading.Futures" />
-    <Import Include="Strilbrary.Threading.Queueing" />
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Collections.Generic" />
@@ -125,8 +124,10 @@
     <CodeAnalysisDictionary Include="CustomDictionary.xml" />
     <Compile Include="Exceptions\Exception Types.vb" />
     <Compile Include="Exceptions\Exception Extensions.vb" />
-    <Compile Include="Misc\BitBuffer.vb" />
+    <Compile Include="Misc\ExpensiveValue.vb" />
+    <Compile Include="Numerics\BitBuffer.vb" />
     <Compile Include="Misc\Throttle.vb" />
+    <Compile Include="Enumeration\ByteSequenceBitBuffer.vb" />
     <Compile Include="Numerics\ModByte.vb" />
     <Compile Include="Numerics\ModInt16.vb" />
     <Compile Include="Numerics\FiniteDouble.vb" />
@@ -143,7 +144,7 @@
     <Compile Include="Streams\WrappedReadOnlyStream.vb" />
     <Compile Include="Threading\Coroutine.vb" />
     <Compile Include="Threading\Futures\Futures.vb" />
-    <Compile Include="Threading\Futures\FuturesExtra.vb" />
+    <Compile Include="Threading\ThreadingExtensions.vb" />
     <Compile Include="Threading\Queueing\CallQueue.vb" />
     <Compile Include="Misc\Logging.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -161,7 +162,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Misc\Pack.vb" />
+    <Compile Include="Numerics\NumericExtensions.vb" />
     <Compile Include="Streams\ConcatStream.vb" />
     <Compile Include="Streams\WrappedStream.vb" />
     <Compile Include="Streams\ZLibStream.vb" />
@@ -191,6 +192,9 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Packing\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

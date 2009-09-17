@@ -1,6 +1,6 @@
 ﻿Imports System.Threading
 
-Namespace Threading.Queueing
+Namespace Threading
     ''' <summary>
     ''' A multiple-producer, single-consumer lock-free queue.
     ''' Does NOT guarantee an item has been queued when BeginEnqueue finishes.

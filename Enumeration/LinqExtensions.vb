@@ -102,6 +102,7 @@
 
             Return maxElement
         End Function
+
         '''<summary>Determines the element with the maximum output from a transformation function.</summary>
         <Pure()> <Extension()>
         Public Function MaxPair(Of TSequence, TComparable As IComparable)(ByVal sequence As IEnumerable(Of TSequence),

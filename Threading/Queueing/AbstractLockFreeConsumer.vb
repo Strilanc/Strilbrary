@@ -1,6 +1,6 @@
 ﻿Imports System.Threading
 
-Namespace Threading.Queueing
+Namespace Threading
     ''' <summary>
     ''' Consumes items produced by multiple producers.
     ''' </summary>

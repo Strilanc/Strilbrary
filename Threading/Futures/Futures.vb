@@ -1,4 +1,4 @@
-Namespace Threading.Futures
+Namespace Threading
     Public Enum FutureState
         '''<summary>The future was not ready, but now may or may not be ready.</summary>
         Unknown
@@ -131,7 +131,7 @@ Namespace Threading.Futures
                     Contract.Assume(lock IsNot Nothing)
                     If lock.TryAcquire Then 'only run once
                         RemoveHandler future.Readied, handler
-                        Call RunWithDebugTrap(action, "Future callback")
+                        Call RunWithUnexpectedExceptionTrap(action, "Future callback")
                         f.SetReady()
                     End If
                 End Sub

@@ -44,13 +44,16 @@
         Implements IEnumeratorController(Of T)
 
         Private ReadOnly generator As Func(Of IEnumeratorController(Of T), T)
+        Private ReadOnly disposer As action
         Private cur As T
         Private break As Boolean
         Private repeat As Boolean
         Private curSequence As IEnumerator(Of T)
-        Public Sub New(ByVal generator As Func(Of IEnumeratorController(Of T), T))
+        Public Sub New(ByVal generator As Func(Of IEnumeratorController(Of T), T),
+                       Optional ByVal disposer As action = Nothing)
             Contract.Requires(generator IsNot Nothing)
             Me.generator = generator
+            Me.disposer = disposer
         End Sub
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
@@ -97,6 +100,7 @@
             Throw New NotSupportedException()
         End Sub
         Public Sub Dispose() Implements IDisposable.Dispose
+            If disposer IsNot Nothing Then Call disposer()
             GC.SuppressFinalize(Me)
         End Sub
 
