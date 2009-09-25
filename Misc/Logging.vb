@@ -11,7 +11,7 @@ Namespace Logging
 
     Public NotInheritable Class Logger
         Public Event LoggedMessage(ByVal type As LogMessageType, ByVal message As ExpensiveValue(Of String))
-        Public Event LoggedFutureMessage(ByVal placeholder As String, ByVal message As IFuture(Of Outcome))
+        Public Event LoggedFutureMessage(ByVal placeholder As String, ByVal message As IFuture(Of String))
         Private ReadOnly ref As ICallQueue
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
@@ -22,7 +22,7 @@ Namespace Logging
             Me.ref = If(ref, New ThreadPooledCallQueue())
         End Sub
 
-        Public Sub FutureLog(ByVal placeholder As String, ByVal message As IFuture(Of Outcome))
+        Public Sub FutureLog(ByVal placeholder As String, ByVal message As IFuture(Of String))
             ref.QueueAction(Sub()
                                 Contract.Assume(Me IsNot Nothing)
                                 RaiseEvent LoggedFutureMessage(placeholder, message)

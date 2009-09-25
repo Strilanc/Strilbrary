@@ -87,6 +87,9 @@
         Public Function EqualsProper(ByVal other As ModByte) As Boolean Implements IEquatable(Of ModByte).Equals
             Return Me.value = other.value
         End Function
+        Public Overrides Function ToString() As String
+            Return value.ToString(Globalization.CultureInfo.InvariantCulture)
+        End Function
 #End Region
 
 #Region " -> ModByte"

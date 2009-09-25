@@ -23,13 +23,12 @@ Namespace Threading
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Dim f As New Future(Of TReturn)
-            queue.QueueAction(Sub()
-                                  Contract.Assume(f IsNot Nothing)
-                                  Contract.Assume(func IsNot Nothing)
-                                  f.SetValue(func())
-                              End Sub)
-            Return f
+
+            Dim result As TReturn = Nothing
+            Return queue.QueueAction(Sub()
+                                         Contract.Assume(func IsNot Nothing)
+                                         result = func()
+                                     End Sub).EvalOnSuccess(Function() result)
         End Function
     End Module
 
@@ -45,8 +44,8 @@ Namespace Threading
         Inherits AbstractLockFreeConsumer(Of Node)
         Implements ICallQueue
         Public NotInheritable Class Node
-            Public ReadOnly _action As Action
-            Public ReadOnly _future As New Future
+            Private ReadOnly _action As Action
+            Private ReadOnly _future As New FutureAction
 
             Public ReadOnly Property Action As Action
                 Get
@@ -54,9 +53,9 @@ Namespace Threading
                     Return _action
                 End Get
             End Property
-            Public ReadOnly Property Future As Future
+            Public ReadOnly Property Future As FutureAction
                 Get
-                    Contract.Ensures(Contract.Result(Of Future)() IsNot Nothing)
+                    Contract.Ensures(Contract.Result(Of FutureAction)() IsNot Nothing)
                     Return _future
                 End Get
             End Property
@@ -83,11 +82,8 @@ Namespace Threading
 
         '''<summary>Runs queued calls until there are none left.</summary>
         Protected Overrides Sub Consume(ByVal item As Node)
-            RunWithUnexpectedExceptionTrap(Sub()
-                                               Contract.Assume(item IsNot Nothing)
-                                               Call item.Action()()
-                                               Call item.Future.SetReady()
-                                           End Sub, "Exception rose past {0}.Run()".Frmt(Me.GetType.Name))
+            Contract.Assume(item IsNot Nothing)
+            item.Future.SetByCalling(item.Action)
         End Sub
     End Class
 

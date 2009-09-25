@@ -110,7 +110,7 @@ Public Module PoorlyCategorizedFunctions
         Contract.Requires(array IsNot Nothing)
         Contract.Requires(offset >= 0)
         Contract.Requires(length >= 0)
-        Contract.Requires(offset + length <= array.Length)
+        Contract.Requires(offset <= array.Length - length)
         Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
 
         Dim newArray(0 To length - 1) As T
@@ -167,17 +167,6 @@ Public Module PoorlyCategorizedFunctions
         Dim vt = value1
         value1 = value2
         value2 = vt
-    End Sub
-
-    <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
-    Friend Sub RunWithUnexpectedExceptionTrap(ByVal action As Action, ByVal context As String)
-        Contract.Requires(action IsNot Nothing)
-        Contract.Requires(context IsNot Nothing)
-        Try
-            Call action()
-        Catch e As Exception
-            LogUnexpectedException("{0} threw an unhandled exception.".Frmt(context), e)
-        End Try
     End Sub
 
 #Region "Temporary"

@@ -50,7 +50,7 @@ Namespace Threading
                         coexception = ex
                     End Try
 
-                    If FutureDisposed.State = FutureState.Ready Then
+                    If FutureDisposed.State <> FutureState.Unknown Then
                         coexception = New ObjectDisposedException(Me.GetType.Name, coexception)
                     End If
                     finished = True
@@ -91,7 +91,7 @@ Namespace Threading
         End Sub
 
         Private Sub CheckNotDisposed()
-            If FutureDisposed.State = FutureState.Ready Then Throw New ObjectDisposedException(Me.GetType.Name)
+            If FutureDisposed.State <> FutureState.Unknown Then Throw New ObjectDisposedException(Me.GetType.Name)
         End Sub
 
         Protected Overrides Sub PerformDispose(ByVal finalizing As Boolean)

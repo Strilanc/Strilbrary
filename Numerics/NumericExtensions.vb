@@ -52,7 +52,7 @@ Namespace Numerics
         <Extension()> <Pure()>
         Public Function ModFloor(ByVal value As Integer, ByVal divisor As Integer) As Integer
             Contract.Requires(divisor > 0)
-            Contract.Requires(value < Integer.MinValue + divisor)
+            Contract.Requires(value > Integer.MinValue + divisor)
             Contract.Ensures(Contract.Result(Of Integer)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of Integer)() <= value)
             Contract.Ensures(Contract.Result(Of Integer)() > value - divisor)
@@ -178,6 +178,7 @@ Namespace Numerics
                                     Optional ByVal minWordLength As Byte = 2,
                                     Optional ByVal separator As String = " ") As String
             Contract.Requires(data IsNot Nothing)
+            Contract.Requires(separator IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
 
             Dim s As New System.Text.StringBuilder()

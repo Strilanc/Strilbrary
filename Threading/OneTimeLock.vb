@@ -19,7 +19,9 @@ Namespace Threading
         ''' <summary>Determines if the lock has been acquired.</summary>
         Public ReadOnly Property State As OnetimeLockState
             Get
-                Return If(acquired <> 0, OnetimeLockState.Acquired, OnetimeLockState.Unknown)
+                Return If(acquired <> 0,
+                          OnetimeLockState.Acquired,
+                          OnetimeLockState.Unknown)
             End Get
         End Property
     End Class

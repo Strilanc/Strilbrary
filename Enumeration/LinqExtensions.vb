@@ -217,10 +217,12 @@
         Public Function ToList(Of T)(ByVal list As IList(Of T)) As List(Of T)
             Contract.Requires(list IsNot Nothing)
             Contract.Ensures(Contract.Result(Of List(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of List(Of T)).Count = list.Count)
             Dim newList As New List(Of T)(list.Count)
             For i = 0 To list.Count - 1
                 newList.Add(list(i))
             Next i
+            Contract.Assume(newList.Count = list.Count)
             Return newList
         End Function
 
@@ -229,6 +231,7 @@
         Public Function ToArray(Of T)(ByVal list As IList(Of T)) As T()
             Contract.Requires(list IsNot Nothing)
             Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of T()).Length = list.Count)
             Dim newArray(0 To list.Count - 1) As T
             For i = 0 To list.Count - 1
                 newArray(i) = list(i)
@@ -243,6 +246,7 @@
             Contract.Requires(offset >= 0)
             Contract.Requires(offset <= list.Count)
             Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of T()).Length = list.Count - offset)
             Return list.SubToArray(offset, list.Count - offset)
         End Function
 
@@ -254,6 +258,7 @@
             Contract.Requires(count >= 0)
             Contract.Requires(offset <= list.Count - count)
             Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of T()).Length = count)
             Dim ret(0 To count - 1) As T
             For i = 0 To count - 1
                 ret(i) = list(i + offset)
@@ -266,11 +271,13 @@
         Public Function Reverse(Of T)(ByVal list As IList(Of T)) As IList(Of T)
             Contract.Requires(list IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IList(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IList(Of T))().Count = list.Count)
             Dim n = list.Count
             Dim ret(0 To n - 1) As T
             For i = 0 To n - 1
                 ret(i) = list(n - i - 1)
             Next i
+            Contract.Assume(ret.Count = list.Count)
             Return ret
         End Function
 

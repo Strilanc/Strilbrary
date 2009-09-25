@@ -15,9 +15,7 @@
                 Throw New InvalidOperationException
             End Get
         End Property
-        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")>
         Public Sub Dispose() Implements IDisposable.Dispose
-            Throw New InvalidOperationException
         End Sub
     End Class
 
@@ -27,7 +25,7 @@
         Implements IFutureDisposable
 
         Private ReadOnly lock As New OnetimeLock
-        Private ReadOnly _futureDisposed As New Future()
+        Private ReadOnly _futureDisposed As New FutureAction()
         Public ReadOnly Property FutureDisposed As IFuture Implements IFutureDisposable.FutureDisposed
             Get
                 Return _futureDisposed
@@ -46,7 +44,7 @@
         Public Sub Dispose() Implements IDisposable.Dispose
             If Not lock.TryAcquire Then Return
             PerformDispose(finalizing:=False)
-            _futureDisposed.SetReady()
+            _futureDisposed.SetSucceeded()
             GC.SuppressFinalize(Me)
         End Sub
 
@@ -54,7 +52,7 @@
         Protected NotOverridable Overrides Sub Finalize()
             If Not lock.TryAcquire Then Return
             PerformDispose(finalizing:=True)
-            _futureDisposed.SetReady()
+            _futureDisposed.SetSucceeded()
         End Sub
     End Class
 End Namespace

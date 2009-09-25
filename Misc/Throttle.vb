@@ -32,7 +32,7 @@ Public NotInheritable Class Throttle
         If t >= readyTime Then
             Execute()
         Else
-            FutureWait(readyTime - t).CallWhenReady(AddressOf Execute)
+            FutureWait(readyTime - t).CallOnSuccess(AddressOf Execute)
         End If
     End Sub
     Private Sub Execute()
