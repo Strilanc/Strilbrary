@@ -24,11 +24,13 @@ Namespace Threading
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
 
-            Dim result As TReturn = Nothing
-            Return queue.QueueAction(Sub()
-                                         Contract.Assume(func IsNot Nothing)
-                                         result = func()
-                                     End Sub).EvalOnSuccess(Function() result)
+            Dim result = New FutureFunction(Of TReturn)
+            queue.QueueAction(Sub()
+                                  Contract.Assume(result IsNot Nothing)
+                                  Contract.Assume(func IsNot Nothing)
+                                  result.SetByEvaluating(func)
+                              End Sub).MarkAnyExceptionAsHandled()
+            Return result
         End Function
     End Module
 

@@ -32,6 +32,10 @@
             End Get
         End Property
 
+        Protected Sub New()
+            _futureDisposed.MarkAnyExceptionAsHandled()
+        End Sub
+
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(lock IsNot Nothing)
             Contract.Invariant(_futureDisposed IsNot Nothing)

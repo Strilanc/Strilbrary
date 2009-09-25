@@ -66,6 +66,7 @@ Namespace Threading
         ''' </summary>
         Public ReadOnly Property Exception() As Exception Implements IFuture.Exception
             Get
+                Contract.Ensures(Contract.Result(Of Exception)() IsNot Nothing)
                 If State <> FutureState.Failed Then
                     Throw New InvalidOperationException("Future doesn't contain an exception.")
                 End If
@@ -76,6 +77,7 @@ Namespace Threading
         '''<summary>Returns the future's state.</summary>
         Public ReadOnly Property State() As FutureState Implements IFuture.State
             Get
+                Contract.Ensures(Contract.Result(Of FutureState)() <> FutureState.Failed OrElse _exception IsNot Nothing)
                 If lockIsSet.State = OnetimeLockState.Unknown Then Return FutureState.Unknown
                 If _exception Is Nothing Then Return FutureState.Succeeded
                 Return FutureState.Failed
@@ -281,7 +283,6 @@ Namespace Threading
                     Contract.Assume(future IsNot Nothing)
                     Contract.Assume(lock IsNot Nothing)
                     If lock.TryAcquire Then 'ensure only run once
-                        future.MarkAnyExceptionAsHandled()
                         RemoveHandler future.Ready, handler
                         result.SetByCalling(Sub()
                                                 Contract.Assume(action IsNot Nothing)
@@ -299,6 +300,7 @@ Namespace Threading
                 Call handler()
             End If
 
+            future.MarkAnyExceptionAsHandled()
             Return result
         End Function
 
@@ -325,11 +327,13 @@ Namespace Threading
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
 
-            Dim result As TReturn = Nothing
-            Return future.CallWhenReady(Sub(exception)
-                                            Contract.Assume(func IsNot Nothing)
-                                            result = func(exception)
-                                        End Sub).EvalOnSuccess(Function() result)
+            Dim result = New FutureFunction(Of TReturn)
+            future.CallWhenReady(Sub(exception)
+                                     Contract.Assume(func IsNot Nothing)
+                                     Contract.Assume(result IsNot Nothing)
+                                     result.SetByEvaluating(Function() func(exception))
+                                 End Sub).MarkAnyExceptionAsHandled()
+            Return result
         End Function
 
         '''<summary>Determines the future result of applying a function to the future value.</summary>
@@ -364,7 +368,7 @@ Namespace Threading
                                          Contract.Assume(action IsNot Nothing)
                                          result.SetByCalling(action)
                                      End If
-                                 End Sub)
+                                 End Sub).MarkAnyExceptionAsHandled()
             Return result
         End Function
 
@@ -400,7 +404,7 @@ Namespace Threading
                                      Else
                                          result.SetByEvaluating(func)
                                      End If
-                                 End Sub)
+                                 End Sub).MarkAnyExceptionAsHandled()
             Return result
         End Function
 
@@ -468,9 +472,9 @@ Namespace Threading
                                 result.SetSucceeded()
                             End If
                         End Sub
-                    )
+                    ).MarkAnyExceptionAsHandled()
                 End Sub
-            )
+            ).MarkAnyExceptionAsHandled()
             Return result
         End Function
 
@@ -498,6 +502,7 @@ Namespace Threading
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
 
             Dim items = sequence.ToList
+            Contract.Assume(items IsNot Nothing)
             Dim result = New FutureAction()
             Dim numReady = 0
             Dim failed As Exception = Nothing
@@ -517,7 +522,7 @@ Namespace Threading
                          End Sub
             For Each future In items
                 Contract.Assume(future IsNot Nothing)
-                future.CallWhenReady(notify)
+                future.CallWhenReady(notify).MarkAnyExceptionAsHandled()
             Next future
             If numFutures = 0 Then result.SetSucceeded()
 
@@ -533,12 +538,18 @@ Namespace Threading
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of IEnumerable(Of TValue)))() IsNot Nothing)
             Dim items = sequence.ToList
+            Contract.Assume(items IsNot Nothing)
             Return CType(items, IEnumerable(Of IFuture)).Defuturized.EvalOnSuccess(
-                Function() (From future In items
+                Function()
+                    Contract.Assume(items IsNot Nothing)
+                    Dim values = (From future In items
                             Select Function()
                                        Contract.Assume(future IsNot Nothing)
                                        Return future.Value
-                                   End Function()).ToList)
+                                   End Function())
+                    Contract.Assume(values IsNot Nothing)
+                    Return values.ToList
+                End Function)
         End Function
 #End Region
     End Module

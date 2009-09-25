@@ -83,7 +83,7 @@ Namespace Logging
             If exception Is Nothing Then Throw New ArgumentNullException("exception")
             ref.QueueAction(Sub()
                                 RaiseEvent CaughtUnexpectedException(context, exception)
-                            End Sub)
+                            End Sub).MarkAnyExceptionAsHandled()
         End Sub
     End Module
 End Namespace

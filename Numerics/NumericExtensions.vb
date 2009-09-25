@@ -37,6 +37,7 @@ Namespace Numerics
             Contract.Ensures(Contract.Result(Of Integer)() >= value)
             Contract.Ensures(Contract.Result(Of Integer)() < value + divisor)
 
+            Contract.Assume(((value \ divisor) * divisor) Mod divisor = 0)
             If value Mod divisor = 0 Then
                 Return value
             ElseIf value < 0 Then
@@ -57,6 +58,7 @@ Namespace Numerics
             Contract.Ensures(Contract.Result(Of Integer)() <= value)
             Contract.Ensures(Contract.Result(Of Integer)() > value - divisor)
 
+            Contract.Assume(((value \ divisor) * divisor) Mod divisor = 0)
             If value Mod divisor = 0 Then
                 Return value
             ElseIf value < 0 Then
