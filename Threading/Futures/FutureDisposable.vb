@@ -32,7 +32,7 @@
             End Get
         End Property
 
-        Protected Sub New()
+        Public Sub New()
             _futureDisposed.MarkAnyExceptionAsHandled()
         End Sub
 

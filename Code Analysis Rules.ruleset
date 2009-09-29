@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <RuleSet Name="Strilbrary Customized Rules" Description="Rules applied to Strilbrary assembly." ToolsVersion="10.0">
   <IncludeAll Action="Warning" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
@@ -8,11 +8,15 @@
     <Rule Id="CA1009" Action="None" />
     <Rule Id="CA1020" Action="None" />
     <Rule Id="CA1026" Action="None" />
+    <Rule Id="CA1028" Action="None" />
     <Rule Id="CA1032" Action="None" />
     <Rule Id="CA1034" Action="None" />
     <Rule Id="CA1045" Action="None" />
     <Rule Id="CA1051" Action="None" />
+    <Rule Id="CA1061" Action="None" />
     <Rule Id="CA1062" Action="None" />
+    <Rule Id="CA1300" Action="None" />
+    <Rule Id="CA1303" Action="None" />
     <Rule Id="CA1710" Action="None" />
     <Rule Id="CA1711" Action="None" />
     <Rule Id="CA1804" Action="None" />

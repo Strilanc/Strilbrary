@@ -54,6 +54,8 @@ Namespace Threading
                         coexception = New ObjectDisposedException(Me.GetType.Name, coexception)
                     End If
                     finished = True
+                    Contract.Assume(lockProducer IsNot Nothing)
+                    Contract.Assume(lockConsumer IsNot Nothing)
                     lockProducer.Set()
                     lockConsumer.Set()
                 End Sub

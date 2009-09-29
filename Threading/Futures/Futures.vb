@@ -11,6 +11,7 @@ Namespace Threading
     End Enum
 
     '''<summary>Represents an action which can finish in the future.</summary>
+    <ContractClass(GetType(ContractClassForIFuture))>
     Public Interface IFuture
         '''<summary>Raised when the future becomes ready.</summary>
         Event Ready()
@@ -34,6 +35,25 @@ Namespace Threading
         ''' </summary>
         ReadOnly Property Value() As TValue
     End Interface
+
+    <ContractClassFor(GetType(IFuture))>
+    Public Class ContractClassForIFuture
+        Implements IFuture
+        Public Event Ready() Implements IFuture.Ready
+        Public ReadOnly Property Exception As System.Exception Implements IFuture.Exception
+            Get
+                Contract.Ensures(Contract.Result(Of Exception)() IsNot Nothing)
+                Throw New NotSupportedException
+            End Get
+        End Property
+        Public Sub MarkAnyExceptionAsHandled() Implements IFuture.MarkAnyExceptionAsHandled
+        End Sub
+        Public ReadOnly Property State As FutureState Implements IFuture.State
+            Get
+                Throw New NotSupportedException
+            End Get
+        End Property
+    End Class
 
     '''<summary>Represents something which can finish in the future.</summary>
     Public MustInherit Class FutureBase
@@ -66,7 +86,6 @@ Namespace Threading
         ''' </summary>
         Public ReadOnly Property Exception() As Exception Implements IFuture.Exception
             Get
-                Contract.Ensures(Contract.Result(Of Exception)() IsNot Nothing)
                 If State <> FutureState.Failed Then
                     Throw New InvalidOperationException("Future doesn't contain an exception.")
                 End If
@@ -228,6 +247,7 @@ Namespace Threading
         ''' </summary>
         Public Function TrySetSucceeded(ByVal value As TValue) As Boolean
             Return TrySetSucceededBase(Sub()
+                                           Contract.Assume(Me IsNot Nothing)
                                            Me._value = value
                                        End Sub)
         End Function
@@ -331,7 +351,10 @@ Namespace Threading
             future.CallWhenReady(Sub(exception)
                                      Contract.Assume(func IsNot Nothing)
                                      Contract.Assume(result IsNot Nothing)
-                                     result.SetByEvaluating(Function() func(exception))
+                                     result.SetByEvaluating(Function()
+                                                                Contract.Assume(func IsNot Nothing)
+                                                                Return func(exception)
+                                                            End Function)
                                  End Sub).MarkAnyExceptionAsHandled()
             Return result
         End Function
@@ -362,6 +385,8 @@ Namespace Threading
 
             Dim result = New FutureAction
             future.CallWhenReady(Sub(exception)
+                                     Contract.Assume(result IsNot Nothing)
+                                     Contract.Assume(action IsNot Nothing)
                                      If exception IsNot Nothing Then
                                          result.SetFailed(exception)
                                      Else
@@ -432,9 +457,14 @@ Namespace Threading
             Contract.Requires(projection1 IsNot Nothing)
             Contract.Requires(projection2 IsNot Nothing)
             Return future.Select(Function(value1)
+                                     Contract.Assume(projection1 IsNot Nothing)
+                                     Contract.Assume(projection2 IsNot Nothing)
                                      Dim f = projection1(value1)
                                      Contract.Assume(f IsNot Nothing)
-                                     Return f.Select(Function(value2) projection2(value1, value2))
+                                     Return f.Select(Function(value2)
+                                                         Contract.Assume(projection2 IsNot Nothing)
+                                                         Return projection2(value1, value2)
+                                                     End Function)
                                  End Function).Defuturized
         End Function
 #End Region
@@ -458,6 +488,7 @@ Namespace Threading
             Dim result = New FutureAction
             futureFuture.CallWhenValueReady(
                 Sub(futureValue, exception1)
+                    Contract.Assume(result IsNot Nothing)
                     If exception1 IsNot Nothing Then
                         result.SetFailed(exception1)
                         Return
@@ -466,6 +497,7 @@ Namespace Threading
                     Contract.Assume(futureValue IsNot Nothing)
                     futureValue.CallWhenReady(
                         Sub(exception2)
+                            Contract.Assume(result IsNot Nothing)
                             If exception2 IsNot Nothing Then
                                 result.SetFailed(exception2)
                             Else

@@ -7,72 +7,103 @@
         Implements IComparable(Of FiniteDouble)
         Implements IEquatable(Of FiniteDouble)
 
-        Public ReadOnly Value As Double
+        Private ReadOnly _value As Double
+        Public ReadOnly Property Value As Double
+            Get
+                Contract.Ensures(Not Double.IsInfinity(Contract.Result(Of Double)()))
+                Contract.Ensures(Not Double.IsNaN(Contract.Result(Of Double)()))
+                Return _value
+            End Get
+        End Property
+
+        <ContractInvariantMethod()> Private Sub ObjectInvariant()
+            Contract.Invariant(Not Double.IsInfinity(_value))
+            Contract.Invariant(Not Double.IsNaN(_value))
+        End Sub
+
         Public Sub New(ByVal value As Double)
             Contract.Ensures(Me.Value = value)
-            Contract.Assume(value.IsFinite()) '[not a Requires because the static verifier is horrible at proving things about doubles]
-            Me.Value = value
+            If Not value.IsFinite Then Throw New ArgumentOutOfRangeException("value", "value must be finite")
+            Me._value = value
         End Sub
 
 #Region "Arithmetic"
         Public Shared Operator +(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As FiniteDouble
+            'Contract.Ensures(Contract.Result(Of FiniteDouble).Value = leftOperand.Value + rightOperand.Value)
             Return New FiniteDouble(leftOperand.Value + rightOperand.Value)
         End Operator
         Public Shared Operator -(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As FiniteDouble
+            'Contract.Ensures(Contract.Result(Of FiniteDouble).Value = leftOperand.Value - rightOperand.Value)
             Return New FiniteDouble(leftOperand.Value - rightOperand.Value)
         End Operator
         Public Shared Operator -(ByVal rightOperand As FiniteDouble) As FiniteDouble
+            'Contract.Ensures(Contract.Result(Of FiniteDouble).Value = -rightOperand.Value)
             Return New FiniteDouble(-rightOperand.Value)
         End Operator
         Public Shared Operator *(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As FiniteDouble
+            'Contract.Ensures(Contract.Result(Of FiniteDouble).Value = leftOperand.Value * rightOperand.Value)
             Return New FiniteDouble(leftOperand.Value * rightOperand.Value)
         End Operator
         Public Shared Operator /(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As FiniteDouble
             Contract.Requires(rightOperand.Value <> 0)
+            'Contract.Ensures(Contract.Result(Of FiniteDouble).Value = leftOperand.Value / rightOperand.Value)
             Return New FiniteDouble(leftOperand.Value / rightOperand.Value)
         End Operator
         Public Shared Operator ^(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As FiniteDouble
             Contract.Requires(leftOperand <> 0 OrElse rightOperand <> 0)
             Contract.Requires(leftOperand >= 0)
+            'Contract.Ensures(Contract.Result(Of FiniteDouble).Value = leftOperand.Value ^ rightOperand.Value)
             Return New FiniteDouble(leftOperand.Value ^ rightOperand.Value)
         End Operator
         Public Shared Operator ^(ByVal leftOperand As FiniteDouble, ByVal rightOperand As Integer) As FiniteDouble
             Contract.Requires(leftOperand <> 0 OrElse rightOperand <> 0)
+            'Contract.Ensures(Contract.Result(Of FiniteDouble).Value = leftOperand.Value ^ rightOperand)
             Return New FiniteDouble(leftOperand.Value ^ rightOperand)
         End Operator
 #End Region
 
 #Region "Comparisons"
         Public Shared Operator =(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As Boolean
+            Contract.Ensures(Contract.Result(Of Boolean)() = (leftOperand.Value = rightOperand.Value))
             Return leftOperand.Value = rightOperand.Value
         End Operator
         Public Shared Operator <>(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As Boolean
+            Contract.Ensures(Contract.Result(Of Boolean)() = (leftOperand.Value <> rightOperand.Value))
             Return leftOperand.Value <> rightOperand.Value
         End Operator
         Public Shared Operator >(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As Boolean
+            Contract.Ensures(Contract.Result(Of Boolean)() = (leftOperand.Value > rightOperand.Value))
             Return leftOperand.Value > rightOperand.Value
         End Operator
         Public Shared Operator <(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As Boolean
+            Contract.Ensures(Contract.Result(Of Boolean)() = (leftOperand.Value < rightOperand.Value))
             Return leftOperand.Value < rightOperand.Value
         End Operator
         Public Shared Operator <=(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As Boolean
+            Contract.Ensures(Contract.Result(Of Boolean)() = (leftOperand.Value <= rightOperand.Value))
             Return leftOperand.Value <= rightOperand.Value
         End Operator
         Public Shared Operator >=(ByVal leftOperand As FiniteDouble, ByVal rightOperand As FiniteDouble) As Boolean
+            Contract.Ensures(Contract.Result(Of Boolean)() = (leftOperand.Value >= rightOperand.Value))
             Return leftOperand.Value >= rightOperand.Value
         End Operator
 #End Region
 
 #Region "Conversions"
         Public Shared Widening Operator CType(ByVal value As FiniteDouble) As Double
+            Contract.Ensures(Not Double.IsInfinity(Contract.Result(Of Double)()))
+            Contract.Ensures(Not Double.IsNaN(Contract.Result(Of Double)()))
+            Contract.Ensures(Contract.Result(Of Double)() = value.Value)
             Return value.Value
         End Operator
         Public Shared Narrowing Operator CType(ByVal value As Double) As FiniteDouble
-            Contract.Requires(value.IsFinite())
+            'Contract.Requires(value.IsFinite())
+            'Contract.Ensures(Contract.Result(Of FiniteDouble)().Value = value)
             Return New FiniteDouble(value)
         End Operator
         Public Shared Widening Operator CType(ByVal value As Integer) As FiniteDouble
-            Return New FiniteDouble(value)
+            'Contract.Ensures(Contract.Result(Of FiniteDouble)().Value = CDbl(value))
+            Return New FiniteDouble(CDbl(value))
         End Operator
 #End Region
 
@@ -99,6 +130,7 @@
 #Region "Convenience"
         Public ReadOnly Property Abs() As FiniteDouble
             Get
+                'Contract.Ensures(Contract.Result(Of FiniteDouble)().Value = Math.Abs(Me.Value))
                 Return New FiniteDouble(Math.Abs(Me.Value))
             End Get
         End Property
@@ -130,16 +162,19 @@
         End Function
         Public ReadOnly Property Ceiling() As FiniteDouble
             Get
+                'Contract.Ensures(Contract.Result(Of FiniteDouble)().Value = Math.Ceiling(Me.Value))
                 Return New FiniteDouble(Math.Ceiling(Me.Value))
             End Get
         End Property
         Public ReadOnly Property Floor() As FiniteDouble
             Get
+                'Contract.Ensures(Contract.Result(Of FiniteDouble)().Value = Math.Floor(Me.Value))
                 Return New FiniteDouble(Math.Floor(Me.Value))
             End Get
         End Property
         Public ReadOnly Property Round() As FiniteDouble
             Get
+                'Contract.Ensures(Contract.Result(Of FiniteDouble)().Value = Math.Round(Me.Value))
                 Return New FiniteDouble(Math.Round(Me.Value))
             End Get
         End Property

@@ -26,9 +26,11 @@
     End Property
     Public Shared Widening Operator CType(ByVal func As Func(Of T)) As ExpensiveValue(Of T)
         Contract.Requires(func IsNot Nothing)
+        Contract.Ensures(Contract.Result(Of ExpensiveValue(Of T))() IsNot Nothing)
         Return New ExpensiveValue(Of T)(func)
     End Operator
     Public Shared Widening Operator CType(ByVal value As T) As ExpensiveValue(Of T)
+        Contract.Ensures(Contract.Result(Of ExpensiveValue(Of T))() IsNot Nothing)
         Return New ExpensiveValue(Of T)(value)
     End Operator
 End Class

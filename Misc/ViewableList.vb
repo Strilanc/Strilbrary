@@ -1,36 +1,7 @@
-﻿<ContractClass(GetType(ContractClassForIReadableList(Of )))>
-Public Interface IReadableList(Of Out T)
-    Inherits IEnumerable(Of T)
-    ReadOnly Property Length As Integer
-    Default ReadOnly Property Item(ByVal index As Integer) As T
-End Interface
-<ContractClassFor(GetType(IReadableList(Of )))>
-Public NotInheritable Class ContractClassForIReadableList(Of T)
-    Implements IReadableList(Of T)
-    Default Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
-        Get
-            Contract.Requires(index >= 0)
-            Contract.Requires(index < CType(Me, IReadableList(Of T)).Length)
-            Throw New NotSupportedException()
-        End Get
-    End Property
-    Public ReadOnly Property Length As Integer Implements IReadableList(Of T).Length
-        Get
-            Contract.Ensures(Contract.Result(Of Integer)() >= 0)
-            Throw New NotSupportedException()
-        End Get
-    End Property
-    Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of T) Implements System.Collections.Generic.IEnumerable(Of T).GetEnumerator
-        Throw New NotSupportedException()
-    End Function
-    Public Function GetEnumerator1() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
-        Throw New NotSupportedException()
-    End Function
-End Class
-
-Public NotInheritable Class ViewableList(Of T)
-    Implements IReadableList(Of T)
+﻿Public NotInheritable Class ViewableList(Of T)
     Implements IEnumerable(Of T)
+    Implements IList(Of T)
+
     Private ReadOnly items As IList(Of T)
     Private ReadOnly offset As Integer
     Private ReadOnly _length As Integer
@@ -63,14 +34,15 @@ Public NotInheritable Class ViewableList(Of T)
         Me._length = relLength
     End Sub
 
-    Default Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
+    Default Public ReadOnly Property Item(ByVal index As Integer) As T
         Get
-            Contract.Assume(index + offset < items.Count)
+            Contract.Requires(index >= 0)
+            Contract.Requires(index < Length)
             Return items(index + offset)
         End Get
     End Property
 
-    Public ReadOnly Property Length As Integer Implements IReadableList(Of T).Length
+    Public ReadOnly Property Length As Integer
         Get
             Contract.Ensures(Contract.Result(Of Integer)() >= 0)
             Contract.Ensures(Contract.Result(Of Integer)() = Me._length)
@@ -110,4 +82,65 @@ Public NotInheritable Class ViewableList(Of T)
     Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
         Return GetEnumerator()
     End Function
+
+#Region "IList<T>"
+    Private Sub _Add(ByVal item As T) Implements System.Collections.Generic.ICollection(Of T).Add
+        Throw New NotSupportedException
+    End Sub
+    Private Sub _Clear() Implements System.Collections.Generic.ICollection(Of T).Clear
+        Throw New NotSupportedException
+    End Sub
+    Private Function _Contains(ByVal item As T) As Boolean Implements System.Collections.Generic.ICollection(Of T).Contains
+        For i = 0 To Length - 1
+            If item.Equals(Me.Item(i)) Then Return True
+        Next i
+        Return False
+    End Function
+    Private Sub _CopyTo(ByVal array() As T, ByVal arrayIndex As Integer) Implements System.Collections.Generic.ICollection(Of T).CopyTo
+        Contract.Assume(array.Length - arrayIndex >= Length)
+        For i = 0 To Length - 1
+            array(i + arrayIndex) = Me.Item(i)
+        Next i
+    End Sub
+    Private ReadOnly Property _Count As Integer Implements System.Collections.Generic.ICollection(Of T).Count
+        Get
+            Contract.Ensures(Contract.Result(Of Integer)() = Length)
+            Return Me.Length
+        End Get
+    End Property
+    Private ReadOnly Property _IsReadOnly As Boolean Implements System.Collections.Generic.ICollection(Of T).IsReadOnly
+        Get
+            Return True
+        End Get
+    End Property
+    Private Function _Remove(ByVal item As T) As Boolean Implements System.Collections.Generic.ICollection(Of T).Remove
+        Throw New NotSupportedException
+    End Function
+    Private Function _IndexOf(ByVal item As T) As Integer Implements System.Collections.Generic.IList(Of T).IndexOf
+        For i = 0 To Length - 1
+            If item.Equals(Me.Item(i)) Then
+                'contract verifier 1.2.20902.10 claims this is redundant, but removing it causes:
+                '   ensures unproven: Contract.Result<int>() < @this.Count
+                Contract.Assume(i < _Count)
+                Return i
+            End If
+        Next i
+        Return -1
+    End Function
+    Private Sub _Insert(ByVal index As Integer, ByVal item As T) Implements System.Collections.Generic.IList(Of T).Insert
+        Throw New NotSupportedException
+    End Sub
+    Private Property _Item(ByVal index As Integer) As T Implements System.Collections.Generic.IList(Of T).Item
+        Get
+            Contract.Assume(index < Length)
+            Return Item(index)
+        End Get
+        Set(ByVal value As T)
+            Throw New NotSupportedException
+        End Set
+    End Property
+    Private Sub _RemoveAt(ByVal index As Integer) Implements System.Collections.Generic.IList(Of T).RemoveAt
+        Throw New NotSupportedException
+    End Sub
+#End Region
 End Class

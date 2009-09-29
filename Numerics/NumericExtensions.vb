@@ -32,7 +32,6 @@ Namespace Numerics
         <Extension()> <Pure()>
         Public Function ModCeiling(ByVal value As Integer, ByVal divisor As Integer) As Integer
             Contract.Requires(divisor > 0)
-            Contract.Requires(value < Integer.MaxValue - divisor)
             Contract.Ensures(Contract.Result(Of Integer)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of Integer)() >= value)
             Contract.Ensures(Contract.Result(Of Integer)() < value + divisor)
@@ -53,7 +52,6 @@ Namespace Numerics
         <Extension()> <Pure()>
         Public Function ModFloor(ByVal value As Integer, ByVal divisor As Integer) As Integer
             Contract.Requires(divisor > 0)
-            Contract.Requires(value > Integer.MinValue + divisor)
             Contract.Ensures(Contract.Result(Of Integer)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of Integer)() <= value)
             Contract.Ensures(Contract.Result(Of Integer)() > value - divisor)
@@ -70,8 +68,10 @@ Namespace Numerics
             End If
         End Function
 
+        '''<summary>Determines if a double is not positive infinity, negative infinity, or NaN.</summary>
         <Extension()> <Pure()>
         Public Function IsFinite(ByVal value As Double) As Boolean
+            Contract.Ensures(Contract.Result(Of Boolean)() = (Not Double.IsInfinity(value) AndAlso Not Double.IsNaN(value)))
             Return Not Double.IsInfinity(value) AndAlso Not Double.IsNaN(value)
         End Function
 
@@ -116,6 +116,7 @@ Namespace Numerics
                                             Optional ByVal size As Integer = 2) As Byte()
             Contract.Requires(size >= 0)
             Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of Byte())().Length = size)
             Return CULng(value).Bytes(byteOrder, size)
         End Function
         <Extension()> <Pure()>
@@ -124,6 +125,7 @@ Namespace Numerics
                               Optional ByVal size As Integer = 4) As Byte()
             Contract.Requires(size >= 0)
             Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of Byte())().Length = size)
             Return CULng(value).Bytes(byteOrder, size)
         End Function
         <Extension()> <Pure()>
@@ -132,6 +134,7 @@ Namespace Numerics
                               Optional ByVal size As Integer = 8) As Byte()
             Contract.Requires(size >= 0)
             Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of Byte())().Length = size)
             Dim data(0 To size - 1) As Byte
             For i = 0 To size - 1
                 data(i) = CByte(value And CULng(&HFF))
@@ -140,7 +143,9 @@ Namespace Numerics
             If value <> 0 Then Throw New ArgumentOutOfRangeException("value", "The specified value won't fit in the specified number of bytes.")
             Select Case byteOrder
                 Case byteOrder.BigEndian
-                    Return data.Reverse.ToArray
+                    Dim result = data.Reverse.ToArray
+                    Contract.Assume(result.Length = size)
+                    Return result
                 Case byteOrder.LittleEndian
                     Return data
                 Case Else
