@@ -45,4 +45,29 @@ Public Class FutureActionTest
         Assert.IsTrue(target.State = FutureState.Failed)
         Assert.IsTrue(TypeOf target.Exception Is InvalidOperationException)
     End Sub
+    <TestMethod()>
+    Public Sub SetByCallingSucceed()
+        Dim target = New FutureAction()
+        target.SetByCalling(Sub()
+                            End Sub)
+        Assert.IsTrue(target.State = FutureState.Succeeded)
+    End Sub
+    <TestMethod()>
+    <ExpectedException(GetType(InvalidOperationException))>
+    Public Sub OverSetByCalling()
+        Dim target = New FutureAction()
+        target.SetByCalling(Sub()
+                            End Sub)
+        target.SetByCalling(Sub()
+                            End Sub)
+    End Sub
+    <TestMethod()>
+    Public Sub SetByCallingFail()
+        Dim target = New FutureAction()
+        target.SetByCalling(Sub()
+                                Throw New InvalidOperationException("Mock exception")
+                            End Sub)
+        Assert.IsTrue(target.State = FutureState.Failed)
+        Assert.IsTrue(TypeOf target.Exception Is InvalidOperationException)
+    End Sub
 End Class

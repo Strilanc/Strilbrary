@@ -9,8 +9,16 @@ Namespace Threading
     End Interface
     Public Enum CoroutineOutcome
         Continuing
-        Finished
+        FinishedAndDisposed
     End Enum
+
+    Public Class CoroutineException
+        Inherits Exception
+        Public Sub New(Optional ByVal message As String = Nothing,
+                       Optional ByVal innerException As Exception = Nothing)
+            MyBase.New(message, innerException)
+        End Sub
+    End Class
 
     ''' <summary>
     ''' Allows action which effectively yield control at multiple points in their execution.
@@ -73,10 +81,10 @@ Namespace Threading
             End If
             lockProducer.WaitOne()
 
-            If coexception IsNot Nothing Then Throw New InvalidOperationException("Coroutine threw an exception.", coexception)
+            If coexception IsNot Nothing Then Throw New CoroutineException("Coroutine threw an exception.", coexception)
             If finished Then
                 Dispose()
-                Return CoroutineOutcome.Finished
+                Return CoroutineOutcome.FinishedAndDisposed
             Else
                 CheckNotDisposed()
                 Return CoroutineOutcome.Continuing

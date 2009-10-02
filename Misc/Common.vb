@@ -8,18 +8,25 @@ Imports System.IO
 '''<summary>A smattering of functions and other stuff that hasn't been placed in more reasonable groups yet.</summary>
 Public Module PoorlyCategorizedFunctions
 #Region "Strings"
+    ''' <summary>
+    ''' Determines a string created by extending the given string up to the given minimum length using the given padding character.
+    ''' </summary>
     <Pure()> <Extension()>
     Public Function Padded(ByVal text As String,
-                           ByVal minChars As Integer,
+                           ByVal minimumLength As Integer,
                            Optional ByVal paddingCharacter As Char = " "c) As String
         Contract.Requires(text IsNot Nothing)
-        Contract.Requires(minChars >= 0)
+        Contract.Requires(minimumLength >= 0)
         Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
-        If text.Length < minChars Then
-            text += New String(paddingCharacter, minChars - text.Length)
-        End If
-        Return text
+        'Contract.Ensures(Contract.Result(Of String)().Length = Math.Max(minimumLength, text.Length))
+        'Contract.Ensures(Contract.Result(Of String)().Substring(0, text.Length) = text)
+        'Contract.Ensures(Contract.Result(Of String)().Substring(text.Length) = New String(paddingCharacter, Math.Max(0, minimumLength - text.Length)))
+        Return text + New String(paddingCharacter, Math.Max(0, minimumLength - text.Length))
     End Function
+
+    ''' <summary>
+    ''' Determines a string created by prefixing every line of the given string with the given prefix.
+    ''' </summary>
     <Pure()> <Extension()>
     Public Function Indent(ByVal paragraph As String,
                            Optional ByVal prefix As String = vbTab) As String
@@ -28,6 +35,10 @@ Public Module PoorlyCategorizedFunctions
         Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
         Return prefix + paragraph.Replace(Environment.NewLine, Environment.NewLine + prefix)
     End Function
+
+    ''' <summary>
+    ''' Determines a string created by replacing format items in the string with a representation of the corresponding arguments.
+    ''' </summary>
     <Pure()> <Extension()>
     Public Function Frmt(ByVal format As String, ByVal ParamArray args() As Object) As String
         Contract.Requires(format IsNot Nothing)
@@ -35,6 +46,10 @@ Public Module PoorlyCategorizedFunctions
         Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
         Return String.Format(Globalization.CultureInfo.InvariantCulture, format, args)
     End Function
+
+    ''' <summary>
+    ''' Concatenates a separator string between the representations of elements in a specified sequence, yielding a single concatenated string.
+    ''' </summary>
     <Extension()> <Pure()>
     Public Function StringJoin(Of T)(ByVal this As IEnumerable(Of T), ByVal separator As String) As String
         Contract.Requires(this IsNot Nothing)
@@ -64,11 +79,13 @@ Public Module PoorlyCategorizedFunctions
 
         Return String.Join(", ", words.ToArray)
     End Function
+
     <Pure()>
     Public Function EnumValues(Of T)() As IEnumerable(Of T)
         Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
         Return CType([Enum].GetValues(GetType(T)), IEnumerable(Of T))
     End Function
+
     <Pure()> <Extension()>
     Public Function EnumParse(Of T)(ByVal value As String, ByVal ignoreCase As Boolean) As T
         Dim ret As T
@@ -77,6 +94,7 @@ Public Module PoorlyCategorizedFunctions
         End If
         Return ret
     End Function
+
     <Extension()>
     Public Function EnumTryParse(Of T)(ByVal value As String, ByVal ignoreCase As Boolean, ByRef ret As T) As Boolean
         For Each e In EnumValues(Of T)()
@@ -87,6 +105,7 @@ Public Module PoorlyCategorizedFunctions
         Next e
         Return False
     End Function
+
     <Pure()> <Extension()>
     Public Function EnumValueIsDefined(Of T)(ByVal value As T) As Boolean
         Return [Enum].IsDefined(GetType(T), value)

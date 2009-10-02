@@ -1,22 +1,23 @@
 ﻿Namespace Numerics
+    '''<summary>A 32-bit integer which explicitely allows overflow and underflow.</summary>
     <DebuggerDisplay("{ToString} (mod 2^32)")>
     Public Structure ModInt32
         Implements IEquatable(Of ModInt32)
         Private ReadOnly value As UInt32
 
 #Region "Constructors"
-        Private Sub New(ByVal value As UInt32)
+        Public Sub New(ByVal value As UInt32)
             Me.value = value
         End Sub
         Private Sub New(ByVal value As UInt64)
-            Me.value = CUInt(value And UInt32.MaxValue)
+            Me.value = CUInt(value And CULng(UInt32.MaxValue))
         End Sub
 
-        Private Sub New(ByVal value As Int32)
+        Public Sub New(ByVal value As Int32)
             Me.value = CUInt(value + If(value < 0, &H100000000L, 0))
         End Sub
         Private Sub New(ByVal value As Int64)
-            Me.value = CUInt(value And UInt32.MaxValue)
+            Me.value = CUInt(value And CLng(UInt32.MaxValue))
         End Sub
 #End Region
 

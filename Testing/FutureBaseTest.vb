@@ -16,6 +16,13 @@ Public Class FutureBaseTest
         Assert.IsTrue(target.State = FutureState.Failed)
         Assert.IsTrue(TypeOf target.Exception Is InvalidOperationException)
     End Sub
+    <TestMethod()>
+    Public Sub TryFailTest()
+        Dim target As FutureBase = New FutureAction()
+        Assert.IsTrue(target.TrySetFailed(New InvalidOperationException("Mock exception")))
+        Assert.IsTrue(target.State = FutureState.Failed)
+        Assert.IsTrue(TypeOf target.Exception Is InvalidOperationException)
+    End Sub
 
     <TestMethod()>
     <ExpectedException(GetType(InvalidOperationException))>

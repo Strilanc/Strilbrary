@@ -133,6 +133,7 @@
     <Compile Include="Numerics\ModByte.vb" />
     <Compile Include="Numerics\ModInt16.vb" />
     <Compile Include="Numerics\FiniteDouble.vb" />
+    <Compile Include="Threading\Futures\IFutureExtensions.vb" />
     <Compile Include="Threading\Queueing\AbstractLockFreeConsumer.vb" />
     <Compile Include="Threading\Queueing\SingleConsumerLockFreeQueue.vb" />
     <Compile Include="Threading\OneTimeLock.vb" />

@@ -43,7 +43,7 @@ Public Class IFutureExtensionsTest
         Dim result = future.CallWhenReady(Sub(exception)
                                               flag = False
                                           End Sub)
-        Assert.IsTrue(Not BlockOnFuture(result))
+        Assert.IsTrue(Not BlockOnFuture(result, New TimeSpan(0, 0, 0, 0, milliseconds:=100)))
         Assert.IsTrue(flag)
         Assert.IsTrue(result.State = FutureState.Unknown)
     End Sub
@@ -55,6 +55,18 @@ Public Class IFutureExtensionsTest
                                               flag = exception Is Nothing
                                           End Sub)
         future.SetSucceeded()
+        Assert.IsTrue(BlockOnFuture(result))
+        Assert.IsTrue(flag)
+        Assert.IsTrue(result.State = FutureState.Succeeded)
+    End Sub
+    <TestMethod()>
+    Public Sub CallWhenReadyTest_PreSucceed()
+        Dim flag = False
+        Dim future = New FutureAction()
+        future.SetSucceeded()
+        Dim result = future.CallWhenReady(Sub(exception)
+                                              flag = exception Is Nothing
+                                          End Sub)
         Assert.IsTrue(BlockOnFuture(result))
         Assert.IsTrue(flag)
         Assert.IsTrue(result.State = FutureState.Succeeded)
@@ -91,9 +103,23 @@ Public Class IFutureExtensionsTest
                                               flag = False
                                               Return 2
                                           End Function)
-        Assert.IsTrue(Not BlockOnFuture(result))
+        Assert.IsTrue(Not BlockOnFuture(result, New TimeSpan(0, 0, 0, 0, milliseconds:=100)))
         Assert.IsTrue(flag)
         Assert.IsTrue(result.State = FutureState.Unknown)
+    End Sub
+    <TestMethod()>
+    Public Sub EvalWhenReadyTest_PreSucceed()
+        Dim flag = False
+        Dim future = New FutureAction()
+        future.SetSucceeded()
+        Dim result = future.EvalWhenReady(Function(exception)
+                                              flag = exception Is Nothing
+                                              Return 3
+                                          End Function)
+        Assert.IsTrue(BlockOnFuture(result))
+        Assert.IsTrue(flag)
+        Assert.IsTrue(result.State = FutureState.Succeeded)
+        Assert.IsTrue(result.Value = 3)
     End Sub
     <TestMethod()>
     Public Sub EvalWhenReadyTest_Succeed()
@@ -143,9 +169,21 @@ Public Class IFutureExtensionsTest
         Dim result = future.CallWhenValueReady(Sub(value, exception)
                                                    flag = False
                                                End Sub)
-        Assert.IsTrue(Not BlockOnFuture(result))
+        Assert.IsTrue(Not BlockOnFuture(result, New TimeSpan(0, 0, 0, 0, milliseconds:=100)))
         Assert.IsTrue(flag)
         Assert.IsTrue(result.State = FutureState.Unknown)
+    End Sub
+    <TestMethod()>
+    Public Sub CallWhenValueReadyTest_PreSucceed()
+        Dim flag = False
+        Dim future = New FutureFunction(Of Integer)()
+        future.SetSucceeded(11)
+        Dim result = future.CallWhenValueReady(Sub(value, exception)
+                                                   flag = exception Is Nothing AndAlso value = 11
+                                               End Sub)
+        Assert.IsTrue(BlockOnFuture(result))
+        Assert.IsTrue(flag)
+        Assert.IsTrue(result.State = FutureState.Succeeded)
     End Sub
     <TestMethod()>
     Public Sub CallWhenValueReadyTest_Succeed()
@@ -191,9 +229,23 @@ Public Class IFutureExtensionsTest
                                                    flag = False
                                                    Return -1
                                                End Function)
-        Assert.IsTrue(Not BlockOnFuture(result))
+        Assert.IsTrue(Not BlockOnFuture(result, New TimeSpan(0, 0, 0, 0, milliseconds:=100)))
         Assert.IsTrue(flag)
         Assert.IsTrue(result.State = FutureState.Unknown)
+    End Sub
+    <TestMethod()>
+    Public Sub EvalWhenValueReadyTest_PreSucceed()
+        Dim flag = False
+        Dim future = New FutureFunction(Of Integer)()
+        future.SetSucceeded(27)
+        Dim result = future.EvalWhenValueReady(Function(value, exception)
+                                                   flag = exception Is Nothing AndAlso value = 27
+                                                   Return -13
+                                               End Function)
+        Assert.IsTrue(BlockOnFuture(result))
+        Assert.IsTrue(flag)
+        Assert.IsTrue(result.State = FutureState.Succeeded)
+        Assert.IsTrue(result.Value = -13)
     End Sub
     <TestMethod()>
     Public Sub EvalWhenValueReadyTest_Succeed()
@@ -244,9 +296,21 @@ Public Sub CallOnSuccessTest_Dangle()
         Dim result = future.CallOnSuccess(Sub()
                                               flag = False
                                           End Sub)
-        Assert.IsTrue(Not BlockOnFuture(result))
+        Assert.IsTrue(Not BlockOnFuture(result, New TimeSpan(0, 0, 0, 0, milliseconds:=100)))
         Assert.IsTrue(flag)
         Assert.IsTrue(result.State = FutureState.Unknown)
+    End Sub
+    <TestMethod()>
+    Public Sub CallOnSuccessTest_PreSucceed()
+        Dim flag = False
+        Dim future = New FutureAction()
+        future.SetSucceeded()
+        Dim result = future.CallOnSuccess(Sub()
+                                              flag = True
+                                          End Sub)
+        Assert.IsTrue(BlockOnFuture(result))
+        Assert.IsTrue(flag)
+        Assert.IsTrue(result.State = FutureState.Succeeded)
     End Sub
     <TestMethod()>
     Public Sub CallOnSuccessTest_Succeed()
@@ -293,9 +357,23 @@ Public Sub CallOnSuccessTest_Dangle()
                                               flag = False
                                               Return 2
                                           End Function)
-        Assert.IsTrue(Not BlockOnFuture(result))
+        Assert.IsTrue(Not BlockOnFuture(result, New TimeSpan(0, 0, 0, 0, milliseconds:=100)))
         Assert.IsTrue(flag)
         Assert.IsTrue(result.State = FutureState.Unknown)
+    End Sub
+    <TestMethod()>
+    Public Sub EvalOnSuccessTest_PreSucceed()
+        Dim flag = False
+        Dim future = New FutureAction()
+        future.SetSucceeded()
+        Dim result = future.EvalOnSuccess(Function()
+                                              flag = True
+                                              Return 3
+                                          End Function)
+        Assert.IsTrue(BlockOnFuture(result))
+        Assert.IsTrue(flag)
+        Assert.IsTrue(result.State = FutureState.Succeeded)
+        Assert.IsTrue(result.Value = 3)
     End Sub
     <TestMethod()>
     Public Sub EvalOnSuccessTest_Succeed()
@@ -345,9 +423,21 @@ Public Sub CallOnSuccessTest_Dangle()
         Dim result = future.CallOnValueSuccess(Sub(value)
                                                    flag = False
                                                End Sub)
-        Assert.IsTrue(Not BlockOnFuture(result))
+        Assert.IsTrue(Not BlockOnFuture(result, New TimeSpan(0, 0, 0, 0, milliseconds:=100)))
         Assert.IsTrue(flag)
         Assert.IsTrue(result.State = FutureState.Unknown)
+    End Sub
+    <TestMethod()>
+    Public Sub CallOnValueSuccessTest_PreSucceed()
+        Dim flag = False
+        Dim future = New FutureFunction(Of Integer)()
+        future.SetSucceeded(11)
+        Dim result = future.CallOnValueSuccess(Sub(value)
+                                                   flag = value = 11
+                                               End Sub)
+        Assert.IsTrue(BlockOnFuture(result))
+        Assert.IsTrue(flag)
+        Assert.IsTrue(result.State = FutureState.Succeeded)
     End Sub
     <TestMethod()>
     Public Sub CallOnValueSuccessTest_Succeed()
@@ -394,9 +484,23 @@ Public Sub CallOnSuccessTest_Dangle()
                                        flag = False
                                        Return -1
                                    End Function)
-        Assert.IsTrue(Not BlockOnFuture(result))
+        Assert.IsTrue(Not BlockOnFuture(result, New TimeSpan(0, 0, 0, 0, milliseconds:=100)))
         Assert.IsTrue(flag)
         Assert.IsTrue(result.State = FutureState.Unknown)
+    End Sub
+    <TestMethod()>
+    Public Sub SelectTest_PreSucceed()
+        Dim flag = False
+        Dim future = New FutureFunction(Of Integer)()
+        future.SetSucceeded(21)
+        Dim result = future.Select(Function(value)
+                                       flag = value = 21
+                                       Return -2
+                                   End Function)
+        Assert.IsTrue(BlockOnFuture(result))
+        Assert.IsTrue(flag)
+        Assert.IsTrue(result.State = FutureState.Succeeded)
+        Assert.IsTrue(result.Value = -2)
     End Sub
     <TestMethod()>
     Public Sub SelectTest_Succeed()

@@ -1,28 +1,29 @@
 ﻿Namespace Numerics
+    '''<summary>A 16-bit integer which explicitely allows overflow and underflow.</summary>
     <DebuggerDisplay("{ToString} (mod 2^16)")>
     Public Structure ModInt16
         Implements IEquatable(Of ModInt16)
         Private ReadOnly value As UInt16
 
 #Region "Constructors"
-        Private Sub New(ByVal value As UShort)
+        Public Sub New(ByVal value As UShort)
             Me.value = value
         End Sub
         Private Sub New(ByVal value As UInt32)
             Me.value = CUShort(value And UInt16.MaxValue)
         End Sub
         Private Sub New(ByVal value As UInt64)
-            Me.value = CUShort(value And UInt16.MaxValue)
+            Me.value = CUShort(value And CULng(UInt16.MaxValue))
         End Sub
 
-        Private Sub New(ByVal value As Int16)
+        Public Sub New(ByVal value As Int16)
             Me.value = CUShort(value + If(value < 0, &H10000, 0))
         End Sub
         Private Sub New(ByVal value As Int32)
-            Me.value = CUShort(value And UInt16.MaxValue)
+            Me.value = CUShort(value And CInt(UInt16.MaxValue))
         End Sub
         Private Sub New(ByVal value As Int64)
-            Me.value = CUShort(value And UInt16.MaxValue)
+            Me.value = CUShort(value And CLng(UInt16.MaxValue))
         End Sub
 #End Region
 
@@ -132,7 +133,7 @@
             Return CSByte(value.value)
         End Operator
         Public Shared Widening Operator CType(ByVal value As ModInt16) As Int16
-            Return CShort(value.value - If(value.value < 0, &H10000, 0))
+            Return CShort(value.value - If(value.value > Short.MaxValue, &H10000, 0))
         End Operator
         Public Shared Widening Operator CType(ByVal value As ModInt16) As Int32
             Return value.value

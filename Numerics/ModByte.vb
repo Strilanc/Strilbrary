@@ -1,34 +1,35 @@
 ﻿Namespace Numerics
+    '''<summary>An 8-bit integer which explicitely allows overflow and underflow.</summary>
     <DebuggerDisplay("{ToString} (mod 2^8)")>
     Public Structure ModByte
         Implements IEquatable(Of ModByte)
         Private ReadOnly value As Byte
 
 #Region "Constructors"
-        Private Sub New(ByVal value As Byte)
+        Public Sub New(ByVal value As Byte)
             Me.value = value
         End Sub
         Private Sub New(ByVal value As UInt16)
-            Me.value = CByte(value And Byte.MaxValue)
+            Me.value = CByte(value And CUShort(Byte.MaxValue))
         End Sub
         Private Sub New(ByVal value As UInt32)
-            Me.value = CByte(value And Byte.MaxValue)
+            Me.value = CByte(value And CUInt(Byte.MaxValue))
         End Sub
         Private Sub New(ByVal value As UInt64)
-            Me.value = CByte(value And Byte.MaxValue)
+            Me.value = CByte(value And CULng(Byte.MaxValue))
         End Sub
 
-        Private Sub New(ByVal value As SByte)
+        Public Sub New(ByVal value As SByte)
             Me.value = CByte(value + If(value < 0, &H100, 0))
         End Sub
         Private Sub New(ByVal value As Int16)
-            Me.value = CByte(value And Byte.MaxValue)
+            Me.value = CByte(value And CShort(Byte.MaxValue))
         End Sub
         Private Sub New(ByVal value As Int32)
-            Me.value = CByte(value And Byte.MaxValue)
+            Me.value = CByte(value And CInt(Byte.MaxValue))
         End Sub
         Private Sub New(ByVal value As Int64)
-            Me.value = CByte(value And Byte.MaxValue)
+            Me.value = CByte(value And CLng(Byte.MaxValue))
         End Sub
 #End Region
 

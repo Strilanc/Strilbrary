@@ -36,6 +36,9 @@
                             Contract.Assume(Me IsNot Nothing)
                             Contract.Assume(sequenceQueue IsNot Nothing)
 
+                            'Break if there are no elements to return
+                            If finished Then  Return enumController.Break
+
                             'Move to next element, and when current sequence runs out grab another one
                             While curSubsequence Is Nothing OrElse Not curSubsequence.MoveNext
                                 If curSubsequence IsNot Nothing Then

@@ -1,5 +1,5 @@
 Namespace Numerics
-    '''<summary>Stores up to maxBits bits and provides methods to add and extract bits for common types.</summary>
+    '''<summary>Stores up to 64 bits and provides methods to add and extract bits for common types.</summary>
     Public NotInheritable Class BitBuffer
         Public Const MaxBits As Integer = 64
         Private buf As ULong 'bit storage
@@ -34,15 +34,18 @@ Namespace Numerics
         Public Function Take(ByVal bitCount As Integer) As ULong
             Contract.Requires(bitCount >= 0)
             Contract.Requires(bitCount <= MaxBits)
-            Take = Peek(bitCount)
+            Dim result = Peek(bitCount)
             buf >>= bitCount
             _numBufferedBits -= bitCount
+            Return result
         End Function
         Public Function Peek(ByVal bitCount As Integer) As ULong
             Contract.Requires(bitCount >= 0)
             Contract.Requires(bitCount <= MaxBits)
             If bitCount > BufferedBitCount Then Throw New InvalidOperationException("Not enough buffered buffered bits available.")
-            Peek = CULng(buf And ((1UL << bitCount) - 1UL))
+            Dim mask = (1UL << bitCount) - 1UL
+            If mask = 0 Then mask = ULong.MaxValue
+            Return buf And mask
         End Function
 
         Public Sub Clear()
@@ -58,10 +61,10 @@ Namespace Numerics
         Public Sub StackByte(ByVal value As Byte)
             Stack(value, 8)
         End Sub
-        Public Sub StackUShort(ByVal value As UShort)
+        Public Sub StackUInt16(ByVal value As UShort)
             Stack(value, 16)
         End Sub
-        Public Sub StackUInteger(ByVal value As UInteger)
+        Public Sub StackUInt32(ByVal value As UInteger)
             Stack(value, 32)
         End Sub
 #End Region

@@ -49,4 +49,31 @@ Public Class FutureFunctionTest
         Assert.IsTrue(target.State = FutureState.Failed)
         Assert.IsTrue(TypeOf target.Exception Is InvalidOperationException)
     End Sub
+    <TestMethod()>
+    Public Sub SetByEvaluatingSucceed()
+        Dim target = New FutureFunction(Of Integer)
+        target.SetByEvaluating(Function()
+                                   Return -3
+                               End Function)
+        Assert.IsTrue(target.State = FutureState.Succeeded)
+        Assert.IsTrue(target.Value = -3)
+    End Sub
+    <TestMethod()>
+    <ExpectedException(GetType(InvalidOperationException))>
+    Public Sub OverSetByEvaluating()
+        Dim target = New FutureFunction(Of Integer)
+        target.SetByEvaluating(Function()
+                               End Function)
+        target.SetByEvaluating(Function()
+                               End Function)
+    End Sub
+    <TestMethod()>
+    Public Sub SetByEvaluatingFail()
+        Dim target = New FutureFunction(Of Integer)
+        target.SetByEvaluating(Function()
+                                   Throw New InvalidOperationException("Mock exception")
+                               End Function)
+        Assert.IsTrue(target.State = FutureState.Failed)
+        Assert.IsTrue(TypeOf target.Exception Is InvalidOperationException)
+    End Sub
 End Class

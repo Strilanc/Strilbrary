@@ -57,11 +57,18 @@
     <Import Include="System.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BitBufferTest.vb" />
+    <Compile Include="ModByteTest.vb" />
+    <Compile Include="ModInt16Test.vb" />
+    <Compile Include="CoroutineTest.vb" />
+    <Compile Include="FiniteDoubleTest.vb" />
     <Compile Include="FutureActionTest.vb" />
     <Compile Include="FutureBaseTest.vb" />
     <Compile Include="FutureFunctionTest.vb" />
     <Compile Include="IFutureExtensionsTest.vb" />
+    <Compile Include="ModInt32Test.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="PushEnumeratorTest.vb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Strilbrary.vbproj">
