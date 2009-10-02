@@ -240,6 +240,7 @@ Public Module PoorlyCategorizedFunctions
     Public Function ToView(Of T)(ByVal list As IList(Of T)) As ViewableList(Of T)
         Contract.Requires(list IsNot Nothing)
         Contract.Ensures(Contract.Result(Of ViewableList(Of T))() IsNot Nothing)
+        Contract.Ensures(Contract.Result(Of ViewableList(Of T))().Length = list.Count)
         Return New ViewableList(Of T)(list)
     End Function
     <Extension()> <Pure()>

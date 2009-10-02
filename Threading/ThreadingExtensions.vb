@@ -150,8 +150,8 @@ Namespace Threading
 #Region "OnSuccess"
         <Extension()>
         Public Function QueueCallOnSuccess(ByVal future As IFuture,
-                                   ByVal queue As ICallQueue,
-                                   ByVal action As Action) As IFuture
+                                           ByVal queue As ICallQueue,
+                                           ByVal action As Action) As IFuture
             Contract.Requires(future IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(action IsNot Nothing)

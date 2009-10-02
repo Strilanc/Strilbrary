@@ -22,7 +22,7 @@
         End Sub
 
         Public Sub New(ByVal value As Double)
-            Contract.Ensures(Me.Value = value)
+            Contract.Ensures(Me.Value = CDbl(value))
             If Not value.IsFinite Then Throw New ArgumentOutOfRangeException("value", "value must be finite")
             Me._value = value
         End Sub
@@ -98,7 +98,7 @@
         End Operator
         Public Shared Narrowing Operator CType(ByVal value As Double) As FiniteDouble
             'Contract.Requires(value.IsFinite())
-            'Contract.Ensures(Contract.Result(Of FiniteDouble)().Value = value)
+            'Contract.Ensures(Contract.Result(Of FiniteDouble)().Value = CDbl(value))
             Return New FiniteDouble(value)
         End Operator
         Public Shared Widening Operator CType(ByVal value As Integer) As FiniteDouble

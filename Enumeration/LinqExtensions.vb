@@ -273,9 +273,9 @@
             Contract.Ensures(Contract.Result(Of IList(Of T))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IList(Of T))().Count = list.Count)
             Dim n = list.Count
-            Dim ret(0 To n - 1) As T
+            Dim ret = New List(Of T)(n)
             For i = 0 To n - 1
-                ret(i) = list(n - i - 1)
+                ret.Add(list(n - i - 1))
             Next i
             Contract.Assume(ret.Count = list.Count)
             Return ret

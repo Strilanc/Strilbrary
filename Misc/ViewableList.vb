@@ -11,9 +11,11 @@
         Contract.Invariant(_length >= 0)
         Contract.Invariant(offset + _length <= items.Count)
     End Sub
+
     Public Sub New(ByVal items As IList(Of T))
         Me.New(items, 0, items.Count, 0, items.Count)
         Contract.Requires(items IsNot Nothing)
+        Contract.Ensures(Me.Length = items.Count)
     End Sub
 
     Private Sub New(ByVal items As IList(Of T),
@@ -28,6 +30,7 @@
         Contract.Requires(relLength >= 0)
         Contract.Requires(relOffset + relLength <= baseLength)
         Contract.Requires(baseOffset + baseLength <= items.Count)
+        Contract.Ensures(Me.Length = relLength)
 
         Me.items = items
         Me.offset = baseOffset + relOffset

@@ -115,6 +115,7 @@ Namespace Threading
         ''' </summary>
         Public Sub SetFailed(ByVal exception As Exception)
             Contract.Requires(exception IsNot Nothing)
+            Contract.Ensures(Me.State = FutureState.Failed)
             If Not TrySetFailed(exception) Then
                 Throw New InvalidOperationException("Future was already set.")
             End If
@@ -126,6 +127,7 @@ Namespace Threading
         ''' </summary>
         Public Function TrySetFailed(ByVal exception As Exception) As Boolean
             Contract.Requires(exception IsNot Nothing)
+            Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.State = FutureState.Failed)
 
             If Not lockCanSet.TryAcquire Then Return False
             Me._exception = exception
@@ -137,6 +139,7 @@ Namespace Threading
 
         Protected Function TrySetSucceededBase(ByVal action As action) As Boolean
             Contract.Requires(action IsNot Nothing)
+            Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.State = FutureState.Succeeded)
 
             If Not lockCanSet.TryAcquire Then Return False
             Call action()
@@ -174,6 +177,7 @@ Namespace Threading
         ''' Throws an InvalidOperationException if the future was already ready.
         ''' </summary>
         Public Sub SetSucceeded()
+            Contract.Ensures(Me.State = FutureState.Succeeded)
             If Not TrySetSucceeded() Then
                 Throw New InvalidOperationException("Future readied more than once.")
             End If
@@ -184,6 +188,7 @@ Namespace Threading
         ''' Returns false if the future was already ready.
         ''' </summary>
         Public Function TrySetSucceeded() As Boolean
+            Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.State = FutureState.Succeeded)
             Return TrySetSucceededBase(Sub()
                                        End Sub)
         End Function
@@ -224,6 +229,7 @@ Namespace Threading
         <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
         Public Sub SetByEvaluating(ByVal func As Func(Of TValue))
             Contract.Requires(func IsNot Nothing)
+            Contract.Ensures(Me.State <> FutureState.Unknown)
             Try
                 SetSucceeded(func())
             Catch ex As Exception
@@ -236,6 +242,7 @@ Namespace Threading
         ''' Throws an InvalidOperationException if the future was already ready.
         ''' </summary>
         Public Sub SetSucceeded(ByVal value As TValue)
+            Contract.Ensures(Me.State = FutureState.Succeeded)
             If Not TrySetSucceeded(value) Then
                 Throw New InvalidOperationException("Future readied more than once.")
             End If
@@ -246,6 +253,7 @@ Namespace Threading
         ''' Returns false if the future was already ready.
         ''' </summary>
         Public Function TrySetSucceeded(ByVal value As TValue) As Boolean
+            Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.State = FutureState.Succeeded)
             Return TrySetSucceededBase(Sub()
                                            Contract.Assume(Me IsNot Nothing)
                                            Me._value = value
@@ -369,6 +377,7 @@ Namespace Threading
 
             Return future.EvalWhenReady(Function(exception)
                                             Contract.Assume(func IsNot Nothing)
+                                            Contract.Assume(future IsNot Nothing)
                                             Return func(future.TryGetValue, exception)
                                         End Function)
         End Function
@@ -474,6 +483,7 @@ Namespace Threading
         <Extension()>
         Public Function Futurized(Of TValue)(ByVal value As TValue) As IFuture(Of TValue)
             Contract.Ensures(Contract.Result(Of IFuture(Of TValue))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IFuture(Of TValue))().State = FutureState.Succeeded)
             Dim result = New FutureFunction(Of TValue)
             result.SetSucceeded(value)
             Return result
