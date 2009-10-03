@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitBufferTest.vb" />
+    <Compile Include="ThrottleTest.vb" />
     <Compile Include="LazyValueTest.vb" />
     <Compile Include="ModByteTest.vb" />
     <Compile Include="ModInt16Test.vb" />
