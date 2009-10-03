@@ -12,7 +12,7 @@ Namespace Numerics
             Dim reversedValue = 0UI
             For i = 0 To 3
                 reversedValue <<= 8
-                reversedValue = reversedValue Or (value And CUInt(&HFF))
+                reversedValue = reversedValue Or (value And &HFFUI)
                 value >>= 8
             Next i
             Return reversedValue
@@ -22,7 +22,7 @@ Namespace Numerics
             Dim reversedValue = 0UL
             For i = 0 To 7
                 reversedValue <<= 8
-                reversedValue = reversedValue Or (value And CULng(&HFF))
+                reversedValue = reversedValue Or (value And &HFFUL)
                 value >>= 8
             Next i
             Return reversedValue
@@ -111,9 +111,10 @@ Namespace Numerics
             Return val
         End Function
 
-        <Extension()> Public Function Bytes(ByVal value As UInt16,
-                                            Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian,
-                                            Optional ByVal size As Integer = 2) As Byte()
+        <Extension()> <Pure()>
+        Public Function Bytes(ByVal value As UInt16,
+                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian,
+                              Optional ByVal size As Integer = 2) As Byte()
             Contract.Requires(size >= 0)
             Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Byte())().Length = size)
@@ -242,7 +243,8 @@ Namespace Numerics
                     {"f"c, 15}, {"F"c, 15}}
 
         <Extension()> <Pure()>
-        Public Function FromHexToUInt64(ByVal chars As IEnumerable(Of Char), ByVal byteOrder As ByteOrder) As ULong
+        Public Function FromHexToUInt64(ByVal chars As IEnumerable(Of Char),
+                                        ByVal byteOrder As ByteOrder) As ULong
             Contract.Requires(chars IsNot Nothing)
 
             Select Case byteOrder
