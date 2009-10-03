@@ -73,9 +73,9 @@ Namespace Threading
         Protected Overrides Sub Finalize()
             Select Case Me.State
                 Case FutureState.Failed
-                    LogUnexpectedException("Future exception ignored.", Me.Exception)
+                    Call Me.Exception.RaiseAsUnexpected("Future exception ignored.")
                 Case FutureState.Unknown
-                    LogUnexpectedException("Future expired without being set.", New InvalidStateException("Dangling Future."))
+                    Call New InvalidStateException("Dangling Future.").RaiseAsUnexpected("Dangling Future.")
             End Select
             MyBase.Finalize()
         End Sub

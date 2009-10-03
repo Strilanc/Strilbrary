@@ -105,8 +105,9 @@ Namespace Threading
         Protected Overrides Sub StartRunning()
             Try
                 control.BeginInvoke(Sub() Run())
-            Catch e As InvalidOperationException
-                LogUnexpectedException("Invalid Invoke from {0}.StartRunning() ({1}, {2})".Frmt(Me.GetType.Name, control.GetType.Name, control.Name), e)
+            Catch ex As InvalidOperationException
+                ex.RaiseAsUnexpected("Invalid Invoke from {0}.StartRunning() ({1}, {2})".
+                                        Frmt(Me.GetType.Name, control.GetType.Name, control.Name))
             End Try
         End Sub
     End Class
