@@ -8,6 +8,11 @@ Namespace Threading
         Private running As Boolean
         Private ReadOnly ref As ICallQueue = New ThreadPooledCallQueue()
 
+        <ContractInvariantMethod()>
+        Private Sub ObjectInvariant()
+            Contract.Invariant(ref IsNot Nothing)
+        End Sub
+
         Public Sub New(ByVal cooldown As TimeSpan)
             Me.cooldown = cooldown
         End Sub

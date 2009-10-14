@@ -58,17 +58,5 @@ Namespace Streams
             substream.Close()
             MyBase.Close()
         End Sub
-        Public Overrides Function BeginRead(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer, ByVal callback As System.AsyncCallback, ByVal state As Object) As System.IAsyncResult
-            Return substream.BeginRead(buffer, offset, count, callback, state)
-        End Function
-        Public Overrides Function BeginWrite(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer, ByVal callback As System.AsyncCallback, ByVal state As Object) As System.IAsyncResult
-            Return substream.BeginWrite(buffer, offset, count, callback, state)
-        End Function
-        Public Overrides Function EndRead(ByVal asyncResult As System.IAsyncResult) As Integer
-            Return substream.EndRead(asyncResult)
-        End Function
-        Public Overrides Sub EndWrite(ByVal asyncResult As System.IAsyncResult)
-            substream.EndWrite(asyncResult)
-        End Sub
     End Class
 End Namespace

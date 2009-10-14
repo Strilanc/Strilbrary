@@ -208,40 +208,6 @@ Public Module PoorlyCategorizedFunctions
     End Function
 #End Region
 
-    <Extension()>
-    Public Function ReadBytes(ByVal stream As IO.Stream, ByVal length As Integer) As Byte()
-        Contract.Requires(stream IsNot Nothing)
-        Contract.Requires(length >= 0)
-        Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-        Dim buffer(0 To length - 1) As Byte
-        length = stream.Read(buffer, 0, length)
-        Contract.Assume(length >= 0)
-        If length < buffer.Length Then
-            ReDim Preserve buffer(0 To length - 1)
-            Contract.Assume(buffer IsNot Nothing)
-        End If
-        Return buffer
-    End Function
-
-    Public Function ReadAllStreamBytes(ByVal stream As IO.Stream) As Byte()
-        Contract.Requires(stream IsNot Nothing)
-        Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-        Dim m = 1024
-        Dim bb(0 To m - 1) As Byte
-        Dim c = 0
-        Do
-            Dim n = stream.Read(bb, c, m - c)
-            c += n
-            If c <> m Then Exit Do
-            m *= 2
-            ReDim Preserve bb(0 To m - 1)
-        Loop
-        Contract.Assume(c >= 0)
-        ReDim Preserve bb(0 To c - 1)
-        Contract.Assume(bb IsNot Nothing)
-        Return bb
-    End Function
-
     <Extension()> <Pure()>
     Public Function Minutes(ByVal quantity As Integer) As TimeSpan
         Return New TimeSpan(0, quantity, 0)
