@@ -25,11 +25,7 @@ Namespace Threading
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
 
             Dim result = New FutureFunction(Of TReturn)
-            queue.QueueAction(Sub()
-                                  Contract.Assume(result IsNot Nothing)
-                                  Contract.Assume(func IsNot Nothing)
-                                  result.SetByEvaluating(func)
-                              End Sub).MarkAnyExceptionAsHandled()
+            queue.QueueAction(Sub() result.SetByEvaluating(func))
             Return result
         End Function
     End Module
@@ -125,6 +121,15 @@ Namespace Threading
         Inherits AbstractLockFreeCallQueue
         Protected Overrides Sub StartRunning()
             ThreadPooledAction(Sub() Run())
+        End Sub
+    End Class
+
+    '''<summary>Runs queued calls as a task.</summary>
+    Public NotInheritable Class TaskedCallQueue
+        Inherits AbstractLockFreeCallQueue
+        Protected Overrides Sub StartRunning()
+            Contract.Assume(System.Threading.Tasks.Task.Factory IsNot Nothing)
+            System.Threading.Tasks.Task.Factory.StartNew(Sub() Run())
         End Sub
     End Class
 End Namespace

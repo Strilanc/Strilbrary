@@ -14,8 +14,6 @@ Namespace Threading
             Else
                 Dim timer = New Timers.Timer(ds)
                 AddHandler timer.Elapsed, Sub()
-                                              Contract.Assume(result IsNot Nothing)
-                                              Contract.Assume(timer IsNot Nothing)
                                               timer.Dispose()
                                               result.SetSucceeded()
                                           End Sub
@@ -30,11 +28,7 @@ Namespace Threading
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
             Dim result = New FutureAction
-            Call New Thread(Sub()
-                                Contract.Assume(action IsNot Nothing)
-                                Contract.Assume(result IsNot Nothing)
-                                result.SetByCalling(action)
-                            End Sub).Start()
+            Call New Thread(Sub() result.SetByCalling(action)).Start()
             Return result
         End Function
 
@@ -43,11 +37,7 @@ Namespace Threading
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
             Dim result = New FutureFunction(Of TReturn)
-            Call New Thread(Sub()
-                                Contract.Assume(func IsNot Nothing)
-                                Contract.Assume(result IsNot Nothing)
-                                result.SetByEvaluating(func)
-                            End Sub).Start()
+            Call New Thread(Sub() result.SetByEvaluating(func)).Start()
             Return result
         End Function
 
@@ -56,11 +46,7 @@ Namespace Threading
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
             Dim result = New FutureAction
-            ThreadPool.QueueUserWorkItem(Sub()
-                                             Contract.Assume(action IsNot Nothing)
-                                             Contract.Assume(result IsNot Nothing)
-                                             result.SetByCalling(action)
-                                         End Sub)
+            ThreadPool.QueueUserWorkItem(Sub() result.SetByCalling(action))
             Return result
         End Function
 
@@ -69,11 +55,7 @@ Namespace Threading
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
             Dim result = New FutureFunction(Of TReturn)
-            ThreadPool.QueueUserWorkItem(Sub()
-                                             Contract.Assume(func IsNot Nothing)
-                                             Contract.Assume(result IsNot Nothing)
-                                             result.SetByEvaluating(func)
-                                         End Sub)
+            ThreadPool.QueueUserWorkItem(Sub() result.SetByEvaluating(func))
             Return result
         End Function
 
@@ -86,13 +68,8 @@ Namespace Threading
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Return future.EvalWhenReady(Function(exception)
-                                            Contract.Assume(queue IsNot Nothing)
-                                            Return queue.QueueAction(Sub()
-                                                                         Contract.Assume(action IsNot Nothing)
-                                                                         action(exception)
-                                                                     End Sub)
-                                        End Function).Defuturized
+            Return future.EvalWhenReady(Function(exception) queue.QueueAction(
+                                        Sub() action(exception))).Defuturized
         End Function
 
         <Extension()>
@@ -103,13 +80,8 @@ Namespace Threading
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Return future.EvalWhenValueReady(Function(value, valueException)
-                                                 Contract.Assume(queue IsNot Nothing)
-                                                 Return queue.QueueAction(Sub()
-                                                                              Contract.Assume(action IsNot Nothing)
-                                                                              action(value, valueException)
-                                                                          End Sub)
-                                             End Function).Defuturized
+            Return future.EvalWhenValueReady(Function(value, valueException) queue.QueueAction(
+                                             Sub() action(value, valueException))).Defuturized
         End Function
 
         <Extension()>
@@ -120,13 +92,8 @@ Namespace Threading
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Return future.EvalWhenReady(Function(exception)
-                                            Contract.Assume(queue IsNot Nothing)
-                                            Return queue.QueueFunc(Function()
-                                                                       Contract.Assume(func IsNot Nothing)
-                                                                       Return func(exception)
-                                                                   End Function)
-                                        End Function).Defuturized
+            Return future.EvalWhenReady(Function(exception) queue.QueueFunc(
+                                        Function() func(exception))).Defuturized
         End Function
 
         <Extension()>
@@ -137,13 +104,8 @@ Namespace Threading
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Return future.EvalWhenValueReady(Function(value, valueException)
-                                                 Contract.Assume(queue IsNot Nothing)
-                                                 Return queue.QueueFunc(Function()
-                                                                            Contract.Assume(func IsNot Nothing)
-                                                                            Return func(value, valueException)
-                                                                        End Function)
-                                             End Function).Defuturized
+            Return future.EvalWhenValueReady(Function(value, valueException) queue.QueueFunc(
+                                             Function() func(value, valueException))).Defuturized
         End Function
 #End Region
 
@@ -156,11 +118,7 @@ Namespace Threading
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Return future.EvalOnSuccess(Function()
-                                            Contract.Assume(queue IsNot Nothing)
-                                            Contract.Assume(action IsNot Nothing)
-                                            Return queue.QueueAction(action)
-                                        End Function).Defuturized
+            Return future.EvalOnSuccess(Function() queue.QueueAction(action)).Defuturized
         End Function
 
         <Extension()>
@@ -171,13 +129,7 @@ Namespace Threading
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Return future.Select(Function(result)
-                                     Contract.Assume(queue IsNot Nothing)
-                                     Return queue.QueueAction(Sub()
-                                                                  Contract.Assume(action IsNot Nothing)
-                                                                  Call action(result)
-                                                              End Sub)
-                                 End Function).Defuturized
+            Return future.Select(Function(result) queue.QueueAction(Sub() action(result))).Defuturized
         End Function
 
         <Extension()>
@@ -188,11 +140,7 @@ Namespace Threading
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Return future.EvalOnSuccess(Function()
-                                            Contract.Assume(queue IsNot Nothing)
-                                            Contract.Assume(func IsNot Nothing)
-                                            Return queue.QueueFunc(func)
-                                        End Function).Defuturized
+            Return future.EvalOnSuccess(Function() queue.QueueFunc(func)).Defuturized
         End Function
 
         <Extension()>
@@ -203,13 +151,7 @@ Namespace Threading
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Return future.Select(Function(result)
-                                     Contract.Assume(queue IsNot Nothing)
-                                     Return queue.QueueFunc(Function()
-                                                                Contract.Assume(func IsNot Nothing)
-                                                                Return func(result)
-                                                            End Function)
-                                 End Function).Defuturized
+            Return future.Select(Function(result) queue.QueueFunc(Function() func(result))).Defuturized
         End Function
 #End Region
     End Module

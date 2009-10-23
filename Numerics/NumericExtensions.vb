@@ -30,13 +30,14 @@ Namespace Numerics
 
         '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
         <Extension()> <Pure()>
+        <ContractVerification(False)>
         Public Function ModCeiling(ByVal value As Integer, ByVal divisor As Integer) As Integer
+            'contracts 1.2.21022.12 incorrectly proves this method false
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Integer)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of Integer)() >= value)
             Contract.Ensures(Contract.Result(Of Integer)() < value + divisor)
 
-            Contract.Assume(((value \ divisor) * divisor) Mod divisor = 0)
             If value Mod divisor = 0 Then
                 Return value
             ElseIf value < 0 Then
@@ -50,13 +51,14 @@ Namespace Numerics
 
         '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
         <Extension()> <Pure()>
+        <ContractVerification(False)>
         Public Function ModFloor(ByVal value As Integer, ByVal divisor As Integer) As Integer
+            'contracts 1.2.21022.12 incorrectly proves this method false
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Integer)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of Integer)() <= value)
             Contract.Ensures(Contract.Result(Of Integer)() > value - divisor)
 
-            Contract.Assume(((value \ divisor) * divisor) Mod divisor = 0)
             If value Mod divisor = 0 Then
                 Return value
             ElseIf value < 0 Then
@@ -98,7 +100,6 @@ Namespace Numerics
             Select Case byteOrder
                 Case byteOrder.LittleEndian
                     data = data.Reverse
-                    Contract.Assume(data IsNot Nothing)
                 Case byteOrder.BigEndian
                     'no change required
                 Case Else
@@ -144,9 +145,7 @@ Namespace Numerics
             If value <> 0 Then Throw New ArgumentOutOfRangeException("value", "The specified value won't fit in the specified number of bytes.")
             Select Case byteOrder
                 Case byteOrder.BigEndian
-                    Dim result = data.Reverse.ToArray
-                    Contract.Assume(result.Length = size)
-                    Return result
+                    Return data.Reverse.ToArray
                 Case byteOrder.LittleEndian
                     Return data
                 Case Else
@@ -250,7 +249,6 @@ Namespace Numerics
             Select Case byteOrder
                 Case byteOrder.LittleEndian
                     chars = chars.Reverse()
-                    Contract.Assume(chars IsNot Nothing)
                 Case byteOrder.BigEndian
                     'no change needed
                 Case Else

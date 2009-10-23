@@ -72,10 +72,6 @@
     Private Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
         Dim nextIndex = 0
         Return New Enumerator(Of T)(Function(controller)
-                                        Contract.Requires(controller IsNot Nothing)
-                                        Contract.Assume(controller IsNot Nothing)
-                                        Contract.Assume(Me IsNot Nothing)
-                                        Contract.Assume(nextIndex >= 0)
                                         If nextIndex >= Me.Length Then  Return controller.Break()
                                         Dim e = Item(nextIndex)
                                         nextIndex += 1
@@ -119,12 +115,11 @@
     Private Function _Remove(ByVal item As T) As Boolean Implements System.Collections.Generic.ICollection(Of T).Remove
         Throw New NotSupportedException
     End Function
+    <ContractVerification(False)>
     Private Function _IndexOf(ByVal item As T) As Integer Implements System.Collections.Generic.IList(Of T).IndexOf
-        For i = 0 To Length - 1
+        'verification disabled because contracts 1.2.21022.2 fails to verify bounds
+        For i = 0 To Me.Count - 1
             If item.Equals(Me.Item(i)) Then
-                'contract verifier 1.2.20902.10 claims this is redundant, but removing it causes:
-                '   ensures unproven: Contract.Result<int>() < @this.Count
-                Contract.Assume(i < _Count)
                 Return i
             End If
         Next i

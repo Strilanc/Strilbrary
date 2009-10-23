@@ -56,8 +56,7 @@ Public Module PoorlyCategorizedFunctions
         Contract.Requires(separator IsNot Nothing)
         Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
         Dim words = From arg In this Select String.Concat(arg)
-        Contract.Assume(words IsNot Nothing)
-        Return String.Join(separator, words.ToArrayNonNull)
+        Return String.Join(separator, words.ToArray)
     End Function
 #End Region
 
@@ -188,26 +187,6 @@ Public Module PoorlyCategorizedFunctions
         value2 = vt
     End Sub
 
-#Region "Temporary"
-    <Extension()> <Pure()>
-    Friend Function SkipNonNull(Of T)(ByVal this As IEnumerable(Of T), ByVal amount As Integer) As IEnumerable(Of T)
-        Contract.Requires(this IsNot Nothing)
-        Contract.Requires(amount >= 0)
-        Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
-        Dim res = this.Skip(amount)
-        Contract.Assume(res IsNot Nothing)
-        Return res
-    End Function
-    <Extension()> <Pure()>
-    Friend Function ToArrayNonNull(Of T)(ByVal this As IEnumerable(Of T)) As T()
-        Contract.Requires(this IsNot Nothing)
-        Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
-        Dim res = this.ToArray
-        Contract.Assume(res IsNot Nothing)
-        Return res
-    End Function
-#End Region
-
     <Extension()> <Pure()>
     Public Function Minutes(ByVal quantity As Integer) As TimeSpan
         Return New TimeSpan(0, quantity, 0)
@@ -232,61 +211,6 @@ Public Module PoorlyCategorizedFunctions
     Public Function ToView(Of T)(ByVal this As IEnumerable(Of T)) As ViewableList(Of T)
         Contract.Requires(this IsNot Nothing)
         Contract.Ensures(Contract.Result(Of ViewableList(Of T))() IsNot Nothing)
-        Return New ViewableList(Of T)(this.ToArrayNonNull)
-    End Function
-
-    Private Delegate Function RecursiveFunction(Of TArg1, TReturn)(ByVal self As RecursiveFunction(Of TArg1, TReturn)) As Func(Of TArg1, TReturn)
-    <Pure()>
-    Public Function YCombinator(Of TArg1, TReturn)(ByVal recursor As Func(Of Func(Of TArg1, TReturn), Func(Of TArg1, TReturn))) As Func(Of TArg1, TReturn)
-        Contract.Requires(recursor IsNot Nothing)
-        Contract.Ensures(Contract.Result(Of Func(Of TArg1, TReturn))() IsNot Nothing)
-        Dim rec As RecursiveFunction(Of TArg1, TReturn) = Function(self)
-                                                              Return Function(arg1)
-                                                                         Contract.Assume(self IsNot Nothing)
-                                                                         Contract.Assume(recursor IsNot Nothing)
-                                                                         Dim x = recursor(self(self))
-                                                                         Contract.Assume(x IsNot Nothing)
-                                                                         Return x(arg1)
-                                                                     End Function
-                                                          End Function
-        Dim ret = rec(rec)
-        Contract.Assume(ret IsNot Nothing)
-        Return ret
-    End Function
-    Private Delegate Function RecursiveAction(ByVal self As RecursiveAction) As Action
-    <Pure()>
-    Public Function YCombinator(ByVal recursor As Func(Of Action, Action)) As Action
-        Contract.Requires(recursor IsNot Nothing)
-        Contract.Ensures(Contract.Result(Of Action)() IsNot Nothing)
-        Dim rec As RecursiveAction = Function(self)
-                                         Return Sub()
-                                                    Contract.Assume(recursor IsNot Nothing)
-                                                    Contract.Assume(self IsNot Nothing)
-                                                    Dim x = recursor(self(self))
-                                                    Contract.Assume(x IsNot Nothing)
-                                                    Call x()
-                                                End Sub
-                                     End Function
-        Dim ret = rec(rec)
-        Contract.Assume(ret IsNot Nothing)
-        Return ret
-    End Function
-    Private Delegate Function RecursiveAction(Of TArg1)(ByVal self As RecursiveAction(Of TArg1)) As Action(Of TArg1)
-    <Pure()>
-    Public Function YCombinator(Of TArg1)(ByVal recursor As Func(Of Action(Of TArg1), Action(Of TArg1))) As Action(Of TArg1)
-        Contract.Requires(recursor IsNot Nothing)
-        Contract.Ensures(Contract.Result(Of Action(Of TArg1))() IsNot Nothing)
-        Dim rec As RecursiveAction(Of TArg1) = Function(self)
-                                                   Return Sub(arg1)
-                                                              Contract.Assume(recursor IsNot Nothing)
-                                                              Contract.Assume(self IsNot Nothing)
-                                                              Dim x = recursor(self(self))
-                                                              Contract.Assume(x IsNot Nothing)
-                                                              Call x(arg1)
-                                                          End Sub
-                                               End Function
-        Dim ret = rec(rec)
-        Contract.Assume(ret IsNot Nothing)
-        Return ret
+        Return New ViewableList(Of T)(this.ToArray)
     End Function
 End Module

@@ -254,10 +254,7 @@ Namespace Threading
         ''' </summary>
         Public Function TrySetSucceeded(ByVal value As TValue) As Boolean
             Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.State = FutureState.Succeeded)
-            Return TrySetSucceededBase(Sub()
-                                           Contract.Assume(Me IsNot Nothing)
-                                           Me._value = value
-                                       End Sub)
+            Return TrySetSucceededBase(Sub() Me._value = value)
         End Function
 
         Public Overrides Function ToString() As String

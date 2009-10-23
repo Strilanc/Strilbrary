@@ -63,8 +63,10 @@ Public Class FutureFunctionTest
     Public Sub OverSetByEvaluating()
         Dim target = New FutureFunction(Of Integer)
         target.SetByEvaluating(Function()
+                                   Return 0
                                End Function)
         target.SetByEvaluating(Function()
+                                   Return 0
                                End Function)
     End Sub
     <TestMethod()>

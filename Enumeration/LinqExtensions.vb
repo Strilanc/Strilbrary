@@ -164,10 +164,6 @@
             Contract.Ensures(Contract.Result(Of IEnumerator(Of IList(Of T)))() IsNot Nothing)
             Return New Enumerator(Of IList(Of T))(
                 Function(controller)
-                    Contract.Requires(controller IsNot Nothing)
-                    Contract.Assume(controller IsNot Nothing)
-                    Contract.Assume(sequence IsNot Nothing)
-                    Contract.Assume(blockSize > 0)
                     If Not sequence.MoveNext Then  Return controller.Break()
 
                     Dim block = New List(Of T)(blockSize)
@@ -188,12 +184,7 @@
             Contract.Requires(blockSize > 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of IList(Of T)))() IsNot Nothing)
             Dim blockSize_ = blockSize
-            Return sequence.Transform(Function(enumerator)
-                                          Contract.Requires(enumerator IsNot Nothing)
-                                          Contract.Assume(enumerator IsNot Nothing)
-                                          Contract.Assume(blockSize_ > 0)
-                                          Return EnumBlocks(enumerator, blockSize_)
-                                      End Function)
+            Return sequence.Transform(Function(enumerator) EnumBlocks(enumerator, blockSize_))
         End Function
 
         '''<summary>Transforms an IEnumerable using a transformation function meant for an IEnumerator.</summary>
@@ -203,11 +194,7 @@
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(transformation IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TOut))() IsNot Nothing)
-            Return New Enumerable(Of TOut)(Function()
-                                               Contract.Assume(transformation IsNot Nothing)
-                                               Contract.Assume(sequence IsNot Nothing)
-                                               Return transformation(sequence.GetEnumerator())
-                                           End Function)
+            Return New Enumerable(Of TOut)(Function() transformation(sequence.GetEnumerator()))
         End Function
 #End Region
 

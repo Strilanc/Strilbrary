@@ -6,6 +6,16 @@ Namespace Enumeration
         Function Convert(ByVal sequence As IEnumerator(Of TInput)) As IEnumerator(Of TOutput)
     End Interface
 
+    <ContractClassFor(GetType(IConverter(Of ,)))>
+    Public NotInheritable Class ContractClassForIConverter(Of TInput, TOutput)
+        Implements IConverter(Of TInput, TOutput)
+        Public Function Convert(ByVal sequence As IEnumerator(Of TInput)) As IEnumerator(Of TOutput) Implements IConverter(Of TInput, TOutput).Convert
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerator(Of TOutput))() IsNot Nothing)
+            Throw New NotSupportedException()
+        End Function
+    End Class
+
     Public Module ExtensionsIConverter
         <Extension()> Public Function Convert(Of TIn, TOut)(ByVal converter As IConverter(Of TIn, TOut),
                                                             ByVal sequence As IEnumerable(Of TIn)) As IEnumerable(Of TOut)
@@ -29,11 +39,8 @@ Namespace Enumeration
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerator(Of Byte))() IsNot Nothing)
             Return New Enumerator(Of Byte)(Function(controller)
-                                               Contract.Requires(controller IsNot Nothing)
-                                               Contract.Assume(controller IsNot Nothing)
-                                               Contract.Assume(stream IsNot Nothing)
                                                Dim r = stream.ReadByte()
-                                               If r = -1 Then  Return controller.Break()
+                                               If r = -1 Then Return controller.Break()
                                                Return CByte(r)
                                            End Function,
                                            AddressOf stream.Dispose)
@@ -44,10 +51,6 @@ Namespace Enumeration
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of PushEnumerator(Of T))() IsNot Nothing)
             Return New PushEnumerator(Of T)(Sub(sequenceT)
-                                                Contract.Requires(sequenceT IsNot Nothing)
-                                                Contract.Assume(sequenceT IsNot Nothing)
-                                                Contract.Assume(stream IsNot Nothing)
-                                                Contract.Assume(converter IsNot Nothing)
                                                 Dim sequence = converter.Convert(sequenceT)
                                                 While sequence.MoveNext
                                                     stream.WriteByte(sequence.Current)
@@ -76,16 +79,6 @@ Namespace Enumeration
             Return enumerator.Current()
         End Function
     End Module
-
-    <ContractClassFor(GetType(IConverter(Of ,)))>
-    Public NotInheritable Class ContractClassForIConverter(Of TInput, TOutput)
-        Implements IConverter(Of TInput, TOutput)
-        Public Function Convert(ByVal sequence As IEnumerator(Of TInput)) As IEnumerator(Of TOutput) Implements IConverter(Of TInput, TOutput).Convert
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IEnumerator(Of TOutput))() IsNot Nothing)
-            Throw New NotSupportedException()
-        End Function
-    End Class
 
     Friend NotInheritable Class EnumeratorStream
         Inherits IO.Stream
@@ -196,13 +189,6 @@ Namespace Enumeration
             If closed Then Throw New InvalidOperationException("Closed streams are not writable.")
             Dim index = 0
             pusher.Push(New Enumerator(Of Byte)(Function(controller)
-                                                    Contract.Requires(controller IsNot Nothing)
-                                                    Contract.Assume(controller IsNot Nothing)
-                                                    Contract.Assume(index >= 0)
-                                                    Contract.Assume(buffer IsNot Nothing)
-                                                    Contract.Assume(offset >= 0)
-                                                    Contract.Assume(count >= 0)
-                                                    Contract.Assume(offset + count <= buffer.Length)
                                                     If index >= count Then  Return controller.Break()
                                                     index += 1
                                                     Return buffer(index + offset - 1)

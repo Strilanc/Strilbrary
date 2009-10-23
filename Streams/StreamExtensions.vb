@@ -21,10 +21,12 @@
             Contract.Ensures(Contract.Result(Of Integer)() <= length)
             Dim numRead = 0
             Do Until numRead >= length
-                Dim n = stream.Read(buffer, offset + numRead, length)
+                Dim n = stream.Read(buffer, offset + numRead, length - numRead)
                 numRead += n
                 If n = 0 Then Exit Do
             Loop
+            Contract.Assume(numRead >= 0)
+            Contract.Assume(numRead <= length)
             Return numRead
         End Function
 
@@ -66,7 +68,6 @@
             Loop
             Contract.Assume(c >= 0)
             ReDim Preserve bb(0 To c - 1)
-            Contract.Assume(bb IsNot Nothing)
             Return bb
         End Function
 

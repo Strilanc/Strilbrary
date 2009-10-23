@@ -39,9 +39,9 @@
     <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
     <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
     <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
-    <CodeContractsRunCodeAnalysis>False</CodeContractsRunCodeAnalysis>
+    <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
     <CodeContractsBuildReferenceAssembly>True</CodeContractsBuildReferenceAssembly>
-    <CodeContractsNonNullObligations>False</CodeContractsNonNullObligations>
+    <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
     <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
     <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
     <CodeContractsLibPaths />
@@ -53,7 +53,7 @@
     <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
     <CodeContractsEmitXMLDocs>True</CodeContractsEmitXMLDocs>
     <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
@@ -68,13 +68,13 @@
     <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
     <CodeContractsCustomRewriterAssembly />
     <CodeContractsCustomRewriterClass />
-    <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
+    <CodeContractsRuntimeCheckingLevel>Pre and Post</CodeContractsRuntimeCheckingLevel>
     <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
     <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
     <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
-    <CodeContractsRunCodeAnalysis>False</CodeContractsRunCodeAnalysis>
+    <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
     <CodeContractsBuildReferenceAssembly>True</CodeContractsBuildReferenceAssembly>
-    <CodeContractsNonNullObligations>False</CodeContractsNonNullObligations>
+    <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
     <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
     <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
     <CodeContractsLibPaths />
@@ -88,6 +88,7 @@
     <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <CodeContractsReferenceAssembly>Build</CodeContractsReferenceAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -132,6 +133,7 @@
     <Compile Include="Numerics\ModByte.vb" />
     <Compile Include="Numerics\ModInt16.vb" />
     <Compile Include="Numerics\FiniteDouble.vb" />
+    <Compile Include="Streams\StreamExtensions.vb" />
     <Compile Include="Threading\Futures\IFutureExtensions.vb" />
     <Compile Include="Threading\Queueing\AbstractLockFreeConsumer.vb" />
     <Compile Include="Threading\Queueing\SingleConsumerLockFreeQueue.vb" />

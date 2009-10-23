@@ -3,7 +3,9 @@
     ''' Represents a double which is not positive infinity, negative infinity, or NaN.
     ''' </summary>
     <DebuggerDisplay("{ToString}")>
+    <ContractVerification(False)>
     Public Structure FiniteDouble
+        'Contract verification is off because of constant 'possible precision loss' warnings in 1.2.21022.2
         Implements IComparable(Of FiniteDouble)
         Implements IEquatable(Of FiniteDouble)
 
@@ -137,12 +139,12 @@
         Public Shared Function Max(ByVal values As IEnumerable(Of FiniteDouble)) As FiniteDouble
             Contract.Requires(values IsNot Nothing)
             Contract.Requires(values.Any)
-            Return Max(values.First, values.SkipNonNull(1).ToArrayNonNull())
+            Return Max(values.First, values.Skip(1).ToArray)
         End Function
         Public Shared Function Min(ByVal values As IEnumerable(Of FiniteDouble)) As FiniteDouble
             Contract.Requires(values IsNot Nothing)
             Contract.Requires(values.Any)
-            Return Min(values.First, values.SkipNonNull(1).ToArrayNonNull())
+            Return Min(values.First, values.Skip(1).ToArray)
         End Function
         Public Shared Function Min(ByVal initialValue As FiniteDouble, ByVal ParamArray values() As FiniteDouble) As FiniteDouble
             Contract.Requires(values IsNot Nothing)

@@ -43,13 +43,10 @@ Namespace Threading
 
         <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
         Public Sub New(ByVal coroutineAction As Action(Of ICoroutineController))
-            Contract.Assume(coroutineAction IsNot Nothing)
+            Contract.Requires(coroutineAction IsNot Nothing)
 
             Call ThreadedAction(
                 Sub()
-                    Contract.Assume(Me IsNot Nothing)
-                    Contract.Assume(lockJoined IsNot Nothing)
-                    Contract.Assume(coroutineAction IsNot Nothing)
                     Me.lockJoined.WaitOne()
 
                     Try
@@ -62,8 +59,6 @@ Namespace Threading
                         coexception = New ObjectDisposedException(Me.GetType.Name, coexception)
                     End If
                     finished = True
-                    Contract.Assume(lockProducer IsNot Nothing)
-                    Contract.Assume(lockConsumer IsNot Nothing)
                     lockProducer.Set()
                     lockConsumer.Set()
                 End Sub
@@ -128,10 +123,8 @@ Namespace Threading
         End Sub
 
         Public Sub New(ByVal coroutineFunction As Action(Of ICoroutineController(Of TReturn)))
-            'Contract.Requires(coroutineFunction IsNot Nothing)
+            Contract.Requires(coroutineFunction IsNot Nothing)
             Me.coroutineContinuer = New Coroutine(Sub(yielder)
-                                                      Contract.Assume(Me IsNot Nothing)
-                                                      Contract.Assume(coroutineFunction IsNot Nothing)
                                                       Me.coroutineYielder = yielder
                                                       Call coroutineFunction(Me)
                                                   End Sub)
