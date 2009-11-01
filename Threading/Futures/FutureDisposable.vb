@@ -1,23 +1,24 @@
 ﻿Namespace Threading
     '''<summary>Represents an object which makes its future thread-safe disposal available as a future.</summary>
-    <ContractClass(GetType(ContractClassForIFutureDisposable))>
-        Public Interface IFutureDisposable
+    <ContractClass(GetType(IFutureDisposable.ContractClass))>
+    Public Interface IFutureDisposable
         Inherits IDisposable
         ReadOnly Property FutureDisposed As IFuture
-    End Interface
 
-    <ContractClassFor(GetType(IFutureDisposable))>
-    Public NotInheritable Class ContractClassForIFutureDisposable
-        Implements IFutureDisposable
-        Public ReadOnly Property FutureDisposed As IFuture Implements IFutureDisposable.FutureDisposed
-            Get
-                Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-                Throw New InvalidOperationException
-            End Get
-        End Property
-        Public Sub Dispose() Implements IDisposable.Dispose
-        End Sub
-    End Class
+        <ContractClassFor(GetType(IFutureDisposable))>
+        Class ContractClass
+            Implements IFutureDisposable
+            Public ReadOnly Property FutureDisposed As IFuture Implements IFutureDisposable.FutureDisposed
+                Get
+                    Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
+                    Throw New NotSupportedException
+                End Get
+            End Property
+            Public Sub Dispose() Implements IDisposable.Dispose
+                Throw New NotSupportedException
+            End Sub
+        End Class
+    End Interface
 
     '''<summary>A class which makes its future thread-safe disposal available as a future.</summary>
     <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>

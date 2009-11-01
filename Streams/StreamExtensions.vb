@@ -25,7 +25,6 @@
                 numRead += n
                 If n = 0 Then Exit Do
             Loop
-            Contract.Assume(numRead >= 0)
             Contract.Assume(numRead <= length)
             Return numRead
         End Function

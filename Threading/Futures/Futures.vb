@@ -11,7 +11,7 @@ Namespace Threading
     End Enum
 
     '''<summary>Represents an action which can finish in the future.</summary>
-    <ContractClass(GetType(ContractClassForIFuture))>
+    <ContractClass(GetType(IFuture.ContractClass))>
     Public Interface IFuture
         '''<summary>Raised when the future becomes ready.</summary>
         Event Ready()
@@ -24,6 +24,26 @@ Namespace Threading
         ReadOnly Property Exception() As Exception
         '''<summary>Stops the future from logging its stored exception when finalized.</summary>
         Sub MarkAnyExceptionAsHandled()
+
+        <ContractClassFor(GetType(IFuture))>
+        Class ContractClass
+            Implements IFuture
+            Public Event Ready() Implements IFuture.Ready
+            Public ReadOnly Property Exception As System.Exception Implements IFuture.Exception
+                Get
+                    Contract.Ensures(Contract.Result(Of Exception)() IsNot Nothing)
+                    Throw New NotSupportedException
+                End Get
+            End Property
+            Public Sub MarkAnyExceptionAsHandled() Implements IFuture.MarkAnyExceptionAsHandled
+                Throw New NotSupportedException
+            End Sub
+            Public ReadOnly Property State As FutureState Implements IFuture.State
+                Get
+                    Throw New NotSupportedException
+                End Get
+            End Property
+        End Class
     End Interface
 
     '''<summary>Represents a function which can finish in the future.</summary>
@@ -35,25 +55,6 @@ Namespace Threading
         ''' </summary>
         ReadOnly Property Value() As TValue
     End Interface
-
-    <ContractClassFor(GetType(IFuture))>
-    Public Class ContractClassForIFuture
-        Implements IFuture
-        Public Event Ready() Implements IFuture.Ready
-        Public ReadOnly Property Exception As System.Exception Implements IFuture.Exception
-            Get
-                Contract.Ensures(Contract.Result(Of Exception)() IsNot Nothing)
-                Throw New NotSupportedException
-            End Get
-        End Property
-        Public Sub MarkAnyExceptionAsHandled() Implements IFuture.MarkAnyExceptionAsHandled
-        End Sub
-        Public ReadOnly Property State As FutureState Implements IFuture.State
-            Get
-                Throw New NotSupportedException
-            End Get
-        End Property
-    End Class
 
     '''<summary>Represents something which can finish in the future.</summary>
     Public MustInherit Class FutureBase

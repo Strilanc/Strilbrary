@@ -1,9 +1,9 @@
 ﻿Namespace Enumeration
     ''' <summary>
     ''' Allows an IEnumerator generator function to give special commands.
-    ''' All methods should be used in a return statement, eg. "Return controller.break()".
+    ''' All methods should be used in a return statement, eg. "return controller.Break()".
     ''' </summary>
-    <ContractClass(GetType(ContractClassForIEnumeratorController(Of )))>
+    <ContractClass(GetType(IEnumeratorController(Of ).ContractClass))>
     Public Interface IEnumeratorController(Of T)
         '''<summary>No value is enumerated, but the generator is called again. Similar to a loop continue.</summary>
         Function Repeat() As T
@@ -11,19 +11,22 @@
         Function Break() As T
         '''<summary>Multiple values are enumerated before the generator is called again.</summary>
         Function Sequence(ByVal enumerator As IEnumerator(Of T)) As T
-    End Interface
 
-    <ContractClassFor(GetType(IEnumeratorController(Of )))>
-    Public NotInheritable Class ContractClassForIEnumeratorController(Of T)
-        Implements IEnumeratorController(Of T)
-        Public Function Break() As T Implements IEnumeratorController(Of T).Break
-        End Function
-        Public Function Repeat() As T Implements IEnumeratorController(Of T).Repeat
-        End Function
-        Public Function Sequence(ByVal enumerator As System.Collections.Generic.IEnumerator(Of T)) As T Implements IEnumeratorController(Of T).Sequence
-            Contract.Requires(enumerator IsNot Nothing)
-        End Function
-    End Class
+        <ContractClassFor(GetType(IEnumeratorController(Of )))>
+        Class ContractClass
+            Implements IEnumeratorController(Of T)
+            Public Function Break() As T Implements IEnumeratorController(Of T).Break
+                Throw New NotSupportedException
+            End Function
+            Public Function Repeat() As T Implements IEnumeratorController(Of T).Repeat
+                Throw New NotSupportedException
+            End Function
+            Public Function Sequence(ByVal enumerator As IEnumerator(Of T)) As T Implements IEnumeratorController(Of T).Sequence
+                Contract.Requires(enumerator IsNot Nothing)
+                Throw New NotSupportedException
+            End Function
+        End Class
+    End Interface
 
     Public Module ExtensionsForIEnumeratorController
         '''<summary>Multiple values are enumerated before the generator is called again.</summary>

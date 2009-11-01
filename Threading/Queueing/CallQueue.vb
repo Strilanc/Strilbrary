@@ -1,19 +1,20 @@
 Namespace Threading
     '''<summary>Describes a thread-safe call queue for non-blocking calls.</summary>
-    <ContractClass(GetType(ContractClassForICallQueue))>
+    <ContractClass(GetType(ICallQueue.ContractClass))>
     Public Interface ICallQueue
         '''<summary>Queues an action to be run and returns a future for the action's eventual completion.</summary>
         Function QueueAction(ByVal action As Action) As IFuture
+
+        <ContractClassFor(GetType(ICallQueue))>
+        Class ContractClass
+            Implements ICallQueue
+            Public Function QueueAction(ByVal action As Action) As IFuture Implements ICallQueue.QueueAction
+                Contract.Requires(action IsNot Nothing)
+                Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
+                Throw New NotSupportedException
+            End Function
+        End Class
     End Interface
-    <ContractClassFor(GetType(ICallQueue))>
-    Public NotInheritable Class ContractClassForICallQueue
-        Implements ICallQueue
-        Public Function QueueAction(ByVal action As Action) As IFuture Implements ICallQueue.QueueAction
-            Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Return Nothing
-        End Function
-    End Class
 
     Public Module ExtensionsForICallQueue
         '''<summary>Queues a function to be run and returns a future for the function's eventual output.</summary>

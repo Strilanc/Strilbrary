@@ -105,10 +105,6 @@ Namespace Enumeration
             Return sequence.Current
         End Function
         Public Overrides Function Read(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer) As Integer
-            Contract.Assume(buffer IsNot Nothing)
-            Contract.Assume(offset >= 0)
-            Contract.Assume(count >= 0)
-            Contract.Assume(offset + count <= buffer.Length)
             For n = 0 To count - 1
                 Dim r = ReadByte()
                 If r = -1 Then Return n

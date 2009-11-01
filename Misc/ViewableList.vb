@@ -58,6 +58,7 @@
         Contract.Requires(relativeOffset >= 0)
         Contract.Requires(relativeOffset <= Length)
         Contract.Ensures(Contract.Result(Of ViewableList(Of T))() IsNot Nothing)
+        Contract.Ensures(Contract.Result(Of ViewableList(Of T))().Length = Me.Length - relativeOffset)
         Return SubView(relativeOffset, Length - relativeOffset)
     End Function
     <Pure()>
@@ -66,13 +67,14 @@
         Contract.Requires(relativeLength >= 0)
         Contract.Requires(relativeOffset + relativeLength <= Me.Length)
         Contract.Ensures(Contract.Result(Of ViewableList(Of T))() IsNot Nothing)
+        Contract.Ensures(Contract.Result(Of ViewableList(Of T))().Length = relativeLength)
         Return New ViewableList(Of T)(items, relativeOffset, relativeLength, offset, Me.Length)
     End Function
 
     Private Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
         Dim nextIndex = 0
         Return New Enumerator(Of T)(Function(controller)
-                                        If nextIndex >= Me.Length Then  Return controller.Break()
+                                        If nextIndex >= Me.Length Then Return controller.Break()
                                         Dim e = Item(nextIndex)
                                         nextIndex += 1
                                         Return e
@@ -83,40 +85,40 @@
     End Function
 
 #Region "IList<T>"
-    Private Sub _Add(ByVal item As T) Implements System.Collections.Generic.ICollection(Of T).Add
+    Private Sub _Add(ByVal item As T) Implements ICollection(Of T).Add
         Throw New NotSupportedException
     End Sub
-    Private Sub _Clear() Implements System.Collections.Generic.ICollection(Of T).Clear
+    Private Sub _Clear() Implements ICollection(Of T).Clear
         Throw New NotSupportedException
     End Sub
-    Private Function _Contains(ByVal item As T) As Boolean Implements System.Collections.Generic.ICollection(Of T).Contains
+    Private Function _Contains(ByVal item As T) As Boolean Implements ICollection(Of T).Contains
         For i = 0 To Length - 1
             If item.Equals(Me.Item(i)) Then Return True
         Next i
         Return False
     End Function
-    Private Sub _CopyTo(ByVal array() As T, ByVal arrayIndex As Integer) Implements System.Collections.Generic.ICollection(Of T).CopyTo
+    Private Sub _CopyTo(ByVal array() As T, ByVal arrayIndex As Integer) Implements ICollection(Of T).CopyTo
         Contract.Assume(array.Length - arrayIndex >= Length)
         For i = 0 To Length - 1
             array(i + arrayIndex) = Me.Item(i)
         Next i
     End Sub
-    Private ReadOnly Property _Count As Integer Implements System.Collections.Generic.ICollection(Of T).Count
+    Private ReadOnly Property _Count As Integer Implements ICollection(Of T).Count
         Get
             Contract.Ensures(Contract.Result(Of Integer)() = Length)
             Return Me.Length
         End Get
     End Property
-    Private ReadOnly Property _IsReadOnly As Boolean Implements System.Collections.Generic.ICollection(Of T).IsReadOnly
+    Private ReadOnly Property _IsReadOnly As Boolean Implements ICollection(Of T).IsReadOnly
         Get
             Return True
         End Get
     End Property
-    Private Function _Remove(ByVal item As T) As Boolean Implements System.Collections.Generic.ICollection(Of T).Remove
+    Private Function _Remove(ByVal item As T) As Boolean Implements ICollection(Of T).Remove
         Throw New NotSupportedException
     End Function
     <ContractVerification(False)>
-    Private Function _IndexOf(ByVal item As T) As Integer Implements System.Collections.Generic.IList(Of T).IndexOf
+    Private Function _IndexOf(ByVal item As T) As Integer Implements IList(Of T).IndexOf
         'verification disabled because contracts 1.2.21022.2 fails to verify bounds
         For i = 0 To Me.Count - 1
             If item.Equals(Me.Item(i)) Then
@@ -125,10 +127,10 @@
         Next i
         Return -1
     End Function
-    Private Sub _Insert(ByVal index As Integer, ByVal item As T) Implements System.Collections.Generic.IList(Of T).Insert
+    Private Sub _Insert(ByVal index As Integer, ByVal item As T) Implements IList(Of T).Insert
         Throw New NotSupportedException
     End Sub
-    Private Property _Item(ByVal index As Integer) As T Implements System.Collections.Generic.IList(Of T).Item
+    Private Property _Item(ByVal index As Integer) As T Implements IList(Of T).Item
         Get
             Contract.Assume(index < Length)
             Return Item(index)
@@ -137,7 +139,7 @@
             Throw New NotSupportedException
         End Set
     End Property
-    Private Sub _RemoveAt(ByVal index As Integer) Implements System.Collections.Generic.IList(Of T).RemoveAt
+    Private Sub _RemoveAt(ByVal index As Integer) Implements IList(Of T).RemoveAt
         Throw New NotSupportedException
     End Sub
 #End Region
