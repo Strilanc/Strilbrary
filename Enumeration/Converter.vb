@@ -1,4 +1,5 @@
 Imports System.Runtime.CompilerServices
+Imports Strilbrary.Streams
 
 Namespace Enumeration
     <ContractClass(GetType(ContractClassForIConverter(Of ,)))>
@@ -16,26 +17,30 @@ Namespace Enumeration
         End Function
     End Class
 
-    Public Module ExtensionsIConverter
-        <Extension()> Public Function Convert(Of TIn, TOut)(ByVal converter As IConverter(Of TIn, TOut),
-                                                            ByVal sequence As IEnumerable(Of TIn)) As IEnumerable(Of TOut)
+    Public Module ExtensionsForIConverter
+        <Extension()> <Pure()>
+        Public Function Convert(Of TIn, TOut)(ByVal converter As IConverter(Of TIn, TOut),
+                                              ByVal sequence As IEnumerable(Of TIn)) As IEnumerable(Of TOut)
             Contract.Requires(converter IsNot Nothing)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TOut))() IsNot Nothing)
             Return sequence.Transform(AddressOf converter.Convert)
         End Function
 
-        <Extension()> Public Function ToWritableStream(ByVal enumerator As PushEnumerator(Of Byte)) As IO.Stream
-            Contract.Requires(enumerator IsNot Nothing)
+        <Extension()> <Pure()>
+        Public Function ToStream(ByVal enumerable As IEnumerable(Of Byte)) As IO.Stream
+            Contract.Requires(enumerable IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
-            Return New PushEnumeratorStream(enumerator)
+            Return enumerable.GetEnumerator.ToStream
         End Function
-        <Extension()> Public Function ToReadableStream(ByVal enumerator As IEnumerator(Of Byte)) As IO.Stream
+        <Extension()> <Pure()>
+        Public Function ToStream(ByVal enumerator As IEnumerator(Of Byte)) As IO.Stream
             Contract.Requires(enumerator IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
             Return New EnumeratorStream(enumerator)
         End Function
-        <Extension()> Public Function ToReadEnumerator(ByVal stream As IO.Stream) As IEnumerator(Of Byte)
+        <Extension()> <Pure()>
+        Public Function ToEnumerator(ByVal stream As IO.Stream) As IEnumerator(Of Byte)
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerator(Of Byte))() IsNot Nothing)
             Return New Enumerator(Of Byte)(Function(controller)
@@ -45,8 +50,10 @@ Namespace Enumeration
                                            End Function,
                                            AddressOf stream.Dispose)
         End Function
-        <Extension()> Public Function ToWritePushEnumerator(Of T)(ByVal stream As IO.Stream,
-                                                                  ByVal converter As IConverter(Of T, Byte)) As PushEnumerator(Of T)
+
+        <Extension()> <Pure()>
+        Public Function ToWritePushEnumerator(Of T)(ByVal stream As IO.Stream,
+                                                    ByVal converter As IConverter(Of T, Byte)) As PushEnumerator(Of T)
             Contract.Requires(converter IsNot Nothing)
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of PushEnumerator(Of T))() IsNot Nothing)
@@ -59,31 +66,41 @@ Namespace Enumeration
                                             End Sub,
                                             AddressOf stream.Dispose)
         End Function
+        <Extension()> <Pure()>
+        Public Function ToWritableStream(ByVal enumerator As PushEnumerator(Of Byte)) As IO.Stream
+            Contract.Requires(enumerator IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
+            Return New PushEnumeratorStream(enumerator)
+        End Function
 
-        <Extension()> Public Function ConvertReadOnlyStream(ByVal converter As IConverter(Of Byte, Byte), ByVal stream As IO.Stream) As IO.Stream
+        <Extension()> <Pure()>
+        Public Function ConvertReadOnlyStream(ByVal converter As IConverter(Of Byte, Byte), ByVal stream As IO.Stream) As IO.Stream
             Contract.Requires(converter IsNot Nothing)
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
-            Return converter.Convert(stream.ToReadEnumerator()).ToReadableStream()
+            Return converter.Convert(stream.ToEnumerator()).ToStream()
         End Function
-        <Extension()> Public Function ConvertWriteOnlyStream(ByVal converter As IConverter(Of Byte, Byte), ByVal stream As IO.Stream) As IO.Stream
+        <Extension()> <Pure()>
+        Public Function ConvertWriteOnlyStream(ByVal converter As IConverter(Of Byte, Byte), ByVal stream As IO.Stream) As IO.Stream
             Contract.Requires(converter IsNot Nothing)
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
             Return stream.ToWritePushEnumerator(converter).ToWritableStream()
         End Function
 
-        <Extension()> Public Function MoveNextAndReturn(Of T)(ByVal enumerator As IEnumerator(Of T)) As T
+        <Extension()>
+        Public Function MoveNextAndReturn(Of T)(ByVal enumerator As IEnumerator(Of T)) As T
             Contract.Requires(enumerator IsNot Nothing)
             If Not enumerator.MoveNext Then Throw New InvalidOperationException("Ran past end of enumerator")
             Return enumerator.Current()
         End Function
     End Module
 
+    '''<summary>Exposes an IEnumerator as a read-only stream.</summary>
     Friend NotInheritable Class EnumeratorStream
         Inherits IO.Stream
         Private ReadOnly sequence As IEnumerator(Of Byte)
-        Private closed As Boolean
+        Private disposed As Boolean
 
         <ContractInvariantMethod()> Private Shadows Sub ObjectInvariant()
             Contract.Invariant(sequence IsNot Nothing)
@@ -93,33 +110,41 @@ Namespace Enumeration
             Contract.Requires(sequence IsNot Nothing)
             Me.sequence = sequence
         End Sub
+        Public Sub New(ByVal sequence As IEnumerable(Of Byte))
+            Contract.Requires(sequence IsNot Nothing)
+            Me.sequence = sequence.GetEnumerator
+        End Sub
+
+        Public Shadows Function ReadByte() As Integer
+            If disposed Then Throw New ObjectDisposedException(Me.GetType.Name)
+            If Not sequence.MoveNext Then Return -1
+            Return sequence.Current
+        End Function
+        Public Overrides Function Read(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer) As Integer
+            If disposed Then Throw New ObjectDisposedException(Me.GetType.Name)
+            Dim numRead = 0
+            While numRead < count
+                Dim r = ReadByte()
+                If r = -1 Then Exit While
+                buffer(offset + numRead) = CByte(r)
+                numRead += 1
+            End While
+            Return numRead
+        End Function
+
+        Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+            If disposing AndAlso Not disposed Then
+                disposed = True
+                sequence.Dispose()
+            End If
+            MyBase.Dispose(disposing)
+        End Sub
 
         Public Overrides ReadOnly Property CanRead As Boolean
             Get
                 Return True
             End Get
         End Property
-
-        Public Shadows Function ReadByte() As Integer
-            If Not sequence.MoveNext Then Return -1
-            Return sequence.Current
-        End Function
-        Public Overrides Function Read(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer) As Integer
-            For n = 0 To count - 1
-                Dim r = ReadByte()
-                If r = -1 Then Return n
-                buffer(n + offset) = CByte(r)
-            Next n
-            Return count
-        End Function
-
-        Protected Overrides Sub Dispose(ByVal disposing As Boolean)
-            If disposing AndAlso Not closed Then
-                closed = True
-                sequence.Dispose()
-            End If
-            MyBase.Dispose(disposing)
-        End Sub
 
 #Region "Not Supported"
         Public Overrides ReadOnly Property CanSeek As Boolean
@@ -137,7 +162,6 @@ Namespace Enumeration
                 Throw New NotSupportedException()
             End Get
         End Property
-
         Public Overrides Property Position As Long
             Get
                 Throw New NotSupportedException()
@@ -185,7 +209,7 @@ Namespace Enumeration
             If closed Then Throw New InvalidOperationException("Closed streams are not writable.")
             Dim index = 0
             pusher.Push(New Enumerator(Of Byte)(Function(controller)
-                                                    If index >= count Then  Return controller.Break()
+                                                    If index >= count Then Return controller.Break()
                                                     index += 1
                                                     Return buffer(index + offset - 1)
                                                 End Function))
