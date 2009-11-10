@@ -35,7 +35,7 @@ Namespace Threading
             Dim lock = New OnetimeLock()
             Dim result = New FutureAction()
             Dim handler As IFuture.ReadyEventHandler
-            handler = Sub() System.Threading.ThreadPool.QueueUserWorkItem(
+            handler = Sub() System.Threading.Tasks.Task.Factory.StartNew(
                 Sub()
                     If lock.TryAcquire Then 'ensure only run once
                         RemoveHandler future.Ready, handler
@@ -92,7 +92,24 @@ Namespace Threading
         End Function
 #End Region
 
-#Region "OnSuccess/Linq"
+#Region "OnSuccess/Linq/Catch"
+        ''' <summary>
+        ''' Determines the future result of running an exception handler if a future fails.
+        ''' Succeeds if the handler is not run.
+        ''' </summary>
+        <Extension()>
+        Public Function [Catch](ByVal future As IFuture,
+                                ByVal action As Action(Of Exception)) As IFuture
+            Contract.Requires(future IsNot Nothing)
+            Contract.Requires(action IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
+            Return future.CallWhenReady(Sub(exception)
+                                            If exception IsNot Nothing Then
+                                                Call action(exception)
+                                            End If
+                                        End Sub)
+        End Function
+
         '''<summary>Determines the future result of running an action after the future succeeds while propagating failures.</summary>
         <Extension()>
         Public Function CallOnSuccess(ByVal future As IFuture,
@@ -214,8 +231,9 @@ Namespace Threading
         End Function
 
         '''<summary>
-        ''' Returns a future for a list of futures.
-        ''' Fails if any of the future values fail.
+        ''' Determines a future sequence for a sequence of futures.
+        ''' The future sequence becomes ready once all the futures are ready.
+        ''' The future sequence fails if any of the futures fail.
         '''</summary>
         <Extension()>
         Public Function Defuturized(ByVal sequence As IEnumerable(Of IFuture)) As IFuture
@@ -230,7 +248,7 @@ Namespace Threading
 
             'Become ready once all input futures are ready
             Dim notify = Sub(exception As Exception)
-                             If exception IsNot Nothing Then  failed = exception
+                             If exception IsNot Nothing Then failed = exception
                              If Interlocked.Increment(numReady) >= numFutures Then
                                  If failed IsNot Nothing Then
                                      result.SetFailed(failed)
@@ -249,8 +267,9 @@ Namespace Threading
         End Function
 
         '''<summary>
-        ''' Returns a future list for a list of future values.
-        ''' Fails if any of the future values fail.
+        ''' Determines a future sequence for a sequence of future values.
+        ''' The future sequence becomes ready once all the future values are ready.
+        ''' The future sequence fails if any of the future values fail.
         '''</summary>
         <Extension()>
         Public Function Defuturized(Of TValue)(ByVal sequence As IEnumerable(Of IFuture(Of TValue))) As IFuture(Of IEnumerable(Of TValue))

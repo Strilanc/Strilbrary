@@ -160,7 +160,7 @@ Namespace Threading
         ''' <summary>
         ''' Sets the future's state based on the outcome of an action.
         ''' Runs the action whether or not the future was already ready.
-        ''' Throws an InvalidOperationException if the future was already ready.
+        ''' Throws an InvalidOperationException if the future was already ready, but will still evaluate the subroutine.
         ''' </summary>
         <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
         Public Sub SetByCalling(ByVal action As action)
@@ -217,7 +217,7 @@ Namespace Threading
         ''' </summary>
         Public ReadOnly Property Value() As TValue Implements IFuture(Of TValue).Value
             Get
-                If State <> FutureState.Succeeded Then Throw New InvalidOperationException("Attempted to get a future value before it was ready.")
+                If State <> FutureState.Succeeded Then Throw New InvalidOperationException("Attempted to get a premature or failed future value.")
                 Return _value
             End Get
         End Property
@@ -225,7 +225,7 @@ Namespace Threading
         ''' <summary>
         ''' Sets the future's state based on the outcome of a function.
         ''' Evalutes the function whether or not the future was already ready.
-        ''' Throws an InvalidOperationException if the future was already ready.
+        ''' Throws an InvalidOperationException if the future was already ready, but will still evaluate the function.
         ''' </summary>
         <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
         Public Sub SetByEvaluating(ByVal func As Func(Of TValue))

@@ -158,10 +158,11 @@ Namespace Numerics
                                    Optional ByVal nullTerminate As Boolean = False) As Byte()
             Contract.Requires(data IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-            Dim bytes As New List(Of Byte)(data.Length + 1)
+            Contract.Ensures(Contract.Result(Of Byte())().Length = data.Length + If(nullTerminate, 1, 0))
+            Dim bytes = New List(Of Byte)(capacity:=data.Length + If(nullTerminate, 1, 0))
             For Each c In data
                 bytes.Add(CByte(Asc(c)))
-            Next
+            Next c
             If nullTerminate Then bytes.Add(0)
             Return bytes.ToArray()
         End Function
@@ -170,14 +171,14 @@ Namespace Numerics
                                        ByVal nullTerminated As Boolean) As String
             Contract.Requires(data IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of String)().Length <= data.Count)
+            Contract.Ensures(nullTerminated OrElse Contract.Result(Of String)().Length = data.Count)
 
-            Dim s As New System.Text.StringBuilder()
-            For Each b In data
-                If b = 0 AndAlso nullTerminated Then Exit For
-                s.Append(Chr(b))
-            Next b
-
-            Return s.ToString
+            If nullTerminated Then data = data.TakeWhile(Function(b) b <> 0)
+            Dim result = (From b In data Select Chr(b)).ToArray
+            Contract.Assume(result.Length <= data.Count)
+            Contract.Assume(nullTerminated OrElse result.Length = data.Count)
+            Return result
         End Function
 
         <Extension()> <Pure()>

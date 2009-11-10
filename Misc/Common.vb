@@ -95,10 +95,10 @@ Public Module PoorlyCategorizedFunctions
     End Function
 
     <Extension()>
-    Public Function EnumTryParse(Of T)(ByVal value As String, ByVal ignoreCase As Boolean, ByRef ret As T) As Boolean
+    Public Function EnumTryParse(Of T)(ByVal value As String, ByVal ignoreCase As Boolean, ByRef result As T) As Boolean
         For Each e In EnumValues(Of T)()
-            If String.Compare(value, e.ToString(), If(ignoreCase, StringComparison.Ordinal, StringComparison.OrdinalIgnoreCase)) = 0 Then
-                ret = e
+            If String.Compare(value, e.ToString(), If(ignoreCase, StringComparison.OrdinalIgnoreCase, StringComparison.Ordinal)) = 0 Then
+                result = e
                 Return True
             End If
         Next e

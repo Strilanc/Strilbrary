@@ -1,4 +1,5 @@
 ﻿'''<summary>Wraps a value which is computed and stored only once needed.</summary>
+<DebuggerDisplay("ToString")>
 Public NotInheritable Class LazyValue(Of T)
     Private func As Func(Of T)
     Private _value As T
@@ -30,4 +31,8 @@ Public NotInheritable Class LazyValue(Of T)
         Contract.Ensures(Contract.Result(Of LazyValue(Of T))() IsNot Nothing)
         Return New LazyValue(Of T)(value)
     End Operator
+
+    Public Overrides Function ToString() As String
+        Return String.Concat(Me.Value)
+    End Function
 End Class

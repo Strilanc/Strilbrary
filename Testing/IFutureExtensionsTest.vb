@@ -288,9 +288,68 @@ Public Class IFutureExtensionsTest
     End Sub
 #End Region
 
-#Region "OnSuccess/Linq"
+#Region "OnSuccess/Linq/Catch"
     <TestMethod()>
-Public Sub CallOnSuccessTest_Dangle()
+    Public Sub CatchTest_Dangle()
+        Dim flag = True
+        Dim future = New FutureAction()
+        Dim result = future.Catch(Sub(exception)
+                                      flag = False
+                                  End Sub)
+        Assert.IsTrue(Not BlockOnFuture(result, New TimeSpan(0, 0, 0, 0, milliseconds:=100)))
+        Assert.IsTrue(flag)
+        Assert.IsTrue(result.State = FutureState.Unknown)
+    End Sub
+    <TestMethod()>
+    Public Sub CatchTest_PreSucceed()
+        Dim flag = True
+        Dim future = New FutureAction()
+        future.SetSucceeded()
+        Dim result = future.Catch(Sub(exception)
+                                      flag = False
+                                  End Sub)
+        Assert.IsTrue(BlockOnFuture(result))
+        Assert.IsTrue(flag)
+        Assert.IsTrue(result.State = FutureState.Succeeded)
+    End Sub
+    <TestMethod()>
+    Public Sub CatchTest_Succeed()
+        Dim flag = True
+        Dim future = New FutureAction()
+        Dim result = future.Catch(Sub(exception)
+                                      flag = False
+                                  End Sub)
+        future.SetSucceeded()
+        Assert.IsTrue(BlockOnFuture(result))
+        Assert.IsTrue(flag)
+        Assert.IsTrue(result.State = FutureState.Succeeded)
+    End Sub
+    <TestMethod()>
+    Public Sub CatchTest_Fail()
+        Dim flag = False
+        Dim future = New FutureAction()
+        Dim result = future.Catch(Sub(exception)
+                                      flag = True
+                                  End Sub)
+        future.SetFailed(New InvalidOperationException("Mock Failure"))
+        Assert.IsTrue(BlockOnFuture(result))
+        Assert.IsTrue(flag)
+        Assert.IsTrue(result.State = FutureState.Succeeded)
+    End Sub
+    <TestMethod()>
+    Public Sub CatchTest_Throw()
+        Dim future = New FutureAction()
+        Dim result = future.Catch(Sub(exception)
+                                      Throw New InvalidOperationException("Mock Failure")
+                                  End Sub)
+        future.SetFailed(New InvalidOperationException("Mock Failure"))
+        Assert.IsTrue(BlockOnFuture(result))
+        Assert.IsTrue(result.State = FutureState.Failed)
+        Assert.IsTrue(TypeOf result.Exception Is InvalidOperationException)
+    End Sub
+
+    <TestMethod()>
+    Public Sub CallOnSuccessTest_Dangle()
         Dim flag = True
         Dim future = New FutureAction()
         Dim result = future.CallOnSuccess(Sub()
@@ -574,6 +633,7 @@ Public Sub CallOnSuccessTest_Dangle()
         Assert.IsTrue(result.State = FutureState.Unknown)
         futures(0).SetSucceeded()
         Assert.IsTrue(result.State = FutureState.Unknown)
+        Assert.IsTrue(Not BlockOnFuture(result))
         futures(1).SetSucceeded()
         Assert.IsTrue(BlockOnFuture(result))
         Assert.IsTrue(result.State = FutureState.Succeeded)

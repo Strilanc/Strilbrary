@@ -154,5 +154,21 @@ Namespace Threading
             Return future.Select(Function(result) queue.QueueFunc(Function() func(result))).Defuturized
         End Function
 #End Region
+
+        <Extension()>
+        Public Function QueueCatch(ByVal future As IFuture,
+                                   ByVal queue As ICallQueue,
+                                   ByVal action As Action(Of Exception)) As IFuture
+            Contract.Requires(future IsNot Nothing)
+            Contract.Requires(queue IsNot Nothing)
+            Contract.Requires(action IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
+            Return future.EvalWhenReady(Function(exception) queue.QueueAction(
+                Sub()
+                    If exception IsNot Nothing Then
+                        Call action(exception)
+                    End If
+                End Sub))
+        End Function
     End Module
 End Namespace
