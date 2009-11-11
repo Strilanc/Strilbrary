@@ -5,10 +5,10 @@ Imports Strilbrary.Threading
 
 <TestClass()>
 Public Class IFutureExtensionsTest
-    Private Shared Function BlockOnFuture(ByVal future As IFuture) As Boolean
+    Friend Shared Function BlockOnFuture(ByVal future As IFuture) As Boolean
         Return BlockOnFuture(future, New TimeSpan(0, 0, seconds:=1))
     End Function
-    Private Shared Function BlockOnFuture(ByVal future As IFuture,
+    Friend Shared Function BlockOnFuture(ByVal future As IFuture,
                                           ByVal timeout As TimeSpan) As Boolean
         Dim waitHandle = New System.Threading.ManualResetEvent(initialState:=False)
         AddHandler future.Ready, Sub() waitHandle.Set()

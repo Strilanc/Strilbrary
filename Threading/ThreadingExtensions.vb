@@ -3,6 +3,7 @@
 Namespace Threading
     Public Module ThreadingExtensions
         '''<summary>Returns a future which is ready after a specified amount of time.</summary>
+        <Extension()>
         Public Function FutureWait(ByVal dt As TimeSpan) As IFuture
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
             If dt.Ticks > Int32.MaxValue Then Throw New ArgumentOutOfRangeException("dt", "Can't wait that long.")
@@ -23,6 +24,7 @@ Namespace Threading
             Return result
         End Function
 
+#Region "Async Eval"
         '''<summary>Determines a future for running an action in a new thread.</summary>
         Public Function ThreadedAction(ByVal action As Action) As IFuture
             Contract.Requires(action IsNot Nothing)
@@ -38,6 +40,24 @@ Namespace Threading
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
             Dim result = New FutureFunction(Of TReturn)
             Call New Thread(Sub() result.SetByEvaluating(func)).Start()
+            Return result
+        End Function
+
+        '''<summary>Determines a future for running an action as a task.</summary>
+        Public Function TaskedAction(ByVal action As Action) As IFuture
+            Contract.Requires(action IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
+            Dim result = New FutureAction
+            Tasks.Task.Factory.StartNew(Sub() result.SetByCalling(action))
+            Return result
+        End Function
+
+        '''<summary>Determines the future value of running a function as a task.</summary>
+        Public Function TaskedFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
+            Contract.Requires(func IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
+            Dim result = New FutureFunction(Of TReturn)
+            Tasks.Task.Factory.StartNew(Sub() result.SetByEvaluating(func))
             Return result
         End Function
 
@@ -58,6 +78,7 @@ Namespace Threading
             ThreadPool.QueueUserWorkItem(Sub() result.SetByEvaluating(func))
             Return result
         End Function
+#End Region
 
 #Region "WhenReady"
         <Extension()>
@@ -168,7 +189,7 @@ Namespace Threading
                     If exception IsNot Nothing Then
                         Call action(exception)
                     End If
-                End Sub))
+                End Sub)).Defuturized
         End Function
     End Module
 End Namespace
