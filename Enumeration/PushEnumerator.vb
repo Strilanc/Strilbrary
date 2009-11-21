@@ -74,11 +74,11 @@
             coroutine.Continue()
         End Sub
 
-        Protected Overrides Sub PerformDispose(ByVal finalizing As Boolean)
-            If Not finalizing Then
-                If disposer IsNot Nothing Then Call disposer()
-                coroutine.Dispose()
-            End If
-        End Sub
+        Protected Overrides Function PerformDispose(ByVal finalizing As Boolean) As ifuture
+            If finalizing Then Return Nothing
+            If disposer IsNot Nothing Then Call disposer()
+            coroutine.Dispose()
+            Return Nothing
+        End Function
     End Class
 End Namespace

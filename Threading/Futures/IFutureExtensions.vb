@@ -51,7 +51,7 @@ Namespace Threading
                 Call handler()
             End If
 
-            future.MarkAnyExceptionAsHandled()
+            future.SetHandled()
             Return result
         End Function
 

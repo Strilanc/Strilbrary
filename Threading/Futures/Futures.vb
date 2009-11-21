@@ -22,8 +22,8 @@ Namespace Threading
         ''' Throws an InvalidOperationException if there is no such exception.
         ''' </summary>
         ReadOnly Property Exception() As Exception
-        '''<summary>Stops the future from logging its stored exception when finalized.</summary>
-        Sub MarkAnyExceptionAsHandled()
+        '''<summary>Stops the future from complaining about unhandled exceptions.</summary>
+        Sub SetHandled()
 
         <ContractClassFor(GetType(IFuture))>
         Class ContractClass
@@ -35,7 +35,7 @@ Namespace Threading
                     Throw New NotSupportedException
                 End Get
             End Property
-            Public Sub MarkAnyExceptionAsHandled() Implements IFuture.MarkAnyExceptionAsHandled
+            Public Sub SetHandled() Implements IFuture.SetHandled
                 Throw New NotSupportedException
             End Sub
             Public ReadOnly Property State As FutureState Implements IFuture.State
@@ -104,9 +104,8 @@ Namespace Threading
             End Get
         End Property
 
-        '''<summary>Stops the future from logging its stored exception when finalized.</summary>
-        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")>
-        Public Sub MarkAnyExceptionAsHandled() Implements IFuture.MarkAnyExceptionAsHandled
+        '''<summary>Stops the future from complaining about unhandled exceptions.</summary>
+        Public Sub SetHandled() Implements IFuture.SetHandled
             GC.SuppressFinalize(Me)
         End Sub
 
@@ -138,6 +137,7 @@ Namespace Threading
             Return True
         End Function
 
+        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")>
         Protected Function TrySetSucceededBase(ByVal action As action) As Boolean
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.State = FutureState.Succeeded)
@@ -146,7 +146,7 @@ Namespace Threading
             Call action()
             If Not lockIsSet.TryAcquire() Then Throw New UnreachableException()
 
-            MarkAnyExceptionAsHandled()
+            Me.SetHandled()
             RaiseEvent Ready()
             Return True
         End Function

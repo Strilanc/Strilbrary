@@ -99,13 +99,13 @@ Namespace Threading
             If FutureDisposed.State <> FutureState.Unknown Then Throw New ObjectDisposedException(Me.GetType.Name)
         End Sub
 
-        Protected Overrides Sub PerformDispose(ByVal finalizing As Boolean)
-            If Not finalizing Then
-                lockProducer.Dispose()
-                lockConsumer.Dispose()
-                lockJoined.Dispose()
-            End If
-        End Sub
+        Protected Overrides Function PerformDispose(ByVal finalizing As Boolean) As IFuture
+            If finalizing Then Return Nothing
+            lockProducer.Dispose()
+            lockConsumer.Dispose()
+            lockJoined.Dispose()
+            Return Nothing
+        End Function
     End Class
 
     ''' <summary>

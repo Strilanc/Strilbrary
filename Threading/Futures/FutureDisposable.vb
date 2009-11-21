@@ -20,44 +20,58 @@
         End Class
     End Interface
 
-    '''<summary>A class which makes its future thread-safe disposal available as a future.</summary>
+    '''<summary>A class which makes its future disposal available as a future.</summary>
     <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
     Public Class FutureDisposable
         Implements IFutureDisposable
 
         Private ReadOnly lock As New OnetimeLock
         Private ReadOnly _futureDisposed As New FutureAction()
-        Public ReadOnly Property FutureDisposed As IFuture Implements IFutureDisposable.FutureDisposed
-            Get
-                Return _futureDisposed
-            End Get
-        End Property
-
-        Public Sub New()
-            _futureDisposed.MarkAnyExceptionAsHandled()
-        End Sub
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(lock IsNot Nothing)
             Contract.Invariant(_futureDisposed IsNot Nothing)
         End Sub
 
-        Protected Overridable Sub PerformDispose(ByVal finalizing As Boolean)
+        Public Sub New()
+            _futureDisposed.SetHandled() 'in case _futureDisposed were finalized before this class and complained about not being set
         End Sub
+
+        '''<summary>Becomes ready once disposal has completed.</summary>
+        Public ReadOnly Property FutureDisposed As IFuture Implements IFutureDisposable.FutureDisposed
+            Get
+                Return _futureDisposed
+            End Get
+        End Property
+
+        Protected Overridable Function PerformDispose(ByVal finalizing As Boolean) As IFuture
+            Return Nothing
+        End Function
 
         <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
         Public Sub Dispose() Implements IDisposable.Dispose
             If Not lock.TryAcquire Then Return
-            PerformDispose(finalizing:=False)
-            _futureDisposed.SetSucceeded()
             GC.SuppressFinalize(Me)
+
+            Dim result = PerformDispose(finalizing:=False)
+            If result Is Nothing Then
+                _futureDisposed.SetSucceeded()
+            Else
+                result.CallWhenReady(Sub() _futureDisposed.SetSucceeded())
+            End If
         End Sub
 
+        '''<remarks>It is possible for references to still exist to _futureDisposed when finalization occurs.</remarks>
         <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
         Protected NotOverridable Overrides Sub Finalize()
             If Not lock.TryAcquire Then Return
-            PerformDispose(finalizing:=True)
-            _futureDisposed.SetSucceeded()
+
+            Dim result = PerformDispose(finalizing:=True)
+            If result Is Nothing Then
+                _futureDisposed.SetSucceeded()
+            Else
+                result.CallWhenReady(Sub() _futureDisposed.SetSucceeded())
+            End If
         End Sub
     End Class
 End Namespace

@@ -130,6 +130,7 @@
     <Compile Include="Numerics\BitBuffer.vb" />
     <Compile Include="Misc\Throttle.vb" />
     <Compile Include="Enumeration\ByteSequenceBitBuffer.vb" />
+    <Compile Include="Misc\InvariantString.vb" />
     <Compile Include="Numerics\ModByte.vb" />
     <Compile Include="Numerics\ModInt16.vb" />
     <Compile Include="Numerics\FiniteDouble.vb" />

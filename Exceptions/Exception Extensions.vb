@@ -8,8 +8,7 @@
                                      ByVal context As String)
             Contract.Requires(context IsNot Nothing)
             Contract.Requires(exception IsNot Nothing)
-            ThreadPooledAction(Sub() RaiseEvent UnexpectedException(exception, context)).
-                MarkAnyExceptionAsHandled()
+            ThreadPooledAction(Sub() RaiseEvent UnexpectedException(exception, context)).SetHandled()
         End Sub
 
         <Extension()>
