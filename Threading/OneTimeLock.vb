@@ -10,22 +10,23 @@ Namespace Threading
 
     '''<summary>A thread-safe lock which can be acquired once, and never released.</summary>
     Public NotInheritable Class OnetimeLock
-        Private acquired As Integer
+        Private _acquired As Integer
 
+        '''<summary>Tries to permanently acquire the lock. Returns true exactly once, then always returns false.</summary>
         Public Function TryAcquire() As Boolean
             Contract.Ensures(Me.State = OnetimeLockState.Acquired)
-            Dim result = Interlocked.Exchange(acquired, 1) = 0
-            Contract.Assume(acquired = 1)
+            Dim result = Interlocked.Exchange(_acquired, 1) = 0
+            Contract.Assume(_acquired = 1)
             Return result
         End Function
 
         '''<summary>Determines if the lock has been acquired.</summary>
         Public ReadOnly Property State As OnetimeLockState
             Get
-                Contract.Ensures(Contract.Result(Of OnetimeLockState)() = If(acquired <> 0,
+                Contract.Ensures(Contract.Result(Of OnetimeLockState)() = If(_acquired <> 0,
                                                                              OnetimeLockState.Acquired,
                                                                              OnetimeLockState.Unknown))
-                Return If(acquired <> 0,
+                Return If(_acquired <> 0,
                           OnetimeLockState.Acquired,
                           OnetimeLockState.Unknown)
             End Get

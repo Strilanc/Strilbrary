@@ -3,6 +3,11 @@
 ''' </summary>
 <DebuggerDisplay("{ToString}")>
 Public Structure InvariantString
+    Implements IEquatable(Of String)
+    Implements IComparable(Of String)
+    Implements IEquatable(Of InvariantString)
+    Implements IComparable(Of InvariantString)
+
     Private ReadOnly _value As String
 
     Public Sub New(ByVal value As String)
@@ -79,7 +84,7 @@ Public Structure InvariantString
     <Pure()>
     Public Function StartsWith(ByVal value As InvariantString) As Boolean
         Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.Length >= value.Length)
-        Return Me.Value.ToUpperInvariant.EndsWith(value.Value.ToUpperInvariant)
+        Return Me.Value.ToUpperInvariant.StartsWith(value.Value.ToUpperInvariant)
     End Function
     <Pure()>
     Public Function Substring(ByVal startIndex As Integer) As InvariantString
@@ -106,10 +111,22 @@ Public Structure InvariantString
             Return False
         End If
     End Function
+    Public Overloads Function Equals(ByVal other As String) As Boolean Implements IEquatable(Of String).Equals
+        Return Me = other
+    End Function
+    Public Overloads Function Equals(ByVal other As InvariantString) As Boolean Implements IEquatable(Of InvariantString).Equals
+        Return Me = other
+    End Function
     Public Overrides Function GetHashCode() As Integer
         Return Me.Value.ToUpperInvariant.GetHashCode
     End Function
     Public Overrides Function ToString() As String
         Return Value
+    End Function
+    Public Function CompareTo(ByVal other As InvariantString) As Integer Implements IComparable(Of InvariantString).CompareTo
+        Return String.CompareOrdinal(Me.Value.ToUpperInvariant, other.Value.ToUpperInvariant)
+    End Function
+    Public Function CompareTo(ByVal other As String) As Integer Implements IComparable(Of String).CompareTo
+        Return String.CompareOrdinal(Me.Value.ToUpperInvariant, If(other Is Nothing, Nothing, other.ToUpperInvariant))
     End Function
 End Structure

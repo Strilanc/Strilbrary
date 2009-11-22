@@ -10,7 +10,7 @@ Namespace Threading
     ''' - or exactly one consumer exists
     ''' - or another exit point will be hit [by another thread]
     ''' </remarks>
-    Public MustInherit Class AbstractLockFreeConsumer(Of T)
+    Public MustInherit Class BaseLockFreeConsumer(Of T)
         Private ReadOnly queue As New SingleConsumerLockFreeQueue(Of T)
         Private running As Integer 'stores consumer state and is used as a semaphore
 

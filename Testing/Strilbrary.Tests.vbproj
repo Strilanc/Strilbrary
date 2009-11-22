@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitBufferTest.vb" />
+    <Compile Include="CallQueueTest.vb" />
     <Compile Include="InvariantStringTest.vb" />
     <Compile Include="NumericExtensionTest.vb" />
     <Compile Include="ThreadingExtensionsTest.vb" />
