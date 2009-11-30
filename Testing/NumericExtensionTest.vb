@@ -128,4 +128,54 @@ Public Class NumericExtensionTest
         Assert.IsTrue("0123456789ABCdef".FromHexToUInt64(ByteOrder.LittleEndian) = &HFEDCBA9876543210UL)
         Assert.IsTrue("0123456789ABCdef".FromHexToUInt64(ByteOrder.BigEndian) = &H123456789ABCDEFUL)
     End Sub
+
+    <TestMethod()>
+    Public Sub BitwiseToInt16Test()
+        Assert.IsTrue(&H0US.BitwiseToInt16() = &H0S)
+        Assert.IsTrue(&H1US.BitwiseToInt16() = &H1S)
+        Assert.IsTrue(&HFFFFUS.BitwiseToInt16() = &HFFFFS)
+        Assert.IsTrue(&H1234US.BitwiseToInt16() = &H1234S)
+        Assert.IsTrue(&HABCDUS.BitwiseToInt16() = &HABCDS)
+    End Sub
+    <TestMethod()>
+    Public Sub BitwiseToInt32Test()
+        Assert.IsTrue(&H0UI.BitwiseToInt32() = &H0)
+        Assert.IsTrue(&H1UI.BitwiseToInt32() = &H1)
+        Assert.IsTrue(&HFFFFFFFFUI.BitwiseToInt32() = &HFFFFFFFF)
+        Assert.IsTrue(&H12345678UI.BitwiseToInt32() = &H12345678)
+        Assert.IsTrue(&HABCDEF01UI.BitwiseToInt32() = &HABCDEF01)
+    End Sub
+    <TestMethod()>
+    Public Sub BitwiseToInt64Test()
+        Assert.IsTrue(&H0UL.BitwiseToInt64() = &H0L)
+        Assert.IsTrue(&H1UL.BitwiseToInt64() = &H1L)
+        Assert.IsTrue(&HFFFFFFFFFFFFFFFFUL.BitwiseToInt64() = &HFFFFFFFFFFFFFFFFL)
+        Assert.IsTrue(&H1234567890ABCDEFUL.BitwiseToInt64() = &H1234567890ABCDEFL)
+        Assert.IsTrue(&HABCDEF0123456789UL.BitwiseToInt64() = &HABCDEF0123456789L)
+    End Sub
+
+    <TestMethod()>
+    Public Sub BitwiseToUInt16Test()
+        Assert.IsTrue(&H0S.BitwiseToUInt16() = &H0US)
+        Assert.IsTrue(&H1S.BitwiseToUInt16() = &H1US)
+        Assert.IsTrue(&HFFFFS.BitwiseToUInt16() = &HFFFFUS)
+        Assert.IsTrue(&H1234S.BitwiseToUInt16() = &H1234US)
+        Assert.IsTrue(&HABCDS.BitwiseToUInt16() = &HABCDUS)
+    End Sub
+    <TestMethod()>
+    Public Sub BitwiseToUInt32Test()
+        Assert.IsTrue(&H0.BitwiseToUInt32() = &H0UI)
+        Assert.IsTrue(&H1.BitwiseToUInt32() = &H1UI)
+        Assert.IsTrue(&HFFFFFFFF.BitwiseToUInt32() = &HFFFFFFFFUI)
+        Assert.IsTrue(&H12345678.BitwiseToUInt32() = &H12345678UI)
+        Assert.IsTrue(&HABCDEF01.BitwiseToUInt32() = &HABCDEF01UI)
+    End Sub
+    <TestMethod()>
+    Public Sub BitwiseToUInt64Test()
+        Assert.IsTrue(&H0L.BitwiseToUInt64() = &H0UL)
+        Assert.IsTrue(&H1L.BitwiseToUInt64() = &H1UL)
+        Assert.IsTrue(&HFFFFFFFFFFFFFFFFL.BitwiseToUInt64() = &HFFFFFFFFFFFFFFFFUL)
+        Assert.IsTrue(&H1234567890ABCDEFL.BitwiseToUInt64() = &H1234567890ABCDEFUL)
+        Assert.IsTrue(&HABCDEF0123456789L.BitwiseToUInt64() = &HABCDEF0123456789UL)
+    End Sub
 End Class

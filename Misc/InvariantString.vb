@@ -48,10 +48,10 @@ Public Structure InvariantString
         Return value1.Value.ToUpperInvariant Like value2.Value.ToUpperInvariant
     End Operator
     Public Shared Operator Like(ByVal value1 As InvariantString, ByVal value2 As String) As Boolean
-        Return value1.Value.ToUpperInvariant Like value2.ToUpperInvariant
+        Return value1.Value.ToUpperInvariant Like If(value2 Is Nothing, Nothing, value2.ToUpperInvariant)
     End Operator
     Public Shared Operator Like(ByVal value1 As String, ByVal value2 As InvariantString) As Boolean
-        Return value1.ToUpperInvariant Like value2.Value.ToUpperInvariant
+        Return If(value1 Is Nothing, Nothing, value1.ToUpperInvariant) Like value2.Value.ToUpperInvariant
     End Operator
 
     Public Shared Operator +(ByVal value1 As InvariantString, ByVal value2 As InvariantString) As InvariantString
