@@ -31,6 +31,65 @@ Public Class InvariantStringTest
         Assert.IsTrue(Not "test" <> New InvariantString("test"))
         Assert.IsTrue(Not "test" <> New InvariantString("tesT"))
         Assert.IsTrue("test" <> New InvariantString("tesT2"))
+
+        Assert.IsTrue(New InvariantString("test").Equals("test"))
+        Assert.IsTrue(New InvariantString("test").Equals("tesT"))
+        Assert.IsTrue(Not New InvariantString("test").Equals("tesT2"))
+
+        Assert.IsTrue(New InvariantString("test").Equals(New InvariantString("test")))
+        Assert.IsTrue(New InvariantString("test").Equals(New InvariantString("tesT")))
+        Assert.IsTrue(Not New InvariantString("test").Equals(New InvariantString("tesT2")))
+    End Sub
+
+    <TestMethod()>
+    Public Sub CompareTest()
+        Assert.IsTrue(New InvariantString("a") < New InvariantString("b"))
+        Assert.IsTrue(New InvariantString("A") < New InvariantString("b"))
+        Assert.IsTrue(New InvariantString("A") < New InvariantString("B"))
+        Assert.IsTrue(New InvariantString("a") < New InvariantString("B"))
+        Assert.IsTrue(Not New InvariantString("b") < New InvariantString("b"))
+        Assert.IsTrue(Not New InvariantString("b") < New InvariantString("B"))
+        Assert.IsTrue(Not New InvariantString("c") < New InvariantString("b"))
+
+        Assert.IsTrue(New InvariantString("b") > New InvariantString("a"))
+        Assert.IsTrue(New InvariantString("b") > New InvariantString("A"))
+        Assert.IsTrue(New InvariantString("B") > New InvariantString("A"))
+        Assert.IsTrue(New InvariantString("B") > New InvariantString("a"))
+        Assert.IsTrue(Not New InvariantString("b") > New InvariantString("b"))
+        Assert.IsTrue(Not New InvariantString("b") > New InvariantString("B"))
+        Assert.IsTrue(Not New InvariantString("b") > New InvariantString("c"))
+
+        Assert.IsTrue(New InvariantString("a") <= New InvariantString("b"))
+        Assert.IsTrue(New InvariantString("A") <= New InvariantString("b"))
+        Assert.IsTrue(New InvariantString("A") <= New InvariantString("B"))
+        Assert.IsTrue(New InvariantString("a") <= New InvariantString("B"))
+        Assert.IsTrue(New InvariantString("b") <= New InvariantString("b"))
+        Assert.IsTrue(New InvariantString("b") <= New InvariantString("B"))
+        Assert.IsTrue(Not New InvariantString("c") <= New InvariantString("b"))
+
+        Assert.IsTrue(New InvariantString("b") >= New InvariantString("a"))
+        Assert.IsTrue(New InvariantString("b") >= New InvariantString("A"))
+        Assert.IsTrue(New InvariantString("B") >= New InvariantString("A"))
+        Assert.IsTrue(New InvariantString("B") >= New InvariantString("a"))
+        Assert.IsTrue(New InvariantString("b") >= New InvariantString("b"))
+        Assert.IsTrue(New InvariantString("b") >= New InvariantString("B"))
+        Assert.IsTrue(Not New InvariantString("b") >= New InvariantString("c"))
+
+        Assert.IsTrue(New InvariantString("b").CompareTo(New InvariantString("a")) > 0)
+        Assert.IsTrue(New InvariantString("b").CompareTo(New InvariantString("A")) > 0)
+        Assert.IsTrue(New InvariantString("B").CompareTo(New InvariantString("a")) > 0)
+        Assert.IsTrue(New InvariantString("B").CompareTo(New InvariantString("A")) > 0)
+        Assert.IsTrue(New InvariantString("B").CompareTo(New InvariantString("b")) = 0)
+        Assert.IsTrue(New InvariantString("b").CompareTo(New InvariantString("b")) = 0)
+        Assert.IsTrue(New InvariantString("b").CompareTo(New InvariantString("c")) < 0)
+
+        Assert.IsTrue(New InvariantString("b").CompareTo("a") > 0)
+        Assert.IsTrue(New InvariantString("b").CompareTo("A") > 0)
+        Assert.IsTrue(New InvariantString("B").CompareTo("a") > 0)
+        Assert.IsTrue(New InvariantString("B").CompareTo("A") > 0)
+        Assert.IsTrue(New InvariantString("B").CompareTo("b") = 0)
+        Assert.IsTrue(New InvariantString("b").CompareTo("b") = 0)
+        Assert.IsTrue(New InvariantString("b").CompareTo("c") < 0)
     End Sub
 
     <TestMethod()>

@@ -13,28 +13,23 @@
     End Sub
 
     Public Sub New(ByVal items As IList(Of T))
-        Me.New(items, 0, items.Count, 0, items.Count)
+        Me.New(items, 0, items.Count)
         Contract.Requires(items IsNot Nothing)
         Contract.Ensures(Me.Length = items.Count)
     End Sub
 
     Private Sub New(ByVal items As IList(Of T),
-                    ByVal relOffset As Integer,
-                    ByVal relLength As Integer,
-                    ByVal baseOffset As Integer,
-                    ByVal baseLength As Integer)
+                    ByVal offset As Integer,
+                    ByVal length As Integer)
         Contract.Requires(items IsNot Nothing)
-        Contract.Requires(baseOffset >= 0)
-        Contract.Requires(baseLength >= 0)
-        Contract.Requires(relOffset >= 0)
-        Contract.Requires(relLength >= 0)
-        Contract.Requires(relOffset + relLength <= baseLength)
-        Contract.Requires(baseOffset + baseLength <= items.Count)
-        Contract.Ensures(Me.Length = relLength)
+        Contract.Requires(offset >= 0)
+        Contract.Requires(length >= 0)
+        Contract.Requires(offset + length <= items.Count)
+        Contract.Ensures(Me.Length = length)
 
         Me.items = items
-        Me.offset = baseOffset + relOffset
-        Me._length = relLength
+        Me.offset = offset
+        Me._length = length
     End Sub
 
     Default Public ReadOnly Property Item(ByVal index As Integer) As T
@@ -68,7 +63,7 @@
         Contract.Requires(relativeOffset + relativeLength <= Me.Length)
         Contract.Ensures(Contract.Result(Of ViewableList(Of T))() IsNot Nothing)
         Contract.Ensures(Contract.Result(Of ViewableList(Of T))().Length = relativeLength)
-        Return New ViewableList(Of T)(items, relativeOffset, relativeLength, offset, Me.Length)
+        Return New ViewableList(Of T)(items, Me.offset + relativeOffset, relativeLength)
     End Function
 
     Private Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator

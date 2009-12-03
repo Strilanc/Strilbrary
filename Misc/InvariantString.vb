@@ -2,7 +2,9 @@
 ''' A string with case-insensitive equality.
 ''' </summary>
 <DebuggerDisplay("{ToString}")>
+<ContractVerification(False)>
 Public Structure InvariantString
+    'verification off because code contracts 1.2.21023.14 silently crashes if this class is verified
     Implements IEquatable(Of String)
     Implements IComparable(Of String)
     Implements IEquatable(Of InvariantString)
@@ -20,8 +22,7 @@ Public Structure InvariantString
         Get
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
             Contract.Ensures(_value Is Nothing OrElse Contract.Result(Of String)() = _value)
-            If _value Is Nothing Then Return ""
-            Return _value
+            Return If(_value, "")
         End Get
     End Property
 
@@ -42,6 +43,19 @@ Public Structure InvariantString
     End Operator
     Public Shared Operator <>(ByVal value1 As String, ByVal value2 As InvariantString) As Boolean
         Return Not value1 = value2
+    End Operator
+
+    Public Shared Operator <(ByVal value1 As InvariantString, ByVal value2 As InvariantString) As Boolean
+        Return value1.CompareTo(value2) < 0
+    End Operator
+    Public Shared Operator >(ByVal value1 As InvariantString, ByVal value2 As InvariantString) As Boolean
+        Return value1.CompareTo(value2) > 0
+    End Operator
+    Public Shared Operator <=(ByVal value1 As InvariantString, ByVal value2 As InvariantString) As Boolean
+        Return value1.CompareTo(value2) <= 0
+    End Operator
+    Public Shared Operator >=(ByVal value1 As InvariantString, ByVal value2 As InvariantString) As Boolean
+        Return value1.CompareTo(value2) >= 0
     End Operator
 
     Public Shared Operator Like(ByVal value1 As InvariantString, ByVal value2 As InvariantString) As Boolean
@@ -79,12 +93,12 @@ Public Structure InvariantString
     <Pure()>
     Public Function EndsWith(ByVal value As InvariantString) As Boolean
         Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.Length >= value.Length)
-        Return Me.Value.ToUpperInvariant.EndsWith(value.Value.ToUpperInvariant)
+        Return Me.Value.EndsWith(value.Value, StringComparison.OrdinalIgnoreCase)
     End Function
     <Pure()>
     Public Function StartsWith(ByVal value As InvariantString) As Boolean
         Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.Length >= value.Length)
-        Return Me.Value.ToUpperInvariant.StartsWith(value.Value.ToUpperInvariant)
+        Return Me.Value.StartsWith(value.Value, StringComparison.OrdinalIgnoreCase)
     End Function
     <Pure()>
     Public Function Substring(ByVal startIndex As Integer) As InvariantString

@@ -110,10 +110,6 @@ Namespace Enumeration
             Contract.Requires(sequence IsNot Nothing)
             Me.sequence = sequence
         End Sub
-        Public Sub New(ByVal sequence As IEnumerable(Of Byte))
-            Contract.Requires(sequence IsNot Nothing)
-            Me.sequence = sequence.GetEnumerator
-        End Sub
 
         Public Shadows Function ReadByte() As Integer
             If disposed Then Throw New ObjectDisposedException(Me.GetType.Name)

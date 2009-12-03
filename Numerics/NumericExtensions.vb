@@ -139,7 +139,7 @@ Namespace Numerics
             Contract.Ensures(Contract.Result(Of Byte())().Length = size)
             Dim data(0 To size - 1) As Byte
             For i = 0 To size - 1
-                data(i) = CByte(value And CULng(&HFF))
+                data(i) = CByte(value And &HFFUL)
                 value >>= 8
             Next i
             If value <> 0 Then Throw New ArgumentOutOfRangeException("value", "The specified value won't fit in the specified number of bytes.")
@@ -159,26 +159,25 @@ Namespace Numerics
             Contract.Requires(data IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Byte())().Length = data.Length + If(nullTerminate, 1, 0))
-            Dim bytes = New List(Of Byte)(capacity:=data.Length + If(nullTerminate, 1, 0))
-            For Each c In data
-                bytes.Add(CByte(Asc(c)))
-            Next c
-            If nullTerminate Then bytes.Add(0)
-            Return bytes.ToArray()
+            Dim result(0 To data.Length + If(nullTerminate, 1, 0) - 1) As Byte
+            For i = 0 To data.Length - 1
+                result(i) = CByte(Asc(data(i)))
+            Next i
+            Contract.Assume(result.Length = data.Length + If(nullTerminate, 1, 0))
+            Return result
         End Function
         <Extension()> <Pure()>
+        <ContractVerification(False)>
         Public Function ParseChrString(ByVal data As IEnumerable(Of Byte),
                                        ByVal nullTerminated As Boolean) As String
+            'verification off because code contracts 1.2.21023.14 utterly fails to prove postconditons, even if they are added as assumptions
             Contract.Requires(data IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)().Length <= data.Count)
             Contract.Ensures(nullTerminated OrElse Contract.Result(Of String)().Length = data.Count)
 
             If nullTerminated Then data = data.TakeWhile(Function(b) b <> 0)
-            Dim result = (From b In data Select Chr(b)).ToArray
-            Contract.Assume(result.Length <= data.Count)
-            Contract.Assume(nullTerminated OrElse result.Length = data.Count)
-            Return result
+            Return (From b In data Select Chr(b)).ToArray
         End Function
 
         <Extension()> <Pure()>
@@ -189,17 +188,17 @@ Namespace Numerics
             Contract.Requires(separator IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
 
-            Dim s As New System.Text.StringBuilder()
+            Dim result = New System.Text.StringBuilder()
             For Each b In data
-                If s.Length > 0 Then s.Append(separator)
+                If result.Length > 0 Then result.Append(separator)
                 Dim h = Hex(b)
                 Contract.Assume(h IsNot Nothing)
                 For i = 1 To minWordLength - h.Length
-                    s.Append("0"c)
+                    result.Append("0"c)
                 Next i
-                s.Append(h)
+                result.Append(h)
             Next b
-            Return s.ToString()
+            Return result.ToString()
         End Function
         <Extension()> <Pure()>
         Public Function FromHexStringToBytes(ByVal data As String) As Byte()
@@ -225,7 +224,7 @@ Namespace Numerics
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
             Dim ret = ""
             While value > 0 Or minLength > 0
-                ret = (value And CULng(&H1)).ToString(Globalization.CultureInfo.InvariantCulture) + ret
+                ret = (value And &H1UL).ToString(Globalization.CultureInfo.InvariantCulture) + ret
                 value >>= 1
                 minLength -= 1
             End While
@@ -241,7 +240,6 @@ Namespace Numerics
                     {"d"c, 13}, {"D"c, 13},
                     {"e"c, 14}, {"E"c, 14},
                     {"f"c, 15}, {"F"c, 15}}
-
         <Extension()> <Pure()>
         Public Function FromHexToUInt64(ByVal chars As IEnumerable(Of Char),
                                         ByVal byteOrder As ByteOrder) As ULong

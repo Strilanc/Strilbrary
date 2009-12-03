@@ -128,7 +128,7 @@
     <Compile Include="Exceptions\Exception Extensions.vb" />
     <Compile Include="Misc\LazyValue.vb" />
     <Compile Include="Numerics\BitBuffer.vb" />
-    <Compile Include="Misc\Throttle.vb" />
+    <Compile Include="Threading\Throttle.vb" />
     <Compile Include="Enumeration\ByteSequenceBitBuffer.vb" />
     <Compile Include="Misc\InvariantString.vb" />
     <Compile Include="Numerics\ModByte.vb" />

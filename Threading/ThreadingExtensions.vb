@@ -48,6 +48,7 @@ Namespace Threading
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
             Dim result = New FutureAction
+            Contract.Assume(Tasks.Task.Factory IsNot Nothing)
             Tasks.Task.Factory.StartNew(Sub() result.SetByCalling(action))
             Return result
         End Function
@@ -57,6 +58,7 @@ Namespace Threading
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
             Dim result = New FutureFunction(Of TReturn)
+            Contract.Assume(Tasks.Task.Factory IsNot Nothing)
             Tasks.Task.Factory.StartNew(Sub() result.SetByEvaluating(func))
             Return result
         End Function

@@ -82,18 +82,19 @@
 
         '''<summary>Writes all remaining data in a stream to the file system.</summary>
         <Extension()>
+        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")>
         Public Sub WriteToFileSystem(ByVal stream As IO.Stream,
                                      ByVal fileName As String,
                                      Optional ByVal fileMode As IO.FileMode = IO.FileMode.CreateNew)
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanRead)
             Contract.Requires(fileName IsNot Nothing)
-            Using b = New IO.BufferedStream(stream)
-                Using f = New IO.BufferedStream(New IO.FileStream(fileName, fileMode, IO.FileAccess.Write))
+            Using bufferedIn = New IO.BufferedStream(stream)
+                Using bufferedOut = New IO.BufferedStream(New IO.FileStream(fileName, fileMode, IO.FileAccess.Write))
                     Do
                         Dim i = stream.ReadByte()
                         If i = -1 Then Exit Do
-                        f.WriteByte(CByte(i))
+                        bufferedOut.WriteByte(CByte(i))
                     Loop
                 End Using
             End Using

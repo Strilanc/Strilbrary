@@ -15,7 +15,7 @@ Namespace Threading
     Public Interface IFuture
         '''<summary>Raised when the future becomes ready.</summary>
         Event Ready()
-        '''<summary>Returns the future's state.</summary>
+        '''<summary>Determines the future's state.</summary>
         ReadOnly Property State() As FutureState
         ''' <summary>
         ''' Returns the exception stored in the future.
@@ -59,9 +59,9 @@ Namespace Threading
     '''<summary>Represents something which can finish in the future.</summary>
     Public MustInherit Class FutureBase
         Implements IFuture
-        Protected ReadOnly lockCanSet As New OnetimeLock
-        Protected ReadOnly lockIsSet As New OnetimeLock
-        Protected _exception As Exception
+        Private ReadOnly lockCanSet As New OnetimeLock
+        Private ReadOnly lockIsSet As New OnetimeLock
+        Private _exception As Exception
         '''<summary>Raised when the future becomes ready.</summary>
         Public Event Ready() Implements IFuture.Ready
 
@@ -94,7 +94,7 @@ Namespace Threading
             End Get
         End Property
 
-        '''<summary>Returns the future's state.</summary>
+        '''<summary>Determines the future's state.</summary>
         Public ReadOnly Property State() As FutureState Implements IFuture.State
             Get
                 Contract.Ensures(Contract.Result(Of FutureState)() <> FutureState.Failed OrElse _exception IsNot Nothing)
@@ -105,6 +105,7 @@ Namespace Threading
         End Property
 
         '''<summary>Stops the future from complaining about unhandled exceptions.</summary>
+        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")>
         Public Sub SetHandled() Implements IFuture.SetHandled
             GC.SuppressFinalize(Me)
         End Sub
@@ -159,7 +160,6 @@ Namespace Threading
 
         ''' <summary>
         ''' Sets the future's state based on the outcome of an action.
-        ''' Runs the action whether or not the future was already ready.
         ''' Throws an InvalidOperationException if the future was already ready, but will still evaluate the subroutine.
         ''' </summary>
         <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
@@ -224,7 +224,6 @@ Namespace Threading
 
         ''' <summary>
         ''' Sets the future's state based on the outcome of a function.
-        ''' Evalutes the function whether or not the future was already ready.
         ''' Throws an InvalidOperationException if the future was already ready, but will still evaluate the function.
         ''' </summary>
         <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
