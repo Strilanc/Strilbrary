@@ -138,6 +138,20 @@ Namespace Threading
             Return True
         End Function
 
+        ''' <summary>
+        ''' Causes the future to fail if running the given action throws an exception.
+        ''' Throws an InvalidOperationException if the action fails and the future was already ready.
+        ''' </summary>
+        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
+        Public Sub DependentCall(ByVal action As action)
+            Contract.Requires(action IsNot Nothing)
+            Try
+                Call action()
+            Catch ex As Exception
+                SetFailed(ex)
+            End Try
+        End Sub
+
         <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")>
         Protected Function TrySetSucceededBase(ByVal action As action) As Boolean
             Contract.Requires(action IsNot Nothing)
@@ -162,15 +176,14 @@ Namespace Threading
         ''' Sets the future's state based on the outcome of an action.
         ''' Throws an InvalidOperationException if the future was already ready, but will still evaluate the subroutine.
         ''' </summary>
-        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
         Public Sub SetByCalling(ByVal action As action)
             Contract.Requires(action IsNot Nothing)
-            Try
-                Call action()
-                SetSucceeded()
-            Catch ex As Exception
-                SetFailed(ex)
-            End Try
+            Contract.Ensures(Me.State <> FutureState.Unknown)
+            MyBase.DependentCall(Sub()
+                                     Call action()
+                                     SetSucceeded()
+                                 End Sub)
+            Contract.Assume(Me.State <> FutureState.Unknown)
         End Sub
 
         ''' <summary>
@@ -226,15 +239,11 @@ Namespace Threading
         ''' Sets the future's state based on the outcome of a function.
         ''' Throws an InvalidOperationException if the future was already ready, but will still evaluate the function.
         ''' </summary>
-        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
         Public Sub SetByEvaluating(ByVal func As Func(Of TValue))
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Me.State <> FutureState.Unknown)
-            Try
-                SetSucceeded(func())
-            Catch ex As Exception
-                SetFailed(ex)
-            End Try
+            MyBase.DependentCall(Sub() SetSucceeded(func()))
+            Contract.Assume(Me.State <> FutureState.Unknown)
         End Sub
 
         ''' <summary>

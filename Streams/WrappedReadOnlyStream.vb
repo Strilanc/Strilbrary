@@ -48,5 +48,10 @@
                 Throw New NotSupportedException()
             End Set
         End Property
+
+        Public Overrides Sub Close()
+            substream.Close()
+            MyBase.Close()
+        End Sub
     End Class
 End Namespace

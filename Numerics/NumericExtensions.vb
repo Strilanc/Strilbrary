@@ -154,8 +154,10 @@ Namespace Numerics
         End Function
 
         <Extension()> <Pure()>
+        <ContractVerification(False)>
         Public Function ToAscBytes(ByVal data As String,
                                    Optional ByVal nullTerminate As Boolean = False) As Byte()
+            'verification off because code contracts 1.2.21023.14 fails to prove postconditons, and adding assumption causes JIT to fail at run-time
             Contract.Requires(data IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Byte())().Length = data.Length + If(nullTerminate, 1, 0))
@@ -163,7 +165,6 @@ Namespace Numerics
             For i = 0 To data.Length - 1
                 result(i) = CByte(Asc(data(i)))
             Next i
-            Contract.Assume(result.Length = data.Length + If(nullTerminate, 1, 0))
             Return result
         End Function
         <Extension()> <Pure()>

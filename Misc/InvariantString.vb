@@ -86,7 +86,7 @@ Public Structure InvariantString
     Public ReadOnly Property Length As Integer
         Get
             Contract.Ensures(Contract.Result(Of Integer)() >= 0)
-            Contract.Ensures(Contract.Result(Of Integer)() = Value.Length)
+            Contract.Ensures(Contract.Result(Of Integer)() = Me.Value.Length)
             Return Value.Length
         End Get
     End Property

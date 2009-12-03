@@ -3,7 +3,8 @@ Namespace Streams
     Public MustInherit Class WrappedStream
         Inherits IO.Stream
         Protected ReadOnly substream As IO.Stream
-        <ContractInvariantMethod()> Protected Overrides Sub ObjectInvariant()
+
+        <ContractInvariantMethod()> Private Shadows Sub ObjectInvariant()
             Contract.Invariant(substream IsNot Nothing)
         End Sub
 
