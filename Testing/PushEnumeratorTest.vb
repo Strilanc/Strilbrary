@@ -1,13 +1,14 @@
 ﻿Imports System
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports Strilbrary.Enumeration
+Imports System.Threading
 
 <TestClass()>
 Public Class PushEnumeratorTest
     <TestMethod()>
     Public Sub TestPushPullWait()
         Dim value = 0
-        Dim lock = New System.Threading.ManualResetEvent(initialState:=False)
+        Dim lock = New ManualResetEvent(initialState:=False)
         Dim e = New PushEnumerator(Of Integer)(Sub(enumerator)
                                                    If enumerator.MoveNext Then  value = enumerator.Current
                                                    lock.Set()
@@ -20,7 +21,7 @@ Public Class PushEnumeratorTest
     <TestMethod()>
     Public Sub TestPushDoneWait()
         Dim value = 0
-        Dim lock = New System.Threading.ManualResetEvent(initialState:=False)
+        Dim lock = New ManualResetEvent(initialState:=False)
         Dim e = New PushEnumerator(Of Integer)(Sub(enumerator)
                                                    If Not enumerator.MoveNext Then  value = 3
                                                    lock.Set()
@@ -48,7 +49,7 @@ Public Class PushEnumeratorTest
     <TestMethod()>
     Public Sub TestSum()
         Dim value = 0
-        Dim lock = New System.Threading.ManualResetEvent(initialState:=False)
+        Dim lock = New ManualResetEvent(initialState:=False)
         Dim e = New PushEnumerator(Of Integer)(Sub(enumerator)
                                                    While enumerator.MoveNext
                                                        value += enumerator.Current

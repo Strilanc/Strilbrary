@@ -1,12 +1,13 @@
 ﻿Imports System
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports Strilbrary.Threading
+Imports System.Threading
 
 <TestClass()>
 Public Class ThrottleTest
     <TestMethod()>
     Public Sub RunTest()
-        Dim lock = New System.Threading.ManualResetEvent(initialState:=False)
+        Dim lock = New ManualResetEvent(initialState:=False)
         Dim throttle = New Throttle(New TimeSpan(0, 0, 0, 0, milliseconds:=1000))
         throttle.SetActionToRun(Sub()
                                     lock.Set()
@@ -16,7 +17,7 @@ Public Class ThrottleTest
 
     <TestMethod()>
     Public Sub HoldTest()
-        Dim lock = New System.Threading.ManualResetEvent(initialState:=False)
+        Dim lock = New ManualResetEvent(initialState:=False)
         Dim throttle = New Throttle(New TimeSpan(0, 0, 0, 0, milliseconds:=100))
 
         throttle.SetActionToRun(Sub()
@@ -34,7 +35,7 @@ Public Class ThrottleTest
 
     <TestMethod()>
     Public Sub ReentrantTest()
-        Dim lock = New System.Threading.ManualResetEvent(initialState:=False)
+        Dim lock = New ManualResetEvent(initialState:=False)
         Dim throttle = New Throttle(New TimeSpan(0, 0, 0, 0, milliseconds:=100))
 
         throttle.SetActionToRun(Sub()

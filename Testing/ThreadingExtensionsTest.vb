@@ -8,7 +8,7 @@ Imports Strilbrary
 Public Class ThreadingExtensionsTest
     <TestMethod()>
     Public Sub FutureWaitTest()
-        Dim result = 2.Seconds.futurewait
+        Dim result = 2.Seconds.AsyncWait
         BlockOnFuture(result, timeout:=1.Seconds)
         Assert.IsTrue(result.State = FutureState.Unknown)
         BlockOnFuture(result, timeout:=2.Seconds)

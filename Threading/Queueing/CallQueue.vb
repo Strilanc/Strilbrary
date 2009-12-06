@@ -93,8 +93,7 @@ Namespace Threading
             Try
                 control.BeginInvoke(Sub() Run())
             Catch ex As InvalidOperationException
-                ex.RaiseAsUnexpected("Invalid Invoke from {0}.StartRunning() ({1}, {2})".
-                                        Frmt(Me.GetType.Name, control.GetType.Name, control.Name))
+                ex.RaiseAsUnexpected("Invalid Invoke from {0}.StartRunning() ({1}, {2})".Frmt(Me.GetType.Name, control.GetType.Name, control.Name))
             End Try
         End Sub
     End Class
@@ -119,8 +118,7 @@ Namespace Threading
     Public NotInheritable Class TaskedCallQueue
         Inherits BaseCallQueue
         Protected Overrides Sub StartRunning()
-            Contract.Assume(System.Threading.Tasks.Task.Factory IsNot Nothing)
-            System.Threading.Tasks.Task.Factory.StartNew(Sub() Run())
+            TaskedAction(Sub() Run())
         End Sub
     End Class
 

@@ -2,6 +2,7 @@
 Imports System
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports Strilbrary.Threading
+Imports System.Threading
 
 <TestClass()>
 Public Class IFutureExtensionsTest
@@ -10,7 +11,7 @@ Public Class IFutureExtensionsTest
     End Function
     Friend Shared Function BlockOnFuture(ByVal future As IFuture,
                                           ByVal timeout As TimeSpan) As Boolean
-        Dim waitHandle = New System.Threading.ManualResetEvent(initialState:=False)
+        Dim waitHandle = New ManualResetEvent(initialState:=False)
         AddHandler future.Ready, Sub() waitHandle.Set()
         If future.State <> FutureState.Unknown Then waitHandle.Set()
         Return waitHandle.WaitOne(timeout)

@@ -2,9 +2,12 @@
 
 Namespace Threading
     Public Module ThreadingExtensions
-        '''<summary>Returns a future which is ready after a specified amount of time.</summary>
+        ''' <summary>
+        ''' Returns a future which becomes ready after the given amount of time.
+        ''' The resulting future is instantly ready if the given time is non-positive.
+        ''' </summary>
         <Extension()>
-        Public Function FutureWait(ByVal dt As TimeSpan) As IFuture
+        Public Function AsyncWait(ByVal dt As TimeSpan) As IFuture
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
             If dt.Ticks > Int32.MaxValue Then Throw New ArgumentOutOfRangeException("dt", "Can't wait that long.")
 

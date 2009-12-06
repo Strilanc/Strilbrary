@@ -2,11 +2,12 @@
 
 Namespace Threading
     Public Module IFutureExtensions
+#Region "TryGet"
         ''' <summary>
         ''' Returns the exception stored in the future.
-        ''' Returns nothing if the future doesn't contain an exception.
+        ''' Returns null if the future doesn't contain an exception.
         ''' </summary>
-        <Extension()>
+        <Extension()> <Pure()>
         Public Function TryGetException(ByVal future As IFuture) As Exception
             Contract.Requires(future IsNot Nothing)
             Return If(future.State = FutureState.Failed, future.Exception, Nothing)
@@ -16,11 +17,12 @@ Namespace Threading
         ''' Returns the value stored in the future.
         ''' Returns default(T) if the future doesn't contain a value.
         ''' </summary>
-        <Extension()>
+        <Extension()> <Pure()>
         Public Function TryGetValue(Of T)(ByVal future As IFuture(Of T)) As T
             Contract.Requires(future IsNot Nothing)
             Return If(future.State = FutureState.Succeeded, future.Value, Nothing)
         End Function
+#End Region
 
 #Region "WhenReady"
         '''<summary>Determines the future result of running an action after the future is ready.</summary>
@@ -35,7 +37,7 @@ Namespace Threading
             Dim lock = New OnetimeLock()
             Dim result = New FutureAction()
             Dim handler As IFuture.ReadyEventHandler
-            handler = Sub() System.Threading.Tasks.Task.Factory.StartNew(
+            handler = Sub() Tasks.Task.Factory.StartNew(
                 Sub()
                     If lock.TryAcquire Then 'ensure only run once
                         RemoveHandler future.Ready, handler

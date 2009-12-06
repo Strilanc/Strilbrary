@@ -1,5 +1,3 @@
-Imports System.Threading
-
 Namespace Threading
     Public Enum FutureState
         '''<summary>The future was not ready, but now may or may not be ready.</summary>
@@ -99,8 +97,7 @@ Namespace Threading
             Get
                 Contract.Ensures(Contract.Result(Of FutureState)() <> FutureState.Failed OrElse _exception IsNot Nothing)
                 If lockIsSet.State = OnetimeLockState.Unknown Then Return FutureState.Unknown
-                If _exception Is Nothing Then Return FutureState.Succeeded
-                Return FutureState.Failed
+                Return If(_exception Is Nothing, FutureState.Succeeded, FutureState.Failed)
             End Get
         End Property
 
@@ -209,9 +206,9 @@ Namespace Threading
 
         Public Overrides Function ToString() As String
             Select Case State
-                Case FutureState.Failed : Return "FutureAction Failed: {0}".Frmt(Exception.Message)
-                Case FutureState.Succeeded : Return "FutureAction Succeeded"
-                Case FutureState.Unknown : Return "FutureAction Not Ready"
+                Case FutureState.Unknown : Return "Not Ready"
+                Case FutureState.Succeeded : Return "Succeeded"
+                Case FutureState.Failed : Return "Failed: {0}".Frmt(Exception.Message)
                 Case Else : Throw State.MakeImpossibleValueException()
             End Select
         End Function
@@ -268,9 +265,9 @@ Namespace Threading
 
         Public Overrides Function ToString() As String
             Select Case State
-                Case FutureState.Failed : Return "FutureFunction Failed: {0}".Frmt(Exception.Message)
-                Case FutureState.Succeeded : Return "FutureFunction = {0}".Frmt(Value)
-                Case FutureState.Unknown : Return "FutureFunction Not Ready"
+                Case FutureState.Unknown : Return "Not Ready"
+                Case FutureState.Succeeded : Return "Succeeded: {0}".Frmt(Value)
+                Case FutureState.Failed : Return "Failed: {0}".Frmt(Exception.Message)
                 Case Else : Throw State.MakeImpossibleValueException()
             End Select
         End Function

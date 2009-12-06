@@ -35,7 +35,7 @@ Namespace Threading
                                 nextAction = Nothing
                                 If action IsNot Nothing Then
                                     Call ThreadPooledAction(action)
-                                    FutureWait(cooldown).CallOnSuccess(AddressOf RunNextAction)
+                                    cooldown.AsyncWait().CallOnSuccess(AddressOf RunNextAction)
                                 Else
                                     running = False
                                 End If
