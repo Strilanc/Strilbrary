@@ -127,7 +127,7 @@ Namespace Threading
             Contract.Requires(exception IsNot Nothing)
             Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.State = FutureState.Failed)
 
-            If Not lockCanSet.TryAcquire Then Return False
+            If Not lockCanSet.TryAcquire() Then Return False
             Me._exception = exception
             If Not lockIsSet.TryAcquire() Then Throw New UnreachableException()
 
@@ -149,12 +149,11 @@ Namespace Threading
             End Try
         End Sub
 
-        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")>
         Protected Function TrySetSucceededBase(ByVal action As action) As Boolean
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.State = FutureState.Succeeded)
 
-            If Not lockCanSet.TryAcquire Then Return False
+            If Not lockCanSet.TryAcquire() Then Return False
             Call action()
             If Not lockIsSet.TryAcquire() Then Throw New UnreachableException()
 

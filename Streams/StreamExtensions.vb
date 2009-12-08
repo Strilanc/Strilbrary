@@ -55,19 +55,16 @@
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanRead)
             Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-            Dim m = 1024
-            Dim bb(0 To m - 1) As Byte
-            Dim c = 0
+            Dim result = New List(Of Byte)(capacity:=1024)
+            Dim buffer(0 To 4096 - 1) As Byte
             Do
-                Dim n = stream.Read(bb, c, m - c)
-                c += n
-                If c <> m Then Exit Do
-                m *= 2
-                ReDim Preserve bb(0 To m - 1)
+                Dim n = stream.Read(buffer, 0, buffer.Length)
+                If n = 0 Then Exit Do
+                For i = 0 To n - 1
+                    result.Add(buffer(i))
+                Next i
             Loop
-            Contract.Assume(c >= 0)
-            ReDim Preserve bb(0 To c - 1)
-            Return bb
+            Return result.ToArray
         End Function
 
         '''<summary>Writes the full contents of a buffer to the stream.</summary>
