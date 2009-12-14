@@ -36,7 +36,6 @@ Public Class NumericExtensionTest
         Assert.IsTrue(23.ModFloor(11) = 22)
     End Sub
 
-    '''<summary>Determines if a double is not positive infinity, negative infinity, or NaN.</summary>
     <TestMethod()>
     Public Sub IsFiniteTest()
         Assert.IsTrue(2.0.IsFinite)
@@ -130,6 +129,14 @@ Public Class NumericExtensionTest
     End Sub
 
     <TestMethod()>
+    Public Sub BitwiseToSByteTest()
+        Assert.IsTrue(CByte(&H0).BitwiseToSByte() = CSByte(&H0))
+        Assert.IsTrue(CByte(&H1).BitwiseToSByte() = CSByte(&H1))
+        Assert.IsTrue(CByte(&HFF).BitwiseToSByte() = CSByte(&HFF - 256))
+        Assert.IsTrue(CByte(&H12).BitwiseToSByte() = CSByte(&H12))
+        Assert.IsTrue(CByte(&HAB).BitwiseToSByte() = CSByte(&HAB - 256))
+    End Sub
+    <TestMethod()>
     Public Sub BitwiseToInt16Test()
         Assert.IsTrue(&H0US.BitwiseToInt16() = &H0S)
         Assert.IsTrue(&H1US.BitwiseToInt16() = &H1S)
@@ -154,6 +161,14 @@ Public Class NumericExtensionTest
         Assert.IsTrue(&HABCDEF0123456789UL.BitwiseToInt64() = &HABCDEF0123456789L)
     End Sub
 
+    <TestMethod()>
+    Public Sub BitwiseToByteTest()
+        Assert.IsTrue(CSByte(&H0).BitwiseToByte() = CByte(&H0))
+        Assert.IsTrue(CSByte(&H1).BitwiseToByte() = CByte(&H1))
+        Assert.IsTrue(CSByte(&HFF - 256).BitwiseToByte() = CByte(&HFF))
+        Assert.IsTrue(CSByte(&H12).BitwiseToByte() = CByte(&H12))
+        Assert.IsTrue(CSByte(&HAB - 256).BitwiseToByte() = CByte(&HAB))
+    End Sub
     <TestMethod()>
     Public Sub BitwiseToUInt16Test()
         Assert.IsTrue(&H0S.BitwiseToUInt16() = &H0US)

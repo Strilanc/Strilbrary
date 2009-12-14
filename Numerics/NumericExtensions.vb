@@ -265,10 +265,19 @@ Namespace Numerics
         End Function
 
         <Pure()> <Extension()>
+        Public Function BitwiseToSByte(ByVal value As Byte) As SByte
+            Dim sign = value And (CByte(1) << 7)
+            If CBool(sign) Then
+                Return CSByte(value And Not sign) Or (CSByte(1) << 7)
+            Else
+                Return CSByte(value)
+            End If
+        End Function
+        <Pure()> <Extension()>
         Public Function BitwiseToInt16(ByVal value As UInt16) As Int16
             Dim sign = value And (1US << 15)
             If CBool(sign) Then
-                Return CShort(value And Not sign) + (1S << 15)
+                Return CShort(value And Not sign) Or (1S << 15)
             Else
                 Return CShort(value)
             End If
@@ -277,7 +286,7 @@ Namespace Numerics
         Public Function BitwiseToInt32(ByVal value As UInt32) As Int32
             Dim sign = value And (1UI << 31)
             If CBool(sign) Then
-                Return CInt(value And Not sign) + (1 << 31)
+                Return CInt(value And Not sign) Or (1 << 31)
             Else
                 Return CInt(value)
             End If
@@ -286,17 +295,26 @@ Namespace Numerics
         Public Function BitwiseToInt64(ByVal value As UInt64) As Int64
             Dim sign = value And (1UL << 63)
             If CBool(sign) Then
-                Return CLng(value And Not sign) + (1L << 63)
+                Return CLng(value And Not sign) Or (1L << 63)
             Else
                 Return CLng(value)
             End If
         End Function
 
         <Pure()> <Extension()>
+        Public Function BitwiseToByte(ByVal value As SByte) As Byte
+            Dim sign = value And (CSByte(1) << 7)
+            If CBool(sign) Then
+                Return CByte(value And Not sign) Or (CByte(1) << 7)
+            Else
+                Return CByte(value)
+            End If
+        End Function
+        <Pure()> <Extension()>
         Public Function BitwiseToUInt16(ByVal value As Int16) As UInt16
             Dim sign = value And (1S << 15)
             If CBool(sign) Then
-                Return CUShort(value And Not sign) + (1US << 15)
+                Return CUShort(value And Not sign) Or (1US << 15)
             Else
                 Return CUShort(value)
             End If
@@ -305,7 +323,7 @@ Namespace Numerics
         Public Function BitwiseToUInt32(ByVal value As Int32) As UInt32
             Dim sign = value And (1 << 31)
             If CBool(sign) Then
-                Return CUInt(value And Not sign) + (1UI << 31)
+                Return CUInt(value And Not sign) Or (1UI << 31)
             Else
                 Return CUInt(value)
             End If
@@ -314,7 +332,7 @@ Namespace Numerics
         Public Function BitwiseToUInt64(ByVal value As Int64) As UInt64
             Dim sign = value And (1L << 63)
             If CBool(sign) Then
-                Return CULng(value And Not sign) + (1UL << 63)
+                Return CULng(value And Not sign) Or (1UL << 63)
             Else
                 Return CULng(value)
             End If
