@@ -28,46 +28,50 @@ Namespace Numerics
             Return reversedValue
         End Function
 
+        '''<summary>Determines the smallest non-negative remainder of the division of the value by the given divisor.</summary>
+        <Extension()> <Pure()>
+        Public Function ProperMod(ByVal value As Integer, ByVal divisor As Integer) As Integer
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Integer)() >= 0)
+            Contract.Ensures(Contract.Result(Of Integer)() < divisor)
+            Contract.Ensures((value - Contract.Result(Of Integer)()) Mod divisor = 0)
+            Dim result = value Mod divisor + If(value >= 0, 0, divisor)
+            Contract.Assume(result >= 0)
+            Contract.Assume(result < divisor)
+            Contract.Assume((value - result) Mod divisor = 0)
+            Return result
+        End Function
+        '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
+        <Extension()> <Pure()>
+        Public Function PositiveMod(ByVal value As Integer, ByVal divisor As Integer) As Integer
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Integer)() > 0)
+            Contract.Ensures(Contract.Result(Of Integer)() <= divisor)
+            Contract.Ensures((value - Contract.Result(Of Integer)()) Mod divisor = 0)
+            Dim result = (value - 1).ProperMod(divisor) + 1
+            Contract.Assume((value - result) Mod divisor = 0)
+            Return result
+        End Function
+
         '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
-        Public Function ModCeiling(ByVal value As Integer, ByVal divisor As Integer) As Integer
-            'contracts 1.2.21022.12 incorrectly proves this method false
+        Public Function CeilingMultiple(ByVal value As Integer, ByVal divisor As Integer) As Integer
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Integer)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of Integer)() >= value)
             Contract.Ensures(Contract.Result(Of Integer)() < value + divisor)
-
-            If value Mod divisor = 0 Then
-                Return value
-            ElseIf value < 0 Then
-                'division will truncate upwards
-                Return (value \ divisor) * divisor
-            Else
-                'division will truncate downwards
-                Return (value \ divisor) * divisor + divisor
-            End If
+            Dim result = value - (value.PositiveMod(divisor) - divisor)
+            Contract.Assume(result Mod divisor = 0)
+            Return result
         End Function
-
         '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
-        Public Function ModFloor(ByVal value As Integer, ByVal divisor As Integer) As Integer
-            'contracts 1.2.21022.12 incorrectly proves this method false
+        Public Function FloorMultiple(ByVal value As Integer, ByVal divisor As Integer) As Integer
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Integer)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of Integer)() <= value)
             Contract.Ensures(Contract.Result(Of Integer)() > value - divisor)
-
-            If value Mod divisor = 0 Then
-                Return value
-            ElseIf value < 0 Then
-                'division will truncate upwards
-                Return (value \ divisor) * divisor - divisor
-            Else
-                'division will truncate downwards
-                Return (value \ divisor) * divisor
-            End If
+            Return value - value.ProperMod(divisor)
         End Function
 
         '''<summary>Determines if a double is not positive infinity, negative infinity, or NaN.</summary>
@@ -336,6 +340,48 @@ Namespace Numerics
             Else
                 Return CULng(value)
             End If
+        End Function
+
+        <Pure()> <Extension()>
+        Public Function ShiftRotateLeft(ByVal value As Byte, ByVal offset As Integer) As Byte
+            offset = offset.ProperMod(8)
+            Return (value << offset) Or (value >> (8 - offset))
+        End Function
+        <Pure()> <Extension()>
+        Public Function ShiftRotateLeft(ByVal value As UInt16, ByVal offset As Integer) As UInt16
+            offset = offset.ProperMod(16)
+            Return (value << offset) Or (value >> (16 - offset))
+        End Function
+        <Pure()> <Extension()>
+        Public Function ShiftRotateLeft(ByVal value As UInt32, ByVal offset As Integer) As UInt32
+            offset = offset.ProperMod(32)
+            Return (value << offset) Or (value >> (32 - offset))
+        End Function
+        <Pure()> <Extension()>
+        Public Function ShiftRotateLeft(ByVal value As UInt64, ByVal offset As Integer) As UInt64
+            offset = offset.ProperMod(64)
+            Return (value << offset) Or (value >> (64 - offset))
+        End Function
+
+        <Pure()> <Extension()>
+        Public Function ShiftRotateRight(ByVal value As Byte, ByVal offset As Integer) As Byte
+            offset = offset.ProperMod(8)
+            Return (value >> offset) Or (value << (8 - offset))
+        End Function
+        <Pure()> <Extension()>
+        Public Function ShiftRotateRight(ByVal value As UInt16, ByVal offset As Integer) As UInt16
+            offset = offset.ProperMod(16)
+            Return (value >> offset) Or (value << (16 - offset))
+        End Function
+        <Pure()> <Extension()>
+        Public Function ShiftRotateRight(ByVal value As UInt32, ByVal offset As Integer) As UInt32
+            offset = offset.ProperMod(32)
+            Return (value >> offset) Or (value << (32 - offset))
+        End Function
+        <Pure()> <Extension()>
+        Public Function ShiftRotateRight(ByVal value As UInt64, ByVal offset As Integer) As UInt64
+            offset = offset.ProperMod(64)
+            Return (value >> offset) Or (value << (64 - offset))
         End Function
     End Module
 End Namespace

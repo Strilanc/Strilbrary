@@ -21,19 +21,41 @@ Public Class NumericExtensionTest
     End Sub
 
     <TestMethod()>
-    Public Sub ModCeilingTest()
-        Assert.IsTrue(6.ModCeiling(7) = 7)
-        Assert.IsTrue(18.ModCeiling(9) = 18)
-        Assert.IsTrue((-5).ModCeiling(10) = 0)
-        Assert.IsTrue(23.ModCeiling(11) = 33)
+    Public Sub ProperModTest()
+        Assert.IsTrue(27.ProperMod(27) = 0)
+        Assert.IsTrue(16.ProperMod(15) = 1)
+        Assert.IsTrue(15.ProperMod(16) = 15)
+        Assert.IsTrue(6.ProperMod(7) = 6)
+        Assert.IsTrue(18.ProperMod(9) = 0)
+        Assert.IsTrue((-5).ProperMod(10) = 5)
+        Assert.IsTrue((-5).ProperMod(9) = 4)
+        Assert.IsTrue(23.ProperMod(11) = 1)
+    End Sub
+    <TestMethod()>
+    Public Sub PositiveModTest()
+        Assert.IsTrue(27.PositiveMod(27) = 27)
+        Assert.IsTrue(16.PositiveMod(15) = 1)
+        Assert.IsTrue(15.PositiveMod(16) = 15)
+        Assert.IsTrue(6.PositiveMod(7) = 6)
+        Assert.IsTrue(18.PositiveMod(9) = 9)
+        Assert.IsTrue((-5).PositiveMod(10) = 5)
+        Assert.IsTrue((-5).PositiveMod(9) = 4)
+        Assert.IsTrue(23.PositiveMod(11) = 1)
     End Sub
 
     <TestMethod()>
-    Public Sub ModFloorTest()
-        Assert.IsTrue(6.ModFloor(7) = 0)
-        Assert.IsTrue(18.ModFloor(9) = 18)
-        Assert.IsTrue((-5).ModFloor(10) = -10)
-        Assert.IsTrue(23.ModFloor(11) = 22)
+    Public Sub CeilingMultipleTest()
+        Assert.IsTrue(6.CeilingMultiple(7) = 7)
+        Assert.IsTrue(18.CeilingMultiple(9) = 18)
+        Assert.IsTrue((-5).CeilingMultiple(10) = 0)
+        Assert.IsTrue(23.CeilingMultiple(11) = 33)
+    End Sub
+    <TestMethod()>
+    Public Sub FloorMultipleTest()
+        Assert.IsTrue(6.FloorMultiple(7) = 0)
+        Assert.IsTrue(18.FloorMultiple(9) = 18)
+        Assert.IsTrue((-5).FloorMultiple(10) = -10)
+        Assert.IsTrue(23.FloorMultiple(11) = 22)
     End Sub
 
     <TestMethod()>
@@ -192,5 +214,95 @@ Public Class NumericExtensionTest
         Assert.IsTrue(&HFFFFFFFFFFFFFFFFL.BitwiseToUInt64() = &HFFFFFFFFFFFFFFFFUL)
         Assert.IsTrue(&H1234567890ABCDEFL.BitwiseToUInt64() = &H1234567890ABCDEFUL)
         Assert.IsTrue(&HABCDEF0123456789L.BitwiseToUInt64() = &HABCDEF0123456789UL)
+    End Sub
+
+    <TestMethod()>
+    Public Sub ShiftRotateLeftTest_Byte()
+        Assert.IsTrue(CByte(&HFF).ShiftRotateLeft(5) = &HFF)
+        Assert.IsTrue(CByte(0).ShiftRotateLeft(3) = 0)
+        Assert.IsTrue(CByte(&HF0).ShiftRotateLeft(4) = &HF)
+        Assert.IsTrue(CByte(&HF).ShiftRotateLeft(4) = &HF0)
+        Assert.IsTrue(CByte(&H1).ShiftRotateLeft(7) = &H80)
+        Assert.IsTrue(CByte(&H1).ShiftRotateLeft(8) = &H1)
+        Assert.IsTrue(CByte(&H1).ShiftRotateLeft(9) = &H2)
+        Assert.IsTrue(CByte(&H6).ShiftRotateLeft(0) = &H6)
+    End Sub
+    <TestMethod()>
+    Public Sub ShiftRotateLeftTest_UInt16()
+        Assert.IsTrue(&HFFFFUS.ShiftRotateLeft(5) = &HFFFFUS)
+        Assert.IsTrue(0US.ShiftRotateLeft(3) = 0US)
+        Assert.IsTrue(&HFF00US.ShiftRotateLeft(8) = &HFFUS)
+        Assert.IsTrue(&HFFUS.ShiftRotateLeft(8) = &HFF00US)
+        Assert.IsTrue(&H1US.ShiftRotateLeft(15) = &H8000US)
+        Assert.IsTrue(&H1US.ShiftRotateLeft(16) = &H1US)
+        Assert.IsTrue(&H1US.ShiftRotateLeft(17) = &H2US)
+        Assert.IsTrue(&H6US.ShiftRotateLeft(0) = &H6US)
+    End Sub
+    <TestMethod()>
+    Public Sub ShiftRotateLeftTest_UInt32()
+        Assert.IsTrue(&HFFFFFFFFUI.ShiftRotateLeft(5) = &HFFFFFFFFUI)
+        Assert.IsTrue(0UI.ShiftRotateLeft(3) = 0UI)
+        Assert.IsTrue(&HFFFF0000UI.ShiftRotateLeft(16) = &HFFFFUI)
+        Assert.IsTrue(&HFFFFUI.ShiftRotateLeft(16) = &HFFFF0000UI)
+        Assert.IsTrue(&H1UI.ShiftRotateLeft(31) = &H80000000UI)
+        Assert.IsTrue(&H1UI.ShiftRotateLeft(32) = &H1UI)
+        Assert.IsTrue(&H1UI.ShiftRotateLeft(33) = &H2UI)
+        Assert.IsTrue(&H6UI.ShiftRotateLeft(0) = &H6UI)
+    End Sub
+    <TestMethod()>
+    Public Sub ShiftRotateLeftTest_UInt64()
+        Assert.IsTrue(&HFFFFFFFFFFFFFFFFUL.ShiftRotateLeft(5) = &HFFFFFFFFFFFFFFFFUL)
+        Assert.IsTrue(0UL.ShiftRotateLeft(3) = 0UL)
+        Assert.IsTrue(&HFFFFFFFF00000000UL.ShiftRotateLeft(32) = &HFFFFFFFFUL)
+        Assert.IsTrue(&HFFFFFFFFUL.ShiftRotateLeft(32) = &HFFFFFFFF00000000UL)
+        Assert.IsTrue(&H1UL.ShiftRotateLeft(63) = &H8000000000000000UL)
+        Assert.IsTrue(&H1UL.ShiftRotateLeft(64) = &H1UL)
+        Assert.IsTrue(&H1UL.ShiftRotateLeft(65) = &H2UL)
+        Assert.IsTrue(&H6UL.ShiftRotateLeft(0) = &H6UL)
+    End Sub
+
+    <TestMethod()>
+    Public Sub ShiftRotateRightTest_Byte()
+        Assert.IsTrue(CByte(&HFF).ShiftRotateRight(5) = &HFF)
+        Assert.IsTrue(CByte(0).ShiftRotateRight(3) = 0)
+        Assert.IsTrue(CByte(&HF0).ShiftRotateRight(4) = &HF)
+        Assert.IsTrue(CByte(&HF).ShiftRotateRight(4) = &HF0)
+        Assert.IsTrue(CByte(&H1).ShiftRotateRight(7) = &H2)
+        Assert.IsTrue(CByte(&H1).ShiftRotateRight(8) = &H1)
+        Assert.IsTrue(CByte(&H1).ShiftRotateRight(9) = &H80)
+        Assert.IsTrue(CByte(&H6).ShiftRotateRight(0) = &H6)
+    End Sub
+    <TestMethod()>
+    Public Sub ShiftRotateRightTest_UInt16()
+        Assert.IsTrue(&HFFFFUS.ShiftRotateRight(5) = &HFFFFUS)
+        Assert.IsTrue(0US.ShiftRotateRight(3) = 0US)
+        Assert.IsTrue(&HFF00US.ShiftRotateRight(8) = &HFFUS)
+        Assert.IsTrue(&HFFUS.ShiftRotateRight(8) = &HFF00US)
+        Assert.IsTrue(&H1US.ShiftRotateRight(15) = &H2US)
+        Assert.IsTrue(&H1US.ShiftRotateRight(16) = &H1US)
+        Assert.IsTrue(&H1US.ShiftRotateRight(17) = &H8000US)
+        Assert.IsTrue(&H6US.ShiftRotateRight(0) = &H6US)
+    End Sub
+    <TestMethod()>
+    Public Sub ShiftRotateRightTest_UInt32()
+        Assert.IsTrue(&HFFFFFFFFUI.ShiftRotateRight(5) = &HFFFFFFFFUI)
+        Assert.IsTrue(0UI.ShiftRotateRight(3) = 0UI)
+        Assert.IsTrue(&HFFFF0000UI.ShiftRotateRight(16) = &HFFFFUI)
+        Assert.IsTrue(&HFFFFUI.ShiftRotateRight(16) = &HFFFF0000UI)
+        Assert.IsTrue(&H1UI.ShiftRotateRight(31) = &H2UI)
+        Assert.IsTrue(&H1UI.ShiftRotateRight(32) = &H1UI)
+        Assert.IsTrue(&H1UI.ShiftRotateRight(33) = &H80000000UI)
+        Assert.IsTrue(&H6UI.ShiftRotateRight(0) = &H6UI)
+    End Sub
+    <TestMethod()>
+    Public Sub ShiftRotateRightTest_UInt64()
+        Assert.IsTrue(&HFFFFFFFFFFFFFFFFUL.ShiftRotateRight(5) = &HFFFFFFFFFFFFFFFFUL)
+        Assert.IsTrue(0UL.ShiftRotateRight(3) = 0UL)
+        Assert.IsTrue(&HFFFFFFFF00000000UL.ShiftRotateRight(32) = &HFFFFFFFFUL)
+        Assert.IsTrue(&HFFFFFFFFUL.ShiftRotateRight(32) = &HFFFFFFFF00000000UL)
+        Assert.IsTrue(&H1UL.ShiftRotateRight(63) = &H2UL)
+        Assert.IsTrue(&H1UL.ShiftRotateRight(64) = &H1UL)
+        Assert.IsTrue(&H1UL.ShiftRotateRight(65) = &H8000000000000000UL)
+        Assert.IsTrue(&H6UL.ShiftRotateRight(0) = &H6UL)
     End Sub
 End Class

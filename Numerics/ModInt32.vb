@@ -56,12 +56,10 @@
             Return value1.value <> value2.value
         End Operator
         Public Function ShiftRotateLeft(ByVal offset As Integer) As ModInt32
-            offset = offset And &H1F
-            Return New ModInt32((value << offset) Or (value >> 32 - offset))
+            Return value.ShiftRotateLeft(offset)
         End Function
         Public Function ShiftRotateRight(ByVal offset As Integer) As ModInt32
-            offset = offset And &H1F
-            Return New ModInt32((value >> offset) Or (value << 32 - offset))
+            Return value.ShiftRotateRight(offset)
         End Function
 #End Region
 

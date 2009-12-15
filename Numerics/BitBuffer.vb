@@ -1,117 +1,226 @@
 Namespace Numerics
-    '''<summary>Stores up to 64 bits and provides methods to add and extract bits for common types.</summary>
-    Public NotInheritable Class BitBuffer
-        Public Const MaxBits As Integer = 64
-        Private buf As ULong 'bit storage
-        Private _numBufferedBits As Integer 'number of stored bits
-        Public ReadOnly Property BufferedBitCount() As Integer
+    '''<summary>Stores bits and provides methods to add and remove the bits of common numeric types.</summary>
+    <DebuggerDisplay("{ToString}")>
+    <ContractVerification(False)>
+    Public NotInheritable Class BitBuffer 'verification off because of silly warnings in 1.2.21023.14
+        Private _words As New LinkedList(Of BitWord64)()
+        Private _bitCount As Integer
+
+        <ContractInvariantMethod()> Private Sub ObjectInvariant()
+            Contract.Invariant(_bitCount >= 0)
+            Contract.Invariant(_words IsNot Nothing)
+        End Sub
+
+        '''<summary>Determines the number of bits currently stored in the BitBuffer.</summary>
+        Public ReadOnly Property BitCount() As Integer
             Get
-                Return _numBufferedBits
-            End Get
-        End Property
-        Public ReadOnly Property BufferedByteCount() As Integer
-            Get
-                Return _numBufferedBits \ 8
+                Contract.Ensures(Contract.Result(Of Integer)() >= 0)
+                Contract.Ensures(Contract.Result(Of Integer)() = Me._bitCount)
+                Return _bitCount
             End Get
         End Property
 
 #Region "Base Operations"
-        Public Sub Queue(ByVal bits As ULong, ByVal bitCount As Integer)
-            Contract.Requires(bitCount >= 0)
-            Contract.Requires(bitCount <= MaxBits)
-            If bitCount > MaxBits - BufferedBitCount Then Throw New InvalidOperationException("Not enough capacity available.")
-            buf = buf Or (bits << _numBufferedBits)
-            _numBufferedBits += bitCount
+        Public Sub Queue(ByVal word As BitWord64)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + word.BitCount)
+
+            Dim tail = word
+            If _words.Count > 0 AndAlso _words.Last.Value.BitCount + tail.BitCount <= BitWord64.MaxSize Then
+                tail = _words.Last.Value + tail
+                _words.RemoveLast()
+            End If
+            _words.AddLast(tail)
+            _bitCount += word.BitCount
         End Sub
-        Public Sub Stack(ByVal bits As ULong, ByVal bitCount As Integer)
-            Contract.Requires(bitCount >= 0)
-            Contract.Requires(bitCount <= MaxBits)
-            If bitCount > MaxBits - BufferedBitCount Then Throw New InvalidOperationException("Not enough capacity available.")
-            buf <<= bitCount
-            buf = buf Or bits
-            _numBufferedBits += bitCount
+        Public Sub Stack(ByVal word As BitWord64)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + word.BitCount)
+            Contract.Ensures(Me.Peek(word.BitCount) = word)
+
+            Dim head = word
+            If _words.Count > 0 AndAlso _words.First.Value.BitCount + head.BitCount <= BitWord64.MaxSize Then
+                head += _words.First.Value
+                _words.RemoveFirst()
+            End If
+
+            _words.AddFirst(head)
+            _bitCount += word.BitCount
         End Sub
-        Public Function Take(ByVal bitCount As Integer) As ULong
-            Contract.Requires(bitCount >= 0)
-            Contract.Requires(bitCount <= MaxBits)
-            Dim result = Peek(bitCount)
-            buf >>= bitCount
-            _numBufferedBits -= bitCount
+        Public Sub Skip(ByVal skippedBitCount As Integer)
+            Contract.Requires(skippedBitCount >= 0)
+            Contract.Requires(skippedBitCount <= Me.BitCount)
+            Contract.Requires(skippedBitCount <= BitWord64.MaxSize)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - skippedBitCount)
+
+            Dim remainingBits = skippedBitCount
+            While remainingBits > 0
+                If _words.First.Value.BitCount > remainingBits Then
+                    Dim remainder = _words.First.Value.HighPart(splitIndex:=remainingBits)
+                    remainingBits = 0
+                    _words.RemoveFirst()
+                    _words.AddFirst(remainder)
+                Else
+                    remainingBits -= _words.First.Value.BitCount
+                    _words.RemoveFirst()
+                End If
+            End While
+
+            _bitCount -= skippedBitCount
+        End Sub
+        Public Function Take(ByVal resultBitCount As Integer) As BitWord64
+            Contract.Requires(resultBitCount >= 0)
+            Contract.Requires(resultBitCount <= Me.BitCount)
+            Contract.Requires(resultBitCount <= BitWord64.MaxSize)
+            Contract.Ensures(Contract.Result(Of BitWord64)() = Contract.OldValue(Me.Peek(resultBitCount)))
+            Contract.Ensures(Contract.Result(Of BitWord64)().BitCount = resultBitCount)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - resultBitCount)
+
+            Dim result = Peek(resultBitCount)
+            Skip(resultBitCount)
             Return result
         End Function
-        Public Function Peek(ByVal bitCount As Integer) As ULong
-            Contract.Requires(bitCount >= 0)
-            Contract.Requires(bitCount <= MaxBits)
-            If bitCount > BufferedBitCount Then Throw New InvalidOperationException("Not enough buffered buffered bits available.")
-            Dim mask = (1UL << bitCount) - 1UL
-            If mask = 0 Then mask = ULong.MaxValue
-            Return buf And mask
+        <Pure()>
+        Public Function Peek(ByVal resultBitCount As Integer) As BitWord64
+            Contract.Requires(resultBitCount >= 0)
+            Contract.Requires(resultBitCount <= Me.BitCount)
+            Contract.Requires(resultBitCount <= BitWord64.MaxSize)
+            Contract.Ensures(Contract.Result(Of BitWord64)().BitCount = resultBitCount)
+
+            Dim n = _words.First
+            Dim result = New BitWord64(0, 0)
+            While result.BitCount < resultBitCount
+                If result.BitCount + n.Value.BitCount > resultBitCount Then
+                    result += n.Value.LowPart(splitIndex:=resultBitCount - result.BitCount)
+                Else
+                    result += _words.First.Value
+                End If
+                n = n.Next
+                Contract.Assert(result.BitCount <= resultBitCount)
+            End While
+            Return result
         End Function
 
         Public Sub Clear()
-            _numBufferedBits = 0
-            buf = 0
+            Contract.Ensures(Me.BitCount = 0)
+            _bitCount = 0
+            _words.Clear()
         End Sub
 #End Region
 
-#Region "Stack Types"
+#Region "Derived Operations"
         Public Sub StackBit(ByVal value As Boolean)
-            Stack(If(value, 1UL, 0UL), 1)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 1)
+            Contract.Assume(If(value, 1UL, 0UL) >> 1 = 0)
+            Stack(New BitWord64(If(value, 1UL, 0UL), 1))
         End Sub
         Public Sub StackByte(ByVal value As Byte)
-            Stack(value, 8)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 8)
+            Contract.Assume(CULng(value) >> 8 = 0)
+            Stack(New BitWord64(value, 8))
         End Sub
         Public Sub StackUInt16(ByVal value As UShort)
-            Stack(value, 16)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 16)
+            Contract.Assume(CULng(value) >> 16 = 0)
+            Stack(New BitWord64(value, 16))
         End Sub
         Public Sub StackUInt32(ByVal value As UInteger)
-            Stack(value, 32)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 32)
+            Contract.Assume(CULng(value) >> 32 = 0)
+            Stack(New BitWord64(value, 32))
         End Sub
-#End Region
+        Public Sub StackUInt64(ByVal value As UInt64)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 64)
+            Stack(New BitWord64(value, 64))
+        End Sub
 
-#Region "Queue Types"
         Public Sub QueueBit(ByVal value As Boolean)
-            Queue(If(value, 1UL, 0UL), 1)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 1)
+            Contract.Assume(If(value, 1UL, 0UL) >> 1 = 0)
+            Queue(New BitWord64(If(value, 1UL, 0UL), 1))
         End Sub
         Public Sub QueueByte(ByVal value As Byte)
-            Queue(value, 8)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 8)
+            Contract.Assume(CULng(value) >> 8 = 0)
+            Queue(New BitWord64(value, 8))
         End Sub
         Public Sub QueueUInt16(ByVal value As UInt16)
-            Queue(value, 16)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 16)
+            Contract.Assume(CULng(value) >> 16 = 0)
+            Queue(New BitWord64(value, 16))
         End Sub
         Public Sub QueueUInt32(ByVal value As UInt32)
-            Queue(value, 32)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 32)
+            Contract.Assume(CULng(value) >> 32 = 0)
+            Queue(New BitWord64(value, 32))
         End Sub
-#End Region
+        Public Sub QueueUInt64(ByVal value As UInt64)
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 64)
+            Queue(New BitWord64(value, 64))
+        End Sub
 
-#Region "Take Types"
         Public Function TakeBit() As Boolean
-            Return Take(1) <> 0
+            Contract.Requires(Me.BitCount >= 1)
+            Contract.Ensures(Contract.Result(Of Boolean)() = Contract.OldValue(Me.PeekBit))
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 1)
+            Return Take(1).Bits <> 0
         End Function
         Public Function TakeByte() As Byte
-            Return CByte(Take(8))
+            Contract.Requires(Me.BitCount >= 8)
+            Contract.Ensures(Contract.Result(Of Byte)() = Contract.OldValue(Me.PeekByte))
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 8)
+            Return CByte(Take(8).Bits)
         End Function
         Public Function TakeUInt16() As UInt16
-            Return CUShort(Take(16))
+            Contract.Requires(Me.BitCount >= 16)
+            Contract.Ensures(Contract.Result(Of UInt16)() = Contract.OldValue(Me.PeekUInt16))
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 16)
+            Return CUShort(Take(16).Bits)
         End Function
         Public Function TakeUInt32() As UInt32
-            Return CUInt(Take(32))
+            Contract.Requires(Me.BitCount >= 32)
+            Contract.Ensures(Contract.Result(Of UInt32)() = Contract.OldValue(Me.PeekUInt32))
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 32)
+            Return CUInt(Take(32).Bits)
+        End Function
+        Public Function TakeUInt64() As UInt64
+            Contract.Requires(Me.BitCount >= 64)
+            Contract.Ensures(Contract.Result(Of UInt64)() = Contract.OldValue(Me.PeekUInt64))
+            Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 64)
+            Return Take(64).Bits
+        End Function
+
+        <Pure()>
+        Public Function PeekBit() As Boolean
+            Contract.Requires(Me.BitCount >= 1)
+            Return Peek(1).Bits <> 0
+        End Function
+        <Pure()>
+        Public Function PeekByte() As Byte
+            Contract.Requires(Me.BitCount >= 8)
+            Return CByte(Peek(8).Bits)
+        End Function
+        <Pure()>
+        Public Function PeekUInt16() As UInt16
+            Contract.Requires(Me.BitCount >= 16)
+            Return CUShort(Peek(16).Bits)
+        End Function
+        <Pure()>
+        Public Function PeekUInt32() As UInt32
+            Contract.Requires(Me.BitCount >= 32)
+            Return CUInt(Peek(32).Bits)
+        End Function
+        <Pure()>
+        Public Function PeekUInt64() As UInt64
+            Contract.Requires(Me.BitCount >= 64)
+            Return Peek(64).Bits
         End Function
 #End Region
 
-#Region "Peek Types"
-        Public Function PeekBit() As Boolean
-            Return Peek(1) <> 0
+        Public Overrides Function ToString() As String
+            If Me.BitCount > BitWord64.MaxSize Then
+                Return "{0}: {1}...".Frmt(BitCount, Peek(BitWord64.MaxSize))
+            Else
+                Return "{0}: {1}".Frmt(BitCount, Peek(BitCount))
+            End If
         End Function
-        Public Function PeekByte() As Byte
-            Return CByte(Peek(8))
-        End Function
-        Public Function PeekUInt16() As UInt16
-            Return CUShort(Peek(16))
-        End Function
-        Public Function PeekUInt32() As UInt32
-            Return CUInt(Peek(32))
-        End Function
-#End Region
     End Class
 End Namespace

@@ -68,12 +68,10 @@
             Return value1.value <> value2.value
         End Operator
         Public Function ShiftRotateLeft(ByVal offset As Integer) As ModByte
-            offset = offset And &H7
-            Return New ModByte((value << offset) Or (value >> 8 - offset))
+            Return value.ShiftRotateLeft(offset)
         End Function
         Public Function ShiftRotateRight(ByVal offset As Integer) As ModByte
-            offset = offset And &H7
-            Return New ModByte((value >> offset) Or (value << 8 - offset))
+            Return value.ShiftRotateRight(offset)
         End Function
 #End Region
 

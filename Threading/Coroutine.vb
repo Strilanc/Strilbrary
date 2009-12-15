@@ -118,7 +118,7 @@ Namespace Threading
         Private coroutineYielder As ICoroutineController
         Private cur As TReturn
 
-        <ContractInvariantMethod()> Protected Sub ObjectInvariant()
+        <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(coroutineContinuer IsNot Nothing)
         End Sub
 
