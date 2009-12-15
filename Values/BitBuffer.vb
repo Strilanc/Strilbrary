@@ -1,4 +1,4 @@
-Namespace Numerics
+Namespace Values
     '''<summary>Stores bits and provides methods to add and remove the bits of common numeric types.</summary>
     <DebuggerDisplay("{ToString}")>
     <ContractVerification(False)>

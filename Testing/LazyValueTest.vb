@@ -1,6 +1,6 @@
 ﻿Imports System
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-Imports strilbrary
+Imports Strilbrary.Misc
 
 <TestClass()>
 Public Class LazyValueTest

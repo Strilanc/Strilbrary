@@ -1,4 +1,4 @@
-﻿Namespace Numerics
+﻿Namespace Values
     '''<summary>Stores up to 64 bits.</summary>
     <DebuggerDisplay("{ToString}")>
     <ContractVerification(False)>

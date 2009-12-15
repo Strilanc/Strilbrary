@@ -1,8 +1,7 @@
-﻿Imports System.Threading
-Imports Strilbrary.Threading
+﻿Imports Strilbrary.Threading
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports StrilbraryTests.IFutureExtensionsTest
-Imports Strilbrary
+Imports Strilbrary.Misc
 
 <TestClass()>
 Public Class ThreadingExtensionsTest

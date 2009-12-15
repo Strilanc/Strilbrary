@@ -1,4 +1,4 @@
-Namespace Numerics
+Namespace Values
     Public Enum ByteOrder
         '''<summary>Least significant bytes first.</summary>
         LittleEndian
@@ -81,6 +81,47 @@ Namespace Numerics
             Return Not Double.IsInfinity(value) AndAlso Not Double.IsNaN(value)
         End Function
 
+#Region "Bytes"
+        <Extension()> <Pure()>
+        Public Function Bytes(ByVal value As UInt16,
+                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As Byte()
+            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of Byte())().Length = 2)
+
+            Dim result = BitConverter.GetBytes(value)
+            Select Case byteOrder
+                Case byteOrder.BigEndian : Return result.Reverse.ToArray
+                Case byteOrder.LittleEndian : Return result
+                Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
+            End Select
+        End Function
+        <Extension()> <Pure()>
+        Public Function Bytes(ByVal value As UInt32,
+                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As Byte()
+            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of Byte())().Length = 4)
+
+            Dim result = BitConverter.GetBytes(value)
+            Select Case byteOrder
+                Case byteOrder.BigEndian : Return result.Reverse.ToArray
+                Case byteOrder.LittleEndian : Return result
+                Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
+            End Select
+        End Function
+        <Extension()> <Pure()>
+        Public Function Bytes(ByVal value As UInt64,
+                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As Byte()
+            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of Byte())().Length = 8)
+
+            Dim result = BitConverter.GetBytes(value)
+            Select Case byteOrder
+                Case byteOrder.BigEndian : Return result.Reverse.ToArray
+                Case byteOrder.LittleEndian : Return result
+                Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
+            End Select
+        End Function
+
         <Extension()> <Pure()>
         Public Function ToUInt16(ByVal data As IEnumerable(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
@@ -115,159 +156,9 @@ Namespace Numerics
             Next b
             Return val
         End Function
+#End Region
 
-        <Extension()> <Pure()>
-        Public Function Bytes(ByVal value As UInt16,
-                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian,
-                              Optional ByVal size As Integer = 2) As Byte()
-            Contract.Requires(size >= 0)
-            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Byte())().Length = size)
-            Return CULng(value).Bytes(byteOrder, size)
-        End Function
-        <Extension()> <Pure()>
-        Public Function Bytes(ByVal value As UInt32,
-                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian,
-                              Optional ByVal size As Integer = 4) As Byte()
-            Contract.Requires(size >= 0)
-            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Byte())().Length = size)
-            Return CULng(value).Bytes(byteOrder, size)
-        End Function
-        <Extension()> <Pure()>
-        Public Function Bytes(ByVal value As UInt64,
-                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian,
-                              Optional ByVal size As Integer = 8) As Byte()
-            Contract.Requires(size >= 0)
-            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Byte())().Length = size)
-            Dim data(0 To size - 1) As Byte
-            For i = 0 To size - 1
-                data(i) = CByte(value And &HFFUL)
-                value >>= 8
-            Next i
-            If value <> 0 Then Throw New ArgumentOutOfRangeException("value", "The specified value won't fit in the specified number of bytes.")
-            Select Case byteOrder
-                Case byteOrder.BigEndian
-                    Return data.Reverse.ToArray
-                Case byteOrder.LittleEndian
-                    Return data
-                Case Else
-                    Throw byteOrder.MakeArgumentValueException("byteOrder")
-            End Select
-        End Function
-
-        <Extension()> <Pure()>
-        <ContractVerification(False)>
-        Public Function ToAscBytes(ByVal data As String,
-                                   Optional ByVal nullTerminate As Boolean = False) As Byte()
-            'verification off because code contracts 1.2.21023.14 fails to prove postconditons, and adding assumption causes JIT to fail at run-time
-            Contract.Requires(data IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Byte())().Length = data.Length + If(nullTerminate, 1, 0))
-            Dim result(0 To data.Length + If(nullTerminate, 1, 0) - 1) As Byte
-            For i = 0 To data.Length - 1
-                result(i) = CByte(Asc(data(i)))
-            Next i
-            Return result
-        End Function
-        <Extension()> <Pure()>
-        <ContractVerification(False)>
-        Public Function ParseChrString(ByVal data As IEnumerable(Of Byte),
-                                       ByVal nullTerminated As Boolean) As String
-            'verification off because code contracts 1.2.21023.14 utterly fails to prove postconditons, even if they are added as assumptions
-            Contract.Requires(data IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of String)().Length <= data.Count)
-            Contract.Ensures(nullTerminated OrElse Contract.Result(Of String)().Length = data.Count)
-
-            If nullTerminated Then data = data.TakeWhile(Function(b) b <> 0)
-            Return (From b In data Select Chr(b)).ToArray
-        End Function
-
-        <Extension()> <Pure()>
-        Public Function ToHexString(ByVal data As IEnumerable(Of Byte),
-                                    Optional ByVal minWordLength As Byte = 2,
-                                    Optional ByVal separator As String = " ") As String
-            Contract.Requires(data IsNot Nothing)
-            Contract.Requires(separator IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
-
-            Dim result = New System.Text.StringBuilder()
-            For Each b In data
-                If result.Length > 0 Then result.Append(separator)
-                Dim h = Hex(b)
-                Contract.Assume(h IsNot Nothing)
-                For i = 1 To minWordLength - h.Length
-                    result.Append("0"c)
-                Next i
-                result.Append(h)
-            Next b
-            Return result.ToString()
-        End Function
-        <Extension()> <Pure()>
-        Public Function FromHexStringToBytes(ByVal data As String) As Byte()
-            Contract.Requires(data IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-
-            If data Like "*[!0-9A-Fa-f ]*" Then Throw New ArgumentException("Invalid characters.")
-            If data Like "*[! ][! ][! ]*" Then Throw New ArgumentException("Contains a hex value which won't fit in a byte.")
-            Dim words = data.Split(" "c)
-            Dim bb(0 To words.Length - 1) As Byte
-            For i = 0 To words.Length - 1
-                Contract.Assume(words(i) IsNot Nothing)
-                bb(i) = CByte(words(i).FromHexToUInt64(ByteOrder.BigEndian))
-            Next i
-            Return bb
-        End Function
-
-        <Extension()> <Pure()>
-        Public Function ToBinary(ByVal value As ULong,
-                                 Optional ByVal minLength As Integer = 8) As String
-            Contract.Requires(minLength >= 0)
-            Contract.Requires(minLength <= 64)
-            Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
-            Dim ret = ""
-            While value > 0 Or minLength > 0
-                ret = (value And &H1UL).ToString(Globalization.CultureInfo.InvariantCulture) + ret
-                value >>= 1
-                minLength -= 1
-            End While
-            Return ret
-        End Function
-
-        Private ReadOnly HexDictionary As New Dictionary(Of Char, Byte) From {
-                    {"0"c, 0}, {"1"c, 1}, {"2"c, 2}, {"3"c, 3}, {"4"c, 4},
-                    {"5"c, 5}, {"6"c, 6}, {"7"c, 7}, {"8"c, 8}, {"9"c, 9},
-                    {"a"c, 10}, {"A"c, 10},
-                    {"b"c, 11}, {"B"c, 11},
-                    {"c"c, 12}, {"C"c, 12},
-                    {"d"c, 13}, {"D"c, 13},
-                    {"e"c, 14}, {"E"c, 14},
-                    {"f"c, 15}, {"F"c, 15}}
-        <Extension()> <Pure()>
-        Public Function FromHexToUInt64(ByVal chars As IEnumerable(Of Char),
-                                        ByVal byteOrder As ByteOrder) As ULong
-            Contract.Requires(chars IsNot Nothing)
-
-            Select Case byteOrder
-                Case byteOrder.LittleEndian
-                    chars = chars.Reverse()
-                Case byteOrder.BigEndian
-                    'no change needed
-                Case Else
-                    Throw byteOrder.MakeArgumentValueException("byteOrder")
-            End Select
-
-            Dim val = 0UL
-            For Each c In chars
-                If Not HexDictionary.ContainsKey(c) Then Throw New ArgumentException("Invalid character.", "chars")
-                val <<= 4
-                val += HexDictionary(c)
-            Next c
-            Return val
-        End Function
-
+#Region "Bitwise Conversions"
         <Pure()> <Extension()>
         Public Function BitwiseToSByte(ByVal value As Byte) As SByte
             Dim sign = value And (CByte(1) << 7)
@@ -341,7 +232,9 @@ Namespace Numerics
                 Return CULng(value)
             End If
         End Function
+#End Region
 
+#Region "ShiftRotate"
         <Pure()> <Extension()>
         Public Function ShiftRotateLeft(ByVal value As Byte, ByVal offset As Integer) As Byte
             offset = offset.ProperMod(8)
@@ -383,5 +276,6 @@ Namespace Numerics
             offset = offset.ProperMod(64)
             Return (value >> offset) Or (value << (64 - offset))
         End Function
+#End Region
     End Module
 End Namespace

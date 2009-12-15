@@ -60,7 +60,7 @@
     <Compile Include="BitBufferTest.vb" />
     <Compile Include="CallQueueTest.vb" />
     <Compile Include="InvariantStringTest.vb" />
-    <Compile Include="NumericExtensionTest.vb" />
+    <Compile Include="ValueExtensionTest.vb" />
     <Compile Include="ThreadingExtensionsTest.vb" />
     <Compile Include="ThrottleTest.vb" />
     <Compile Include="LazyValueTest.vb" />

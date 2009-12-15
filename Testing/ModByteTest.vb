@@ -1,6 +1,5 @@
-﻿Imports System
-Imports Microsoft.VisualStudio.TestTools.UnitTesting
-Imports Strilbrary.Numerics
+﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
+Imports Strilbrary.Values
 
 <TestClass()>
 Public Class ModByteTest

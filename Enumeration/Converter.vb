@@ -1,5 +1,4 @@
 Imports System.Runtime.CompilerServices
-Imports Strilbrary.Streams
 
 Namespace Enumeration
     <ContractClass(GetType(ContractClassForIConverter(Of ,)))>

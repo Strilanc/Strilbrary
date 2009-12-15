@@ -1,10 +1,10 @@
 ﻿Imports System
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-Imports Strilbrary.Numerics
+Imports Strilbrary.Values
 Imports Strilbrary.Enumeration
 
 <TestClass()>
-Public Class NumericExtensionTest
+Public Class ValueExtensionTest
     <TestMethod()>
     Public Sub ReversedByteOrderUInt32Test()
         Assert.IsTrue(0UI.ReversedByteOrder() = 0UI)

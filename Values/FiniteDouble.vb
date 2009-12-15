@@ -1,4 +1,4 @@
-﻿Namespace Numerics
+﻿Namespace Values
     ''' <summary>
     ''' Represents a double which is not positive infinity, negative infinity, or NaN.
     ''' </summary>

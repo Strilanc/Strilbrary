@@ -287,6 +287,40 @@
 
             Return True
         End Function
+
+        '''<summary>Determines a read-only view of the list.</summary>
+        <Extension()> <Pure()>
+        Public Function ToView(Of T)(ByVal list As IList(Of T)) As ListView(Of T)
+            Contract.Requires(list IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of ListView(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of ListView(Of T))().Count = list.Count)
+            Dim result = TryCast(list, ListView(Of T))
+            If result IsNot Nothing Then
+                Contract.Assume(result.Count = list.Count)
+                Return result
+            Else
+                Return New ListView(Of T)(list)
+            End If
+        End Function
+        '''<summary>Determines a read-only view of a contiguous subset of the list starting at the given offset.</summary>
+        <Extension()> <Pure()>
+        Public Function SubView(Of T)(ByVal list As IList(Of T), ByVal offset As Integer) As ListView(Of T)
+            Contract.Requires(list IsNot Nothing)
+            Contract.Requires(offset >= 0)
+            Contract.Requires(offset <= list.Count)
+            Contract.Ensures(Contract.Result(Of ListView(Of T))() IsNot Nothing)
+            Return list.ToView.SubView(offset)
+        End Function
+        '''<summary>Determines a read-only view of a contiguous subset of the list starting at the given offset and running for the given length.</summary>
+        <Extension()> <Pure()>
+        Public Function SubView(Of T)(ByVal list As IList(Of T), ByVal offset As Integer, ByVal length As Integer) As ListView(Of T)
+            Contract.Requires(list IsNot Nothing)
+            Contract.Requires(offset >= 0)
+            Contract.Requires(length >= 0)
+            Contract.Requires(offset + length <= list.Count)
+            Contract.Ensures(Contract.Result(Of ListView(Of T))() IsNot Nothing)
+            Return list.ToView.SubView(offset, length)
+        End Function
 #End Region
     End Module
 End Namespace

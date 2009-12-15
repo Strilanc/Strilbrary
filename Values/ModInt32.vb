@@ -1,4 +1,4 @@
-﻿Namespace Numerics
+﻿Namespace Values
     '''<summary>A 32-bit integer which explicitely allows overflow and underflow.</summary>
     <DebuggerDisplay("{ToString} (mod 2^32)")>
     Public Structure ModInt32

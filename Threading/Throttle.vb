@@ -1,6 +1,4 @@
-﻿Imports System.Threading
-
-Namespace Threading
+﻿Namespace Threading
     '''<summary>Runs specified actions while respecting a minimum cooldown.</summary>
     Public NotInheritable Class Throttle
         Private ReadOnly cooldown As TimeSpan

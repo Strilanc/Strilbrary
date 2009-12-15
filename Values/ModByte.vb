@@ -1,4 +1,4 @@
-﻿Namespace Numerics
+﻿Namespace Values
     '''<summary>An 8-bit integer which explicitely allows overflow and underflow.</summary>
     <DebuggerDisplay("{ToString} (mod 2^8)")>
     Public Structure ModByte

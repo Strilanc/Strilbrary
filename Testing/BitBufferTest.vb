@@ -1,5 +1,5 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
-Imports Strilbrary.Numerics
+Imports Strilbrary.Values
 
 <TestClass()>
 Public Class BitBufferTest
