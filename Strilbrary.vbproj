@@ -109,11 +109,6 @@
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
-    <Import Include="Strilbrary.Enumeration" />
-    <Import Include="Strilbrary.Exceptions" />
-    <Import Include="Strilbrary.Misc" />
-    <Import Include="Strilbrary.Threading" />
-    <Import Include="Strilbrary.Values" />
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Collections.Generic" />
@@ -128,6 +123,10 @@
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="CustomDictionary.xml" />
+    <Compile Include="Collections\CompatibilityExtensions.vb" />
+    <Compile Include="Collections\LinqExtensions.vb" />
+    <Compile Include="Collections\IReadableList.vb" />
+    <Compile Include="Collections\IReadableCollection.vb" />
     <Compile Include="Exceptions\Exception Types.vb" />
     <Compile Include="Exceptions\Exception Extensions.vb" />
     <Compile Include="Misc\LazyValue.vb" />
@@ -147,7 +146,7 @@
     <Compile Include="Threading\SingleConsumerLockFreeQueue.vb" />
     <Compile Include="Threading\OneTimeLock.vb" />
     <Compile Include="Values\ModInt32.vb" />
-    <Compile Include="Enumeration\ListView.vb" />
+    <Compile Include="Collections\ListView.vb" />
     <Compile Include="Enumeration\Enumerable.vb" />
     <Compile Include="Enumeration\Enumerator.vb" />
     <Compile Include="Enumeration\PushEnumerator.vb" />
@@ -179,7 +178,7 @@
     <Compile Include="Misc\Common.vb" />
     <Compile Include="Enumeration\Converter.vb" />
     <Compile Include="Threading\FutureDisposable.vb" />
-    <Compile Include="Enumeration\LinqExtensions.vb" />
+    <Compile Include="Collections\LinqListExtensions.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

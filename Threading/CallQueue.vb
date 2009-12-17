@@ -1,3 +1,6 @@
+Imports Strilbrary.Values
+Imports Strilbrary.Exceptions
+
 Namespace Threading
     '''<summary>Represents a thread-safe call queue.</summary>
     <ContractClass(GetType(ICallQueue.ContractClass))>

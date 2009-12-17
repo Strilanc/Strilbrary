@@ -1,4 +1,6 @@
-﻿Namespace Streams
+﻿Imports Strilbrary.Values
+
+Namespace Streams
     Public Module StreamExtensions
         ''' <summary>
         ''' Reads until the buffer range has been filled or the stream has ended.
@@ -7,10 +9,11 @@
         ''' Differs from Read in that it definitely won't partially fill the range if the stream has not ended.
         ''' </remarks>
         <Extension()>
+        <ContractVerification(False)>
         Public Function ReadUntilDone(ByVal stream As IO.Stream,
                                       ByVal buffer As Byte(),
                                       ByVal offset As Integer,
-                                      ByVal length As Integer) As Integer
+                                      ByVal length As Integer) As Integer 'verification disabled due to incorrect BCL stream contracts
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanRead)
             Contract.Requires(buffer IsNot Nothing)
@@ -51,7 +54,8 @@
 
         '''<summary>Reads all remaining data from the stream into a byte array.</summary>
         <Extension()>
-        Public Function ReadRemaining(ByVal stream As IO.Stream) As Byte()
+        <ContractVerification(False)>
+        Public Function ReadRemaining(ByVal stream As IO.Stream) As Byte() 'verification disabled due to incorrect BCL stream contracts
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanRead)
             Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
@@ -69,8 +73,9 @@
 
         '''<summary>Writes the full contents of a buffer to the stream.</summary>
         <Extension()>
+        <ContractVerification(False)>
         Public Sub Write(ByVal stream As IO.Stream,
-                         ByVal buffer As Byte())
+                         ByVal buffer As Byte()) 'verification disabled due to incorrect BCL stream contracts
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanWrite)
             Contract.Requires(buffer IsNot Nothing)

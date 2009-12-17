@@ -1,4 +1,6 @@
-﻿Namespace Enumeration
+﻿Imports Strilbrary.Threading
+
+Namespace Enumeration
     ''' <summary>
     ''' Reverses the direction of an enumerator, allowing you to push values instead of pulling them.
     ''' </summary>

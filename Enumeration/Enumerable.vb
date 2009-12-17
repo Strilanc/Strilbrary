@@ -1,4 +1,6 @@
-﻿Namespace Enumeration
+﻿Imports Strilbrary.Exceptions
+
+Namespace Enumeration
     ''' <summary>
     ''' Uses a lambda expression to create enumerators.
     ''' </summary>

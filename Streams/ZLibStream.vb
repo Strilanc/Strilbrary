@@ -1,4 +1,6 @@
-﻿Namespace Streams
+﻿Imports Strilbrary.Exceptions
+
+Namespace Streams
     '''<summary>A DeflateStream with two magic bytes preceding the compressed data.</summary>
     Public NotInheritable Class ZLibStream
         Inherits WrappedStream

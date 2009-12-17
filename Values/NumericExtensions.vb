@@ -1,3 +1,6 @@
+Imports Strilbrary.Exceptions
+Imports Strilbrary.Collections
+
 Namespace Values
     Public Enum ByteOrder
         '''<summary>Least significant bytes first.</summary>
@@ -35,9 +38,9 @@ Namespace Values
             Contract.Ensures(Contract.Result(Of Integer)() >= 0)
             Contract.Ensures(Contract.Result(Of Integer)() < divisor)
             Contract.Ensures((value - Contract.Result(Of Integer)()) Mod divisor = 0)
-            Dim result = value Mod divisor + If(value >= 0, 0, divisor)
+            Dim result = value Mod divisor
+            If result < 0 Then result += divisor
             Contract.Assume(result >= 0)
-            Contract.Assume(result < divisor)
             Contract.Assume((value - result) Mod divisor = 0)
             Return result
         End Function
@@ -48,7 +51,10 @@ Namespace Values
             Contract.Ensures(Contract.Result(Of Integer)() > 0)
             Contract.Ensures(Contract.Result(Of Integer)() <= divisor)
             Contract.Ensures((value - Contract.Result(Of Integer)()) Mod divisor = 0)
-            Dim result = (value - 1).ProperMod(divisor) + 1
+            Dim result = value Mod divisor
+            If result <= 0 Then result += divisor
+            Contract.Assume(result > 0)
+            Contract.Assume(result <= divisor)
             Contract.Assume((value - result) Mod divisor = 0)
             Return result
         End Function

@@ -1,4 +1,6 @@
-﻿Namespace Enumeration
+﻿Imports Strilbrary.Values
+
+Namespace Enumeration
     Public NotInheritable Class ByteSequenceBitBuffer
         Private ReadOnly buf As New BitBuffer
         Private ReadOnly sequence As IEnumerator(Of Byte)

@@ -1,3 +1,6 @@
+Imports Strilbrary.Values
+Imports Strilbrary.Exceptions
+
 Namespace Threading
     Public Enum FutureState
         '''<summary>The future was not ready, but now may or may not be ready.</summary>

@@ -1,4 +1,4 @@
-Imports System.Runtime.CompilerServices
+Imports Strilbrary.Collections
 
 Namespace Enumeration
     <ContractClass(GetType(ContractClassForIConverter(Of ,)))>

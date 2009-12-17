@@ -1,3 +1,5 @@
+Imports Strilbrary.Exceptions
+
 Namespace Values
     Public Module TextExtensions
         ''' <summary>

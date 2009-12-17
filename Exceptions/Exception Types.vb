@@ -1,4 +1,6 @@
-﻿Namespace Exceptions
+﻿Imports Strilbrary.Values
+
+Namespace Exceptions
     '''<summary>Indicates a valid operation failed to be performed.</summary>
     Public Class OperationFailedException
         Inherits Exception
