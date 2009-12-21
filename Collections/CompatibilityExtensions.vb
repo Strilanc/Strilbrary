@@ -3,7 +3,8 @@
 Namespace Collections
     Public Module CompatibilityExtensions
         <Extension()> <Pure()>
-        Public Function AsList(Of T)(ByVal this As IReadableList(Of T)) As IList(Of T)
+        <ContractVerification(False)>
+        Public Function AsList(Of T)(ByVal this As IReadableList(Of T)) As IList(Of T) 'verification disabled due to stupid verifier
             Contract.Requires(this IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IList(Of T))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IList(Of T))().Count = this.Count)
@@ -33,7 +34,8 @@ Namespace Collections
                 Me._subList = subList
             End Sub
 
-            Public Sub CopyTo(ByVal array() As T, ByVal arrayIndex As Integer) Implements ICollection(Of T).CopyTo
+            <ContractVerification(False)>
+            Public Sub CopyTo(ByVal array() As T, ByVal arrayIndex As Integer) Implements ICollection(Of T).CopyTo 'verification disabled due to stupid verifier
                 For i = 0 To _subList.Count - 1
                     array(i + arrayIndex) = _subList(i)
                 Next i
@@ -56,7 +58,7 @@ Namespace Collections
                 End Get
             End Property
             Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
-                Return CType(_subList, IEnumerable(Of T)).GetEnumerator()
+                Return _subList.AsEnumerable.GetEnumerator()
             End Function
             Public Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
                 Return _subList.GetEnumerator()
@@ -127,7 +129,7 @@ Namespace Collections
                 End Get
             End Property
             Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
-                Return CType(_subList, IEnumerable(Of T)).GetEnumerator
+                Return _subList.AsEnumerable.GetEnumerator
             End Function
             Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements IEnumerable.GetEnumerator
                 Return _subList.GetEnumerator

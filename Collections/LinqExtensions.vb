@@ -60,30 +60,19 @@ Namespace Collections
         End Function
 #End Region
 
-#Region "Comparisons"
-        '''<summary>Determines if the items in two sequences are equivalent and in the same order.</summary>
+        '''<summary>Concatenates a sequence of sequences into a single sequence.</summary>
         <Pure()> <Extension()>
-        Public Function HasSameItemsAs(Of T As IEquatable(Of T))(ByVal this As IEnumerable(Of T), ByVal sequence As IEnumerable(Of T)) As Boolean
-            Contract.Requires(this IsNot Nothing)
-            Contract.Requires(sequence IsNot Nothing)
-
-            Dim otherEnumerator = sequence.GetEnumerator()
-            For Each element In this
-                'Fewer elements in other sequence?
-                If Not otherEnumerator.MoveNext Then Return False
-                'Different element from other sequence?
-                If element Is Nothing Then
-                    If otherEnumerator.Current IsNot Nothing Then Return False
-                Else
-                    If Not element.Equals(otherEnumerator.Current) Then Return False
-                End If
-            Next element
-            'More elements in other sequence?
-            If otherEnumerator.MoveNext Then Return False
-
-            Return True
+        Public Function Fold(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
+            Contract.Requires(sequences IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
+            Return New Enumerable(Of T)(
+                Function()
+                    Dim e = sequences.GetEnumerator
+                    Return New Enumerator(Of T)(Function(controller) If(e.MoveNext,
+                                                                        controller.Sequence(e.Current),
+                                                                        controller.Break()))
+                End Function)
         End Function
-#End Region
 
 #Region "Transformations"
         '''<summary>Determines the maximum element in a sequence based on the given comparison function.</summary>

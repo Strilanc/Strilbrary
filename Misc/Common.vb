@@ -29,7 +29,7 @@ Namespace Misc
         Public Function Concat(Of T)(ByVal ParamArray arrays As T()()) As T()
             Contract.Requires(arrays IsNot Nothing)
             Contract.Ensures(Contract.Result(Of T())() IsNot Nothing)
-            Return CType(arrays, IEnumerable(Of T())).Concat()
+            Return arrays.AsEnumerable.Concat()
         End Function
         <Extension()> <Pure()>
         Public Function Concat(Of T)(ByVal arrays As IEnumerable(Of T())) As T()

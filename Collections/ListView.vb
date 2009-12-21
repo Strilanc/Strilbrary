@@ -1,6 +1,9 @@
 ﻿Imports Strilbrary.Enumeration
 
 Namespace Collections
+    ''' <summary>
+    ''' Exposes a contiguous subset of a readable list as a readable list.
+    ''' </summary>
     Public NotInheritable Class ListView(Of T)
         Implements IEnumerable(Of T)
         Implements IReadableList(Of T)
@@ -36,8 +39,9 @@ Namespace Collections
         End Sub
 
         Default Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
-            Get
-                Return _items(index + _offset)
+            <ContractVerification(False)>
+            Get 'verification disabled due to stupid verifier
+                Return _items(_offset + index)
             End Get
         End Property
         Public ReadOnly Property Count As Integer Implements IReadableCollection(Of T).Count
