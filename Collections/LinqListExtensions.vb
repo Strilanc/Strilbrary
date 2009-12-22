@@ -112,6 +112,7 @@ Namespace Collections
             Contract.Requires(offset >= 0)
             Contract.Requires(offset <= list.Count)
             Contract.Ensures(Contract.Result(Of ListView(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of ListView(Of T))().Count = list.Count - offset)
             Return list.ToView.SubView(offset)
         End Function
         '''<summary>Determines a read-only view of a contiguous subset of the list starting at the given offset and running for the given length.</summary>
@@ -122,6 +123,7 @@ Namespace Collections
             Contract.Requires(length >= 0)
             Contract.Requires(offset + length <= list.Count)
             Contract.Ensures(Contract.Result(Of ListView(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of ListView(Of T))().Count = length)
             Return list.ToView.SubView(offset, length)
         End Function
     End Module
