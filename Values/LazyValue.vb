@@ -1,6 +1,6 @@
-﻿Namespace Misc
+﻿Namespace Values
     '''<summary>Wraps a value which is computed and stored only once needed.</summary>
-    <DebuggerDisplay("ToString")>
+    <DebuggerDisplay("{ToString}")>
     Public NotInheritable Class LazyValue(Of T)
         Private func As Func(Of T)
         Private _value As T

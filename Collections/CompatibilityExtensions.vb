@@ -1,4 +1,5 @@
 ﻿Imports Strilbrary.Enumeration
+Imports Strilbrary.Values
 
 Namespace Collections
     Public Module CompatibilityExtensions
@@ -19,6 +20,7 @@ Namespace Collections
             Return New ListToReadableListBridge(Of T)(this)
         End Function
 
+        <DebuggerDisplay("{ToString}")>
         Private Class ReadableListToListBridge(Of T)
             Implements IList(Of T)
 
@@ -92,7 +94,11 @@ Namespace Collections
             Public Sub Clear() Implements ICollection(Of T).Clear
                 Throw New NotSupportedException
             End Sub
+            Public Overrides Function ToString() As String
+                Return _subList.ToString
+            End Function
         End Class
+        <DebuggerDisplay("{ToString}")>
         Private Class ListToReadableListBridge(Of T)
             Implements IReadableList(Of T)
 
@@ -133,6 +139,14 @@ Namespace Collections
             End Function
             Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements IEnumerable.GetEnumerator
                 Return _subList.GetEnumerator
+            End Function
+
+            Public Overrides Function ToString() As String
+                If Me.Count > 10 Then
+                    Return Me.Take(10).StringJoin(", ") + "..."
+                Else
+                    Return Me.StringJoin(", ")
+                End If
             End Function
         End Class
     End Module

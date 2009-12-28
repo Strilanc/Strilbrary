@@ -1,9 +1,11 @@
 ﻿Imports Strilbrary.Enumeration
+Imports Strilbrary.Values
 
 Namespace Collections
     ''' <summary>
     ''' Exposes a contiguous subset of a readable list as a readable list.
     ''' </summary>
+    <DebuggerDisplay("{ToString}")>
     Public NotInheritable Class ListView(Of T)
         Implements IEnumerable(Of T)
         Implements IReadableList(Of T)
@@ -95,6 +97,14 @@ Namespace Collections
         End Function
         Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
             Return GetEnumerator()
+        End Function
+
+        Public Overrides Function ToString() As String
+            If Me.Count > 10 Then
+                Return Me.Take(10).StringJoin(", ") + "..."
+            Else
+                Return Me.StringJoin(", ")
+            End If
         End Function
     End Class
 End Namespace
