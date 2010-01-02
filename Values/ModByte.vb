@@ -83,7 +83,7 @@
             If Not TypeOf obj Is ModByte Then Return False
             Return Me.value = CType(obj, ModByte).value
         End Function
-        Public Function EqualsProper(ByVal other As ModByte) As Boolean Implements IEquatable(Of ModByte).Equals
+        Public Overloads Function Equals(ByVal other As ModByte) As Boolean Implements IEquatable(Of ModByte).Equals
             Return Me.value = other.value
         End Function
         Public Overrides Function ToString() As String

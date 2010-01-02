@@ -77,7 +77,7 @@
             If Not TypeOf obj Is ModInt16 Then Return False
             Return Me.value = CType(obj, ModInt16).value
         End Function
-        Public Function EqualsProper(ByVal other As ModInt16) As Boolean Implements IEquatable(Of ModInt16).Equals
+        Public Overloads Function Equals(ByVal other As ModInt16) As Boolean Implements IEquatable(Of ModInt16).Equals
             Return Me.value = other.value
         End Function
         Public Overrides Function ToString() As String

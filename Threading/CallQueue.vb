@@ -93,11 +93,11 @@ Namespace Threading
             Me.control = control
         End Sub
         Protected Overrides Sub StartRunning()
-            Try
-                control.BeginInvoke(Sub() Run())
-            Catch ex As InvalidOperationException
-                ex.RaiseAsUnexpected("Invalid Invoke from {0}.StartRunning() ({1}, {2})".Frmt(Me.GetType.Name, control.GetType.Name, control.Name))
-            End Try
+            control.AsyncInvokedAction(
+                Sub() Run()
+            ).Catch(
+                Sub(ex) ex.RaiseAsUnexpected("Invalid Invoke from {0}.StartRunning() ({1}, {2})".Frmt(Me.GetType.Name, control.GetType.Name, control.Name))
+            )
         End Sub
     End Class
 

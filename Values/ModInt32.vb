@@ -71,7 +71,7 @@
             If Not TypeOf obj Is ModInt32 Then Return False
             Return Me.value = CType(obj, ModInt32).value
         End Function
-        Public Function EqualsProper(ByVal other As ModInt32) As Boolean Implements IEquatable(Of ModInt32).Equals
+        Public Overloads Function Equals(ByVal other As ModInt32) As Boolean Implements IEquatable(Of ModInt32).Equals
             Return Me.value = other.value
         End Function
         Public Overrides Function ToString() As String

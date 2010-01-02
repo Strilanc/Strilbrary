@@ -36,8 +36,7 @@ Namespace Threading
             Call New Thread(Sub() result.SetByCalling(action)).Start()
             Return result
         End Function
-
-        '''<summary>Determines the future value of running a function in a new thread.</summary>
+        '''<summary>Determines a future value for running a function in a new thread.</summary>
         Public Function ThreadedFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
@@ -55,8 +54,7 @@ Namespace Threading
             Tasks.Task.Factory.StartNew(Sub() result.SetByCalling(action))
             Return result
         End Function
-
-        '''<summary>Determines the future value of running a function as a task.</summary>
+        '''<summary>Determines a future value for running a function as a task.</summary>
         Public Function TaskedFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
@@ -74,13 +72,33 @@ Namespace Threading
             ThreadPool.QueueUserWorkItem(Sub() result.SetByCalling(action))
             Return result
         End Function
-
-        '''<summary>Determines the future value of running a function in the thread pool.</summary>
+        '''<summary>Determines a future value for running a function in the thread pool.</summary>
         Public Function ThreadPooledFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
             Dim result = New FutureFunction(Of TReturn)
             ThreadPool.QueueUserWorkItem(Sub() result.SetByEvaluating(func))
+            Return result
+        End Function
+
+        '''<summary>Determines a future for invoking an action on a control's thread.</summary>
+        <Extension()>
+        Public Function AsyncInvokedAction(ByVal control As Control, ByVal action As Action) As IFuture
+            Contract.Requires(control IsNot Nothing)
+            Contract.Requires(action IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
+            Dim result = New FutureAction()
+            result.DependentCall(Sub() control.BeginInvoke(Sub() result.SetByCalling(action)))
+            Return result
+        End Function
+        '''<summary>Determines a future value for invoking a function on a control's thread.</summary>
+        <Extension()>
+        Public Function AsyncInvokedFunc(Of T)(ByVal control As Control, ByVal func As Func(Of T)) As IFuture(Of T)
+            Contract.Requires(control IsNot Nothing)
+            Contract.Requires(func IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IFuture(Of T))() IsNot Nothing)
+            Dim result = New FutureFunction(Of T)()
+            result.DependentCall(Sub() control.BeginInvoke(Sub() result.SetByEvaluating(func)))
             Return result
         End Function
 #End Region
