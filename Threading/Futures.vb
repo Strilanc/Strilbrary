@@ -1,4 +1,4 @@
-Imports Strilbrary.Values
+﻿Imports Strilbrary.Values
 Imports Strilbrary.Exceptions
 
 Namespace Threading

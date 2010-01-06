@@ -129,6 +129,7 @@
     <Compile Include="Collections\IReadableCollection.vb" />
     <Compile Include="Exceptions\Exception Types.vb" />
     <Compile Include="Exceptions\Exception Extensions.vb" />
+    <Compile Include="Threading\Futures.vb" />
     <Compile Include="Values\LazyValue.vb" />
     <Compile Include="Values\BitBuffer.vb" />
     <Compile Include="Values\BitWord64.vb" />
@@ -153,7 +154,6 @@
     <Compile Include="Streams\ReadOnlyStream.vb" />
     <Compile Include="Streams\WrappedReadOnlyStream.vb" />
     <Compile Include="Threading\Coroutine.vb" />
-    <Compile Include="Threading\Futures.vb" />
     <Compile Include="Threading\ThreadingExtensions.vb" />
     <Compile Include="Threading\CallQueue.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

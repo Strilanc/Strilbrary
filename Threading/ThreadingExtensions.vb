@@ -9,7 +9,6 @@ Namespace Threading
         <Extension()>
         Public Function AsyncWait(ByVal dt As TimeSpan) As IFuture
             Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            If dt.Ticks > Int32.MaxValue Then Throw New ArgumentOutOfRangeException("dt", "Can't wait that long.")
 
             Dim result = New FutureAction
             Dim ds = dt.TotalMilliseconds
