@@ -32,10 +32,10 @@ Public Class ValueExtensionTest
         Assert.IsTrue(23.ProperMod(11) = 1)
         Assert.IsTrue((-9).ProperMod(10) = 1)
         Assert.IsTrue((-10).ProperMod(10) = 0)
-        Assert.IsTrue((-11).ProperMod(11) = 9)
+        Assert.IsTrue((-11).ProperMod(10) = 9)
         Assert.IsTrue((9).ProperMod(10) = 9)
         Assert.IsTrue((10).ProperMod(10) = 0)
-        Assert.IsTrue((11).ProperMod(11) = 1)
+        Assert.IsTrue((11).ProperMod(10) = 1)
     End Sub
     <TestMethod()>
     Public Sub PositiveModTest()
@@ -49,10 +49,10 @@ Public Class ValueExtensionTest
         Assert.IsTrue(23.PositiveMod(11) = 1)
         Assert.IsTrue((-9).PositiveMod(10) = 1)
         Assert.IsTrue((-10).PositiveMod(10) = 10)
-        Assert.IsTrue((-11).PositiveMod(11) = 9)
+        Assert.IsTrue((-11).PositiveMod(10) = 9)
         Assert.IsTrue((9).PositiveMod(10) = 9)
         Assert.IsTrue((10).PositiveMod(10) = 10)
-        Assert.IsTrue((11).PositiveMod(11) = 1)
+        Assert.IsTrue((11).PositiveMod(10) = 1)
     End Sub
 
     <TestMethod()>
@@ -63,10 +63,10 @@ Public Class ValueExtensionTest
         Assert.IsTrue(23.CeilingMultiple(11) = 33)
         Assert.IsTrue((-9).CeilingMultiple(10) = 0)
         Assert.IsTrue((-10).CeilingMultiple(10) = -10)
-        Assert.IsTrue((-11).CeilingMultiple(11) = -10)
+        Assert.IsTrue((-11).CeilingMultiple(10) = -10)
         Assert.IsTrue((9).CeilingMultiple(10) = 10)
         Assert.IsTrue((10).CeilingMultiple(10) = 10)
-        Assert.IsTrue((11).CeilingMultiple(11) = 20)
+        Assert.IsTrue((11).CeilingMultiple(10) = 20)
     End Sub
     <TestMethod()>
     Public Sub FloorMultipleTest()
@@ -76,10 +76,10 @@ Public Class ValueExtensionTest
         Assert.IsTrue(23.FloorMultiple(11) = 22)
         Assert.IsTrue((-9).FloorMultiple(10) = -10)
         Assert.IsTrue((-10).FloorMultiple(10) = -10)
-        Assert.IsTrue((-11).FloorMultiple(11) = -20)
+        Assert.IsTrue((-11).FloorMultiple(10) = -20)
         Assert.IsTrue((9).FloorMultiple(10) = 0)
         Assert.IsTrue((10).FloorMultiple(10) = 10)
-        Assert.IsTrue((11).FloorMultiple(11) = 10)
+        Assert.IsTrue((11).FloorMultiple(10) = 10)
     End Sub
 
     <TestMethod()>

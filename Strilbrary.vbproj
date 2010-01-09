@@ -130,7 +130,6 @@
     <Compile Include="Exceptions\Exception Types.vb" />
     <Compile Include="Exceptions\Exception Extensions.vb" />
     <Compile Include="Threading\Futures.vb" />
-    <Compile Include="Values\LazyValue.vb" />
     <Compile Include="Values\BitBuffer.vb" />
     <Compile Include="Values\BitWord64.vb" />
     <Compile Include="Threading\Throttle.vb" />
