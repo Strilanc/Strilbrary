@@ -2,6 +2,9 @@
 Imports Strilbrary.Values
 
 Namespace Time
+    ''' <summary>
+    ''' A clock which advances in real time.
+    ''' </summary>
     Public Class SystemClock
         Implements IClock
 
@@ -28,12 +31,20 @@ Namespace Time
 
         Private Class SystemTimer
             Implements ITimer
-            Private ReadOnly _startTime As ModInt32
+            Private _startTime As ModInt32
+
             Public Sub New()
                 _startTime = Environment.TickCount
             End Sub
+
             Public Function ElapsedTime() As TimeSpan Implements ITimer.ElapsedTime
                 Return CUInt(Environment.TickCount - _startTime).Milliseconds
+            End Function
+
+            Public Function Reset() As TimeSpan Implements ITimer.Reset
+                Dim dt = Environment.TickCount - _startTime
+                _startTime += dt
+                Return CUInt(dt).Milliseconds
             End Function
         End Class
     End Class

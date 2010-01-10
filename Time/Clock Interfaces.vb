@@ -10,7 +10,7 @@ Namespace Time
         ''' </summary>
         Function AsyncWait(ByVal dt As TimeSpan) As IFuture
         ''' <summary>
-        ''' Returns a timer, which can report the time elapsed on the clock since its creation.
+        ''' Returns a timer, which can measure time elapsed on the clock.
         ''' </summary>
         <Pure()>
         Function StartTimer() As ITimer
@@ -34,16 +34,24 @@ Namespace Time
     <ContractClass(GetType(ITimer.ContractClass))>
     Public Interface ITimer
         ''' <summary>
-        ''' Returns the time elapsed on the parent clock since the timer's creation.
+        ''' Returns the time elapsed on the parent clock since the timer started.
         ''' </summary>
         <Pure()>
         Function ElapsedTime() As TimeSpan
+        ''' <summary>
+        ''' Returns the time elapsed on the parent clock since the timer started and restarts the timer.
+        ''' </summary>
+        Function Reset() As TimeSpan
 
         <ContractClassFor(GetType(ITimer))>
         NotInheritable Class ContractClass
             Implements ITimer
             <Pure()>
             Public Function ElapsedTime() As TimeSpan Implements ITimer.ElapsedTime
+                Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks >= 0)
+                Throw New NotSupportedException
+            End Function
+            Public Function Reset() As System.TimeSpan Implements ITimer.Reset
                 Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks >= 0)
                 Throw New NotSupportedException
             End Function

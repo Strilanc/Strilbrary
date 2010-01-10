@@ -2,6 +2,9 @@
 Imports Strilbrary.Values
 
 Namespace Time
+    ''' <summary>
+    ''' A clock which advances manually.
+    ''' </summary>
     Public Class ManualClock
         Implements IClock
 
@@ -19,7 +22,7 @@ Namespace Time
             Contract.Assume(_time.Ticks = 0)
         End Sub
 
-        'verification disabled due to stupid verifier
+        'verification disabled due to stupid verifier 
         <ContractVerification(False)>
         Public Sub Advance(ByVal dt As TimeSpan)
             Contract.Requires(dt.Ticks >= 0)
@@ -65,7 +68,7 @@ Namespace Time
         Private Class ManualTimer
             Implements ITimer
             Private ReadOnly _clock As ManualClock
-            Private ReadOnly _startTime As TimeSpan
+            Private _startTime As TimeSpan
 
             <ContractInvariantMethod()> Private Sub ObjectInvariant()
                 Contract.Invariant(_clock IsNot Nothing)
@@ -81,6 +84,12 @@ Namespace Time
             Public Function ElapsedTime() As System.TimeSpan Implements ITimer.ElapsedTime
                 Dim result = _clock.Time - Me._startTime
                 Contract.Assume(result.Ticks >= 0)
+                Return result
+            End Function
+
+            Public Function Reset() As TimeSpan Implements ITimer.Reset
+                Dim result = ElapsedTime()
+                _startTime += result
                 Return result
             End Function
         End Class

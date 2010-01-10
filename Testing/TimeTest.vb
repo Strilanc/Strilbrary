@@ -73,7 +73,11 @@ Public Class TimeTest
         c.Advance(3.Seconds)
         Assert.IsTrue(t.ElapsedTime = 3.Seconds)
         c.Advance(2.Seconds)
-        Assert.IsTrue(t.ElapsedTime = 5.Seconds)
+        Assert.IsTrue(t.Reset = 5.Seconds)
+        Assert.IsTrue(t.ElapsedTime = 0.Seconds)
+        Assert.IsTrue(t.Reset = 0.Seconds)
+        c.Advance(2.Seconds)
+        Assert.IsTrue(t.ElapsedTime = 2.Seconds)
     End Sub
 
     <TestMethod()>
@@ -95,7 +99,10 @@ Public Class TimeTest
     Public Sub SystemTimerTest()
         Dim c = New SystemClock()
         Dim t = c.StartTimer()
-        Threading.Thread.Sleep(10)
-        Assert.IsTrue(t.ElapsedTime >= 10.Milliseconds)
+        Threading.Thread.Sleep(50)
+        Dim m = t.ElapsedTime
+        Assert.IsTrue(m > 0.Milliseconds)
+        Assert.IsTrue(t.Reset >= m)
+        Assert.IsTrue(t.ElapsedTime >= 0.Milliseconds)
     End Sub
 End Class
