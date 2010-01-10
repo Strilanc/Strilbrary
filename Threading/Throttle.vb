@@ -1,43 +1,51 @@
 ﻿Namespace Threading
     '''<summary>Runs specified actions while respecting a minimum cooldown.</summary>
     Public NotInheritable Class Throttle
-        Private ReadOnly cooldown As TimeSpan
-        Private nextAction As Action
-        Private running As Boolean
-        Private ReadOnly ref As ICallQueue = New ThreadPooledCallQueue()
+        Private ReadOnly _cooldown As TimeSpan
+        Private _nextAction As Action
+        Private _running As Boolean
+        Private ReadOnly inQueue As ICallQueue = New ThreadPooledCallQueue()
+        Private ReadOnly _clock As Time.IClock
 
         <ContractInvariantMethod()>
         Private Sub ObjectInvariant()
-            Contract.Invariant(ref IsNot Nothing)
+            Contract.Invariant(inQueue IsNot Nothing)
+            Contract.Invariant(_clock IsNot Nothing)
+            Contract.Invariant(_cooldown.Ticks >= 0)
         End Sub
 
-        Public Sub New(ByVal cooldown As TimeSpan)
-            Me.cooldown = cooldown
+        Public Sub New(ByVal cooldown As TimeSpan, ByVal clock As Time.IClock)
+            Contract.Requires(cooldown.Ticks >= 0)
+            Contract.Requires(clock IsNot Nothing)
+            Me._cooldown = cooldown
+            Me._clock = clock
         End Sub
 
-        '''<summary>Sets the action to run when the cooldown finishes.</summary>
+        '''<summary>Sets the action to run when the cooldown finishes, or right away if not coolding down.</summary>
         Public Sub SetActionToRun(ByVal action As Action)
-            ref.QueueAction(Sub()
-                                nextAction = action
-                                If Not running Then
-                                    running = True
-                                    RunNextAction()
-                                End If
-                            End Sub)
+            inQueue.QueueAction(
+                Sub()
+                    _nextAction = action
+                    If Not _running Then
+                        _running = True
+                        OnReadyToRun()
+                    End If
+                End Sub)
         End Sub
 
         '''<summary>Runs the next action and resets the cooldown.</summary>
-        Private Sub RunNextAction()
-            ref.QueueAction(Sub()
-                                Dim action = nextAction
-                                nextAction = Nothing
-                                If action IsNot Nothing Then
-                                    Call ThreadPooledAction(action)
-                                    cooldown.AsyncWait().CallOnSuccess(AddressOf RunNextAction)
-                                Else
-                                    running = False
-                                End If
-                            End Sub)
+        Private Sub OnReadyToRun()
+            inQueue.QueueAction(
+                Sub()
+                    Dim actionToRun = _nextAction
+                    _nextAction = Nothing
+                    If actionToRun IsNot Nothing Then
+                        Call ThreadPooledAction(actionToRun)
+                        _clock.AsyncWait(_cooldown).CallOnSuccess(AddressOf OnReadyToRun)
+                    Else
+                        _running = False
+                    End If
+                End Sub)
         End Sub
     End Class
 End Namespace

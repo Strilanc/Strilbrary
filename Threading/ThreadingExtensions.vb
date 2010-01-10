@@ -2,30 +2,6 @@
 
 Namespace Threading
     Public Module ThreadingExtensions
-        ''' <summary>
-        ''' Returns a future which becomes ready after the given amount of time.
-        ''' The resulting future is instantly ready if the given time is non-positive.
-        ''' </summary>
-        <Extension()>
-        Public Function AsyncWait(ByVal dt As TimeSpan) As IFuture
-            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-
-            Dim result = New FutureAction
-            Dim ds = dt.TotalMilliseconds
-            If ds <= 0 Then
-                result.SetSucceeded()
-            Else
-                Dim timer = New Timers.Timer(ds)
-                AddHandler timer.Elapsed, Sub()
-                                              timer.Dispose()
-                                              result.SetSucceeded()
-                                          End Sub
-                timer.AutoReset = False
-                timer.Start()
-            End If
-            Return result
-        End Function
-
 #Region "Async Eval"
         '''<summary>Determines a future for running an action in a new thread.</summary>
         Public Function ThreadedAction(ByVal action As Action) As IFuture

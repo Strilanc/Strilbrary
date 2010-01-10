@@ -1,49 +1,46 @@
 ﻿Imports System
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports Strilbrary.Threading
+Imports Strilbrary.Time
 Imports System.Threading
 
 <TestClass()>
 Public Class ThrottleTest
     <TestMethod()>
     Public Sub RunTest()
+        Dim c = New ManualClock()
+        Dim throttle = New Throttle(1.Milliseconds, c)
+
         Dim lock = New ManualResetEvent(initialState:=False)
-        Dim throttle = New Throttle(New TimeSpan(0, 0, 0, 0, milliseconds:=1000))
-        throttle.SetActionToRun(Sub()
-                                    lock.Set()
-                                End Sub)
+        throttle.SetActionToRun(Sub() lock.Set())
         Assert.IsTrue(lock.WaitOne(millisecondsTimeout:=50))
     End Sub
 
     <TestMethod()>
-    Public Sub HoldTest()
-        Dim lock = New ManualResetEvent(initialState:=False)
-        Dim throttle = New Throttle(New TimeSpan(0, 0, 0, 0, milliseconds:=100))
+    Public Sub ThrottleTest()
+        Dim c = New ManualClock()
+        Dim throttle = New Throttle(1.Milliseconds, c)
 
-        throttle.SetActionToRun(Sub()
-                                    lock.Set()
-                                End Sub)
-        lock.WaitOne(millisecondsTimeout:=50)
+        Dim lock = New ManualResetEvent(initialState:=False)
+        throttle.SetActionToRun(Sub() lock.Set())
+        Assert.IsTrue(lock.WaitOne(millisecondsTimeout:=50))
 
         lock.Reset()
-        throttle.SetActionToRun(Sub()
-                                    lock.Set()
-                                End Sub)
+        throttle.SetActionToRun(Sub() lock.Set())
         Assert.IsTrue(Not lock.WaitOne(millisecondsTimeout:=50))
-        Assert.IsTrue(lock.WaitOne(millisecondsTimeout:=1000))
+        c.Advance(2.Milliseconds)
+        Assert.IsTrue(lock.WaitOne(millisecondsTimeout:=10000))
     End Sub
 
     <TestMethod()>
     Public Sub ReentrantTest()
-        Dim lock = New ManualResetEvent(initialState:=False)
-        Dim throttle = New Throttle(New TimeSpan(0, 0, 0, 0, milliseconds:=100))
+        Dim c = New ManualClock()
+        Dim throttle = New Throttle(1.Milliseconds, c)
 
-        throttle.SetActionToRun(Sub()
-                                    throttle.SetActionToRun(Sub()
-                                                                lock.Set()
-                                                            End Sub)
-                                End Sub)
+        Dim lock = New ManualResetEvent(initialState:=False)
+        throttle.SetActionToRun(Sub() throttle.SetActionToRun(Sub() lock.Set()))
         Assert.IsTrue(Not lock.WaitOne(millisecondsTimeout:=50))
-        Assert.IsTrue(lock.WaitOne(millisecondsTimeout:=1000))
+        c.Advance(2.Milliseconds)
+        Assert.IsTrue(lock.WaitOne(millisecondsTimeout:=10000))
     End Sub
 End Class

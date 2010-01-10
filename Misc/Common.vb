@@ -76,18 +76,5 @@ Namespace Misc
             value1 = value2
             value2 = vt
         End Sub
-
-        <Extension()> <Pure()>
-        Public Function Minutes(ByVal quantity As Integer) As TimeSpan
-            Return New TimeSpan(0, quantity, 0)
-        End Function
-        <Extension()> <Pure()>
-        Public Function Seconds(ByVal quantity As Integer) As TimeSpan
-            Return New TimeSpan(0, 0, quantity)
-        End Function
-        <Extension()> <Pure()>
-        Public Function Milliseconds(ByVal quantity As Integer) As TimeSpan
-            Return New TimeSpan(0, 0, 0, 0, quantity)
-        End Function
     End Module
 End Namespace

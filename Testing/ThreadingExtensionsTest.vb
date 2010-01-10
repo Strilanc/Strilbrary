@@ -1,19 +1,10 @@
 ﻿Imports Strilbrary.Threading
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports StrilbraryTests.IFutureExtensionsTest
-Imports Strilbrary.Misc
+Imports Strilbrary.Time
 
 <TestClass()>
 Public Class ThreadingExtensionsTest
-    <TestMethod()>
-    Public Sub FutureWaitTest()
-        Dim result = 2.Seconds.AsyncWait
-        BlockOnFuture(result, timeout:=1.Seconds)
-        Assert.IsTrue(result.State = FutureState.Unknown)
-        BlockOnFuture(result, timeout:=2.Seconds)
-        Assert.IsTrue(result.State = FutureState.Succeeded)
-    End Sub
-
 #Region "Async Eval"
     <TestMethod()>
     Public Sub ThreadedActionTest()

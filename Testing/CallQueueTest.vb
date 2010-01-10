@@ -1,7 +1,7 @@
 ﻿Imports Strilbrary.Threading
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports StrilbraryTests.IFutureExtensionsTest
-Imports Strilbrary.Misc
+Imports Strilbrary.Time
 
 <TestClass()>
 Public Class CallQueueTest
