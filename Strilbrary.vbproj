@@ -124,6 +124,7 @@
   <ItemGroup>
     <CodeAnalysisDictionary Include="CustomDictionary.xml" />
     <Compile Include="Collections\CompatibilityExtensions.vb" />
+    <Compile Include="Collections\PriorityQueue.vb" />
     <Compile Include="Collections\LinqExtensions.vb" />
     <Compile Include="Collections\IReadableList.vb" />
     <Compile Include="Collections\IReadableCollection.vb" />

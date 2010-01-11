@@ -59,6 +59,18 @@ Public Class TimeTest
         Assert.IsTrue(f3.State = FutureState.Succeeded)
     End Sub
     <TestMethod()>
+    Public Sub ManualAsyncWaitTest_Duplicate()
+        Dim c = New ManualClock()
+        Dim f2 = c.AsyncWait(1.Seconds)
+        Dim f1 = c.AsyncWait(1.Seconds)
+        c.Advance(500.Milliseconds)
+        Assert.IsTrue(f1.State = FutureState.Unknown)
+        Assert.IsTrue(f2.State = FutureState.Unknown)
+        c.Advance(1.Seconds)
+        Assert.IsTrue(f1.State = FutureState.Succeeded)
+        Assert.IsTrue(f2.State = FutureState.Succeeded)
+    End Sub
+    <TestMethod()>
     Public Sub ManualAsyncWaitTest_Instant()
         Dim c = New ManualClock()
         Dim f = c.AsyncWait(-1.Seconds)

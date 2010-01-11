@@ -1,5 +1,6 @@
 ﻿Imports Strilbrary.Threading
 Imports Strilbrary.Values
+Imports Strilbrary.Collections
 
 Namespace Time
     ''' <summary>
@@ -9,7 +10,7 @@ Namespace Time
         Implements IClock
 
         Private _time As New TimeSpan(ticks:=0)
-        Private ReadOnly _asyncWaits As New SortedDictionary(Of TimeSpan, FutureAction)()
+        Private ReadOnly _asyncWaits As New PriorityQueue(Of Tuple(Of TimeSpan, FutureAction))(Function(x, y) -x.item1.compareto(y.item1))
         Private ReadOnly lock As New Object()
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
@@ -29,10 +30,10 @@ Namespace Time
             Contract.Ensures(Me.Time = Contract.OldValue(Me.Time) + dt)
             SyncLock lock
                 _time += dt
-                While _asyncWaits.Count > 0 AndAlso _asyncWaits.First.Key <= Time
-                    Contract.Assume(_asyncWaits.First.Value IsNot Nothing)
-                    _asyncWaits.First.Value.SetSucceeded()
-                    _asyncWaits.Remove(_asyncWaits.First.Key)
+                While _asyncWaits.Count > 0 AndAlso _asyncWaits.Peek.Item1 <= Time
+                    Dim futureAction = _asyncWaits.Dequeue.Item2
+                    Contract.Assume(futureAction IsNot Nothing)
+                    futureAction.SetSucceeded()
                 End While
             End SyncLock
         End Sub
@@ -54,7 +55,7 @@ Namespace Time
                 result.SetSucceeded()
             Else
                 SyncLock lock
-                    _asyncWaits.Add(Time + dt, result)
+                    _asyncWaits.Enqueue(New Tuple(Of TimeSpan, FutureAction)(Time + dt, result))
                 End SyncLock
             End If
             Return result
