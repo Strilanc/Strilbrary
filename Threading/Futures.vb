@@ -71,7 +71,7 @@ Namespace Threading
             Contract.Invariant(lockIsSet IsNot Nothing)
         End Sub
 
-        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")>
+        <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")>
         Protected Overrides Sub Finalize()
             Select Case Me.State
                 Case FutureState.Failed
@@ -105,7 +105,7 @@ Namespace Threading
         End Property
 
         '''<summary>Stops the future from complaining about unhandled exceptions.</summary>
-        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")>
+        <CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")>
         Public Sub SetHandled() Implements IFuture.SetHandled
             GC.SuppressFinalize(Me)
         End Sub
@@ -143,7 +143,7 @@ Namespace Threading
         ''' Causes the future to fail if running the given action throws an exception.
         ''' Throws an InvalidOperationException if the action fails and the future was already ready.
         ''' </summary>
-        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
+        <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
         Public Sub DependentCall(ByVal action As Action)
             Contract.Requires(action IsNot Nothing)
             Try

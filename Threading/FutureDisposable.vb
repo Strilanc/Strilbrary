@@ -6,7 +6,7 @@
         ReadOnly Property FutureDisposed As IFuture
 
         <ContractClassFor(GetType(IFutureDisposable))>
-        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
+        <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
         Class ContractClass
             Implements IFutureDisposable
             Public ReadOnly Property FutureDisposed As IFuture Implements IFutureDisposable.FutureDisposed
@@ -15,8 +15,8 @@
                     Throw New NotSupportedException
                 End Get
             End Property
-            <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
-            <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")>
+            <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
+            <CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")>
             Public Sub Dispose() Implements IDisposable.Dispose
             End Sub
         End Class

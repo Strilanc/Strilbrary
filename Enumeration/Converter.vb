@@ -199,7 +199,6 @@ Namespace Enumeration
             End Get
         End Property
 
-        <CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")>
         Public Overrides Sub Write(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer)
             If closed Then Throw New InvalidOperationException("Closed streams are not writable.")
             Dim index = 0

@@ -16,7 +16,6 @@ Namespace Enumeration
             Contract.Invariant(sequenceQueue IsNot Nothing)
         End Sub
 
-        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")>
         Public Sub New(ByVal consumer As Action(Of IEnumerator(Of T)),
                        Optional ByVal disposer As action = Nothing)
             'Contract.Assume(consumer IsNot Nothing)

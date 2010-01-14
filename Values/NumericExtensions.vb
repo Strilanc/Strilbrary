@@ -141,8 +141,8 @@ Namespace Values
             Dim bytes = data.Take(2).ToArray
             Contract.Assume(bytes.Length = 2)
             Select Case byteOrder
-                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then data = data.Reverse.ToArray
-                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then data = data.Reverse.ToArray
+                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then bytes = bytes.Reverse.ToArray
+                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then bytes = bytes.Reverse.ToArray
                 Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
             End Select
             Return BitConverter.ToUInt16(bytes, 0)
@@ -155,8 +155,8 @@ Namespace Values
             Dim bytes = data.Take(4).ToArray
             Contract.Assume(bytes.Length = 4)
             Select Case byteOrder
-                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then data = data.Reverse.ToArray
-                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then data = data.Reverse.ToArray
+                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then bytes = bytes.Reverse.ToArray
+                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then bytes = bytes.Reverse.ToArray
                 Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
             End Select
             Return BitConverter.ToUInt32(bytes, 0)
@@ -169,8 +169,8 @@ Namespace Values
             Dim bytes = data.Take(8).ToArray
             Contract.Assume(bytes.Length = 8)
             Select Case byteOrder
-                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then data = data.Reverse.ToArray
-                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then data = data.Reverse.ToArray
+                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then bytes = bytes.Reverse.ToArray
+                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then bytes = bytes.Reverse.ToArray
                 Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
             End Select
             Return BitConverter.ToUInt64(bytes, 0)

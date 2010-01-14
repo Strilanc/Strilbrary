@@ -81,7 +81,6 @@ Namespace Streams
 
         '''<summary>Writes all remaining data in a stream to the file system.</summary>
         <Extension()>
-        <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")>
         Public Sub WriteToFileSystem(ByVal stream As IO.Stream,
                                      ByVal fileName As String,
                                      Optional ByVal fileMode As IO.FileMode = IO.FileMode.CreateNew)
