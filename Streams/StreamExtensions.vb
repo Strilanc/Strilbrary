@@ -9,11 +9,10 @@ Namespace Streams
         ''' Differs from Read in that it definitely won't partially fill the range if the stream has not ended.
         ''' </remarks>
         <Extension()>
-        <ContractVerification(False)>
         Public Function ReadUntilDone(ByVal stream As IO.Stream,
                                       ByVal buffer As Byte(),
                                       ByVal offset As Integer,
-                                      ByVal length As Integer) As Integer 'verification disabled due to incorrect BCL stream contracts
+                                      ByVal length As Integer) As Integer
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanRead)
             Contract.Requires(buffer IsNot Nothing)
@@ -54,8 +53,7 @@ Namespace Streams
 
         '''<summary>Reads all remaining data from the stream into a byte array.</summary>
         <Extension()>
-        <ContractVerification(False)>
-        Public Function ReadRemaining(ByVal stream As IO.Stream) As Byte() 'verification disabled due to incorrect BCL stream contracts
+        Public Function ReadRemaining(ByVal stream As IO.Stream) As Byte()
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanRead)
             Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
@@ -73,9 +71,8 @@ Namespace Streams
 
         '''<summary>Writes the full contents of a buffer to the stream.</summary>
         <Extension()>
-        <ContractVerification(False)>
         Public Sub Write(ByVal stream As IO.Stream,
-                         ByVal buffer As Byte()) 'verification disabled due to incorrect BCL stream contracts
+                         ByVal buffer As Byte())
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanWrite)
             Contract.Requires(buffer IsNot Nothing)

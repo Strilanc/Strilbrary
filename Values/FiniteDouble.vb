@@ -5,7 +5,7 @@
     <DebuggerDisplay("{ToString}")>
     <ContractVerification(False)>
     Public Structure FiniteDouble
-        'Contract verification is off because of constant 'possible precision loss' warnings in 1.2.21022.2
+        'Contract verification is off because of constant 'possible precision loss' warnings
         Implements IComparable(Of FiniteDouble)
         Implements IEquatable(Of FiniteDouble)
 

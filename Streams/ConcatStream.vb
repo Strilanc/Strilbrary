@@ -5,7 +5,7 @@ Namespace Streams
         Private ReadOnly streams As IEnumerator(Of IO.Stream)
         Private emptied As Boolean
 
-        <ContractInvariantMethod()> Protected Overrides Sub ObjectInvariant()
+        <ContractInvariantMethod()> Private Shadows Sub ObjectInvariant()
             Contract.Invariant(streams IsNot Nothing)
         End Sub
 

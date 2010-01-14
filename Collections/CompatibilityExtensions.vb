@@ -3,14 +3,17 @@ Imports Strilbrary.Values
 
 Namespace Collections
     Public Module CompatibilityExtensions
+        'verification disabled due to stupid verifier (1.2.30113.1)
         <Extension()> <Pure()>
         <ContractVerification(False)>
-        Public Function AsList(Of T)(ByVal this As IReadableList(Of T)) As IList(Of T) 'verification disabled due to stupid verifier
+        Public Function AsList(Of T)(ByVal this As IReadableList(Of T)) As IList(Of T)
             Contract.Requires(this IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IList(Of T))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IList(Of T))().Count = this.Count)
             Contract.Ensures(Contract.Result(Of IList(Of T))().IsReadOnly)
-            Return New ReadableListToListBridge(Of T)(this)
+            Dim list = New ReadableListToListBridge(Of T)(this)
+            'Contract.Assume(list.IsReadOnly) '[would fix the unproven postcondition, but causes a can-be-proven-warning!]
+            Return list
         End Function
         <Extension()> <Pure()>
         Public Function AsReadableList(Of T)(ByVal this As IList(Of T)) As IReadableList(Of T)
@@ -24,7 +27,7 @@ Namespace Collections
         Private Class ReadableListToListBridge(Of T)
             Implements IList(Of T)
 
-            Private _subList As IReadableList(Of T)
+            Private ReadOnly _subList As IReadableList(Of T)
 
             <ContractInvariantMethod()> Private Sub ObjectInvariant()
                 Contract.Invariant(_subList IsNot Nothing)
@@ -36,8 +39,9 @@ Namespace Collections
                 Me._subList = subList
             End Sub
 
+            'verification disabled due to stupid verifier (1.2.30113.1)
             <ContractVerification(False)>
-            Public Sub CopyTo(ByVal array() As T, ByVal arrayIndex As Integer) Implements ICollection(Of T).CopyTo 'verification disabled due to stupid verifier
+            Public Sub CopyTo(ByVal array() As T, ByVal arrayIndex As Integer) Implements ICollection(Of T).CopyTo
                 For i = 0 To _subList.Count - 1
                     array(i + arrayIndex) = _subList(i)
                 Next i
@@ -49,8 +53,9 @@ Namespace Collections
                 End Get
             End Property
 
+            'verification disabled due to stupid verifier (1.2.30113.1)
             <ContractVerification(False)>
-            Public Function Contains(ByVal item As T) As Boolean Implements ICollection(Of T).Contains 'verification disabled due to stupid verifier
+            Public Function Contains(ByVal item As T) As Boolean Implements ICollection(Of T).Contains
                 Return _subList.Contains(item)
             End Function
             Public ReadOnly Property Count As Integer Implements System.Collections.Generic.ICollection(Of T).Count
@@ -65,11 +70,13 @@ Namespace Collections
             Public Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
                 Return _subList.GetEnumerator()
             End Function
+            'verification disabled due to stupid verifier (1.2.30113.1)
             <ContractVerification(False)>
-            Public Function IndexOf(ByVal item As T) As Integer Implements IList(Of T).IndexOf 'verification disabled due to stupid verifier
+            Public Function IndexOf(ByVal item As T) As Integer Implements IList(Of T).IndexOf
                 Return _subList.IndexOf(item)
             End Function
-            Default Public Property Item(ByVal index As Integer) As T Implements IList(Of T).Item 'verification disabled due to stupid verifier
+            Default Public Property Item(ByVal index As Integer) As T Implements IList(Of T).Item
+                'verification disabled due to stupid verifier (1.2.30113.1)
                 <ContractVerification(False)>
                 Get
                     Return _subList.Item(index)
@@ -102,7 +109,7 @@ Namespace Collections
         Private Class ListToReadableListBridge(Of T)
             Implements IReadableList(Of T)
 
-            Private _subList As IList(Of T)
+            Private ReadOnly _subList As IList(Of T)
 
             <ContractInvariantMethod()> Private Sub ObjectInvariant()
                 Contract.Invariant(_subList IsNot Nothing)
@@ -114,8 +121,9 @@ Namespace Collections
                 Me._subList = subList
             End Sub
 
+            'verification disabled due to stupid verifier (1.2.30113.1)
             <ContractVerification(False)>
-            Public Function Contains(ByVal item As T) As Boolean Implements IReadableCollection(Of T).Contains 'verification disabled due to stupid verifier
+            Public Function Contains(ByVal item As T) As Boolean Implements IReadableCollection(Of T).Contains
                 Return _subList.Contains(item)
             End Function
             Public ReadOnly Property Count As Integer Implements IReadableCollection(Of T).Count
@@ -124,11 +132,13 @@ Namespace Collections
                     Return _subList.Count
                 End Get
             End Property
+            'verification disabled due to stupid verifier (1.2.30113.1)
             <ContractVerification(False)>
-            Public Function IndexOf(ByVal item As T) As Integer Implements IReadableList(Of T).IndexOf 'verification disabled due to stupid verifier
+            Public Function IndexOf(ByVal item As T) As Integer Implements IReadableList(Of T).IndexOf
                 Return _subList.IndexOf(item)
             End Function
-            Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item 'verification disabled due to stupid verifier
+            Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
+                'verification disabled due to stupid verifier (1.2.30113.1)
                 <ContractVerification(False)>
                 Get
                     Return _subList.Item(index)

@@ -41,8 +41,9 @@ Namespace Collections
         End Sub
 
         Default Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
+            'verification disabled due to stupid verifier (1.2.30113.1)
             <ContractVerification(False)>
-            Get 'verification disabled due to stupid verifier
+            Get
                 Return _items(_offset + index)
             End Get
         End Property

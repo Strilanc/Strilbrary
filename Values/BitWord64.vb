@@ -1,7 +1,6 @@
 ﻿Namespace Values
     '''<summary>Stores up to 64 bits.</summary>
     <DebuggerDisplay("{ToString}")>
-    <ContractVerification(False)>
     Public Structure BitWord64 'verification off because of silly warnings in 1.2.21023.14
         Implements IEquatable(Of BitWord64)
 
@@ -15,6 +14,8 @@
             Contract.Invariant(_bitCount = MaxSize OrElse _bits >> _bitCount = 0)
         End Sub
 
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Sub New(ByVal bits As UInt64, ByVal bitCount As Integer)
             Contract.Requires(bitCount >= 0)
             Contract.Requires(bitCount <= MaxSize)
@@ -26,6 +27,8 @@
         End Sub
 
         Public ReadOnly Property Bits As UInt64
+            'verification disabled due to stupid verifier (1.2.30113.1)
+            <ContractVerification(False)>
             Get
                 Contract.Ensures(BitCount = MaxSize OrElse Contract.Result(Of UInt64)() >> BitCount = 0)
                 Contract.Ensures(Contract.Result(Of UInt64)() = _bits)
@@ -42,6 +45,8 @@
         End Property
 
         Public ReadOnly Property LowPart(ByVal splitIndex As Integer) As BitWord64
+            'verification disabled due to stupid verifier (1.2.30113.1)
+            <ContractVerification(False)>
             Get
                 Contract.Requires(splitIndex >= 0)
                 Contract.Requires(splitIndex <= MaxSize)
@@ -52,6 +57,8 @@
             End Get
         End Property
         Public ReadOnly Property HighPart(ByVal splitIndex As Integer) As BitWord64
+            'verification disabled due to stupid verifier (1.2.30113.1)
+            <ContractVerification(False)>
             Get
                 Contract.Requires(splitIndex >= 0)
                 Contract.Requires(splitIndex <= MaxSize)
@@ -62,6 +69,8 @@
             End Get
         End Property
 
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Shared Operator +(ByVal word1 As BitWord64, ByVal word2 As BitWord64) As BitWord64
             Contract.Requires(word1.BitCount + word2.BitCount <= MaxSize)
             Contract.Ensures(Contract.Result(Of BitWord64)().BitCount = word1.BitCount + word2.BitCount)

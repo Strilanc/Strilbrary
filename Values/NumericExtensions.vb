@@ -54,7 +54,6 @@ Namespace Values
             Dim result = value Mod divisor
             If result <= 0 Then result += divisor
             Contract.Assume(result > 0)
-            Contract.Assume(result <= divisor)
             Contract.Assume((value - result) Mod divisor = 0)
             Return result
         End Function
@@ -96,10 +95,12 @@ Namespace Values
 
             Dim result = BitConverter.GetBytes(value)
             Select Case byteOrder
-                Case byteOrder.BigEndian : Return result.Reverse.ToArray
-                Case byteOrder.LittleEndian : Return result
+                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then result = result.Reverse.ToArray
+                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then result = result.Reverse.ToArray
                 Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
             End Select
+            Contract.Assume(result.Length = 2)
+            Return result
         End Function
         <Extension()> <Pure()>
         Public Function Bytes(ByVal value As UInt32,
@@ -109,10 +110,12 @@ Namespace Values
 
             Dim result = BitConverter.GetBytes(value)
             Select Case byteOrder
-                Case byteOrder.BigEndian : Return result.Reverse.ToArray
-                Case byteOrder.LittleEndian : Return result
+                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then result = result.Reverse.ToArray
+                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then result = result.Reverse.ToArray
                 Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
             End Select
+            Contract.Assume(result.Length = 4)
+            Return result
         End Function
         <Extension()> <Pure()>
         Public Function Bytes(ByVal value As UInt64,
@@ -122,10 +125,12 @@ Namespace Values
 
             Dim result = BitConverter.GetBytes(value)
             Select Case byteOrder
-                Case byteOrder.BigEndian : Return result.Reverse.ToArray
-                Case byteOrder.LittleEndian : Return result
+                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then result = result.Reverse.ToArray
+                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then result = result.Reverse.ToArray
                 Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
             End Select
+            Contract.Assume(result.Length = 8)
+            Return result
         End Function
 
         <Extension()> <Pure()>
@@ -133,34 +138,42 @@ Namespace Values
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
             Contract.Requires(data IsNot Nothing)
             If data.CountIsGreaterThan(2) Then Throw New ArgumentOutOfRangeException("data", "Data has too many bytes.")
-            Return CUShort(data.ToUInt64(byteOrder))
+            Dim bytes = data.Take(2).ToArray
+            Contract.Assume(bytes.Length = 2)
+            Select Case byteOrder
+                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then data = data.Reverse.ToArray
+                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then data = data.Reverse.ToArray
+                Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
+            End Select
+            Return BitConverter.ToUInt16(bytes, 0)
         End Function
         <Extension()> <Pure()>
         Public Function ToUInt32(ByVal data As IEnumerable(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt32
             Contract.Requires(data IsNot Nothing)
             If data.CountIsGreaterThan(4) Then Throw New ArgumentOutOfRangeException("data", "Data has too many bytes.")
-            Return CUInt(data.ToUInt64(byteOrder))
+            Dim bytes = data.Take(4).ToArray
+            Contract.Assume(bytes.Length = 4)
+            Select Case byteOrder
+                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then data = data.Reverse.ToArray
+                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then data = data.Reverse.ToArray
+                Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
+            End Select
+            Return BitConverter.ToUInt32(bytes, 0)
         End Function
         <Extension()> <Pure()>
         Public Function ToUInt64(ByVal data As IEnumerable(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt64
             Contract.Requires(data IsNot Nothing)
             If data.CountIsGreaterThan(8) Then Throw New ArgumentOutOfRangeException("data", "Data has too many bytes.")
-            Dim val As ULong
+            Dim bytes = data.Take(8).ToArray
+            Contract.Assume(bytes.Length = 8)
             Select Case byteOrder
-                Case byteOrder.LittleEndian
-                    data = data.Reverse
-                Case byteOrder.BigEndian
-                    'no change required
-                Case Else
-                    Throw byteOrder.MakeArgumentValueException("byteOrder")
+                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then data = data.Reverse.ToArray
+                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then data = data.Reverse.ToArray
+                Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
             End Select
-            For Each b In data
-                val <<= 8
-                val = val Or b
-            Next b
-            Return val
+            Return BitConverter.ToUInt64(bytes, 0)
         End Function
 #End Region
 

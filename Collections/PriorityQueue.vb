@@ -34,11 +34,9 @@ Namespace Collections
             _items.Add(item)
             While curIndex > 0
                 Dim parentIndex = (curIndex - 1) \ 2
-                Contract.Assume(parentIndex < _items.Count)
                 Dim parentItem = _items(parentIndex)
                 If _comparer(item, parentItem) <= 0 Then Exit While
 
-                Contract.Assume(curIndex < _items.Count)
                 _items(curIndex) = parentItem
                 _items(parentIndex) = item
                 curIndex = parentIndex
@@ -59,6 +57,7 @@ Namespace Collections
             Contract.Requires(Count > 0)
             Contract.Ensures(Contract.Result(Of TValue)() IsNot Nothing)
             Dim result = _items(0)
+            Contract.Assume(result IsNot Nothing)
 
             Dim curIndex = 0
             Do

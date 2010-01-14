@@ -135,6 +135,7 @@ Namespace Threading
             If Not lockIsSet.TryAcquire() Then Throw New UnreachableException()
 
             RaiseEvent Ready()
+            Contract.Assume(Me.State = FutureState.Failed)
             Return True
         End Function
 
@@ -143,7 +144,7 @@ Namespace Threading
         ''' Throws an InvalidOperationException if the action fails and the future was already ready.
         ''' </summary>
         <System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
-        Public Sub DependentCall(ByVal action As action)
+        Public Sub DependentCall(ByVal action As Action)
             Contract.Requires(action IsNot Nothing)
             Try
                 Call action()
@@ -152,7 +153,7 @@ Namespace Threading
             End Try
         End Sub
 
-        Protected Function TrySetSucceededBase(ByVal action As action) As Boolean
+        Protected Function TrySetSucceededBase(ByVal action As Action) As Boolean
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.State = FutureState.Succeeded)
 
@@ -162,6 +163,7 @@ Namespace Threading
 
             Me.SetHandled()
             RaiseEvent Ready()
+            Contract.Assume(Me.State = FutureState.Succeeded)
             Return True
         End Function
     End Class
@@ -175,7 +177,7 @@ Namespace Threading
         ''' Sets the future's state based on the outcome of an action.
         ''' Throws an InvalidOperationException if the future was already ready, but will still evaluate the subroutine.
         ''' </summary>
-        Public Sub SetByCalling(ByVal action As action)
+        Public Sub SetByCalling(ByVal action As Action)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Me.State <> FutureState.Unknown)
             MyBase.DependentCall(Sub()

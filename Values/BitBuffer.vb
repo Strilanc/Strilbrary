@@ -1,8 +1,7 @@
 Namespace Values
     '''<summary>Stores bits and provides methods to add and remove the bits of common numeric types.</summary>
     <DebuggerDisplay("{ToString}")>
-    <ContractVerification(False)>
-    Public NotInheritable Class BitBuffer 'verification off because of silly warnings in 1.2.21023.14
+    Public NotInheritable Class BitBuffer
         Private _words As New LinkedList(Of BitWord64)()
         Private _bitCount As Integer
 
@@ -32,6 +31,8 @@ Namespace Values
             _words.AddLast(tail)
             _bitCount += word.BitCount
         End Sub
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Sub Stack(ByVal word As BitWord64)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + word.BitCount)
             Contract.Ensures(Me.Peek(word.BitCount) = word)
@@ -53,13 +54,15 @@ Namespace Values
 
             Dim remainingBits = skippedBitCount
             While remainingBits > 0
-                If _words.First.Value.BitCount > remainingBits Then
-                    Dim remainder = _words.First.Value.HighPart(splitIndex:=remainingBits)
+                Dim n = _words.First
+                Contract.Assume(n IsNot Nothing)
+                If n.Value.BitCount > remainingBits Then
+                    Dim remainder = n.Value.HighPart(splitIndex:=remainingBits)
                     remainingBits = 0
                     _words.RemoveFirst()
                     _words.AddFirst(remainder)
                 Else
-                    remainingBits -= _words.First.Value.BitCount
+                    remainingBits -= n.Value.BitCount
                     _words.RemoveFirst()
                 End If
             End While
@@ -78,6 +81,8 @@ Namespace Values
             Skip(resultBitCount)
             Return result
         End Function
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         <Pure()>
         Public Function Peek(ByVal resultBitCount As Integer) As BitWord64
             Contract.Requires(resultBitCount >= 0)
@@ -88,10 +93,11 @@ Namespace Values
             Dim n = _words.First
             Dim result = New BitWord64(0, 0)
             While result.BitCount < resultBitCount
+                Contract.Assume(n IsNot Nothing)
                 If result.BitCount + n.Value.BitCount > resultBitCount Then
                     result += n.Value.LowPart(splitIndex:=resultBitCount - result.BitCount)
                 Else
-                    result += _words.First.Value
+                    result += n.Value
                 End If
                 n = n.Next
                 Contract.Assert(result.BitCount <= resultBitCount)
@@ -107,49 +113,59 @@ Namespace Values
 #End Region
 
 #Region "Derived Operations"
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Sub StackBit(ByVal value As Boolean)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 1)
-            Contract.Assume(If(value, 1UL, 0UL) >> 1 = 0)
             Stack(New BitWord64(If(value, 1UL, 0UL), 1))
         End Sub
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Sub StackByte(ByVal value As Byte)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 8)
-            Contract.Assume(CULng(value) >> 8 = 0)
             Stack(New BitWord64(value, 8))
         End Sub
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Sub StackUInt16(ByVal value As UShort)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 16)
-            Contract.Assume(CULng(value) >> 16 = 0)
             Stack(New BitWord64(value, 16))
         End Sub
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Sub StackUInt32(ByVal value As UInteger)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 32)
-            Contract.Assume(CULng(value) >> 32 = 0)
             Stack(New BitWord64(value, 32))
         End Sub
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Sub StackUInt64(ByVal value As UInt64)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 64)
             Stack(New BitWord64(value, 64))
         End Sub
 
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Sub QueueBit(ByVal value As Boolean)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 1)
-            Contract.Assume(If(value, 1UL, 0UL) >> 1 = 0)
             Queue(New BitWord64(If(value, 1UL, 0UL), 1))
         End Sub
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Sub QueueByte(ByVal value As Byte)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 8)
-            Contract.Assume(CULng(value) >> 8 = 0)
             Queue(New BitWord64(value, 8))
         End Sub
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Sub QueueUInt16(ByVal value As UInt16)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 16)
-            Contract.Assume(CULng(value) >> 16 = 0)
             Queue(New BitWord64(value, 16))
         End Sub
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Sub QueueUInt32(ByVal value As UInt32)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 32)
-            Contract.Assume(CULng(value) >> 32 = 0)
             Queue(New BitWord64(value, 32))
         End Sub
         Public Sub QueueUInt64(ByVal value As UInt64)
@@ -157,30 +173,40 @@ Namespace Values
             Queue(New BitWord64(value, 64))
         End Sub
 
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Function TakeBit() As Boolean
             Contract.Requires(Me.BitCount >= 1)
             Contract.Ensures(Contract.Result(Of Boolean)() = Contract.OldValue(Me.PeekBit))
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 1)
             Return Take(1).Bits <> 0
         End Function
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Function TakeByte() As Byte
             Contract.Requires(Me.BitCount >= 8)
             Contract.Ensures(Contract.Result(Of Byte)() = Contract.OldValue(Me.PeekByte))
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 8)
             Return CByte(Take(8).Bits)
         End Function
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Function TakeUInt16() As UInt16
             Contract.Requires(Me.BitCount >= 16)
             Contract.Ensures(Contract.Result(Of UInt16)() = Contract.OldValue(Me.PeekUInt16))
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 16)
             Return CUShort(Take(16).Bits)
         End Function
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Function TakeUInt32() As UInt32
             Contract.Requires(Me.BitCount >= 32)
             Contract.Ensures(Contract.Result(Of UInt32)() = Contract.OldValue(Me.PeekUInt32))
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 32)
             Return CUInt(Take(32).Bits)
         End Function
+        'verification disabled due to stupid verifier (1.2.30113.1)
+        <ContractVerification(False)>
         Public Function TakeUInt64() As UInt64
             Contract.Requires(Me.BitCount >= 64)
             Contract.Ensures(Contract.Result(Of UInt64)() = Contract.OldValue(Me.PeekUInt64))

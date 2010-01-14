@@ -55,10 +55,8 @@ Namespace Values
 
 #Region "String <-> Number"
         <Extension()> <Pure()>
-        <ContractVerification(False)>
         Public Function ToAscBytes(ByVal data As String,
                                    Optional ByVal nullTerminate As Boolean = False) As Byte()
-            'verification off because code contracts 1.2.21023.14 fails to prove postconditons, and adding assumption causes JIT to fail at run-time
             Contract.Requires(data IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Byte())().Length = data.Length + If(nullTerminate, 1, 0))
@@ -69,17 +67,18 @@ Namespace Values
             Return result
         End Function
         <Extension()> <Pure()>
-        <ContractVerification(False)>
         Public Function ParseChrString(ByVal data As IEnumerable(Of Byte),
                                        ByVal nullTerminated As Boolean) As String
-            'verification off because code contracts 1.2.21023.14 utterly fails to prove postconditons, even if they are added as assumptions
             Contract.Requires(data IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)().Length <= data.Count)
             Contract.Ensures(nullTerminated OrElse Contract.Result(Of String)().Length = data.Count)
 
-            If nullTerminated Then data = data.TakeWhile(Function(b) b <> 0)
-            Return (From b In data Select Chr(b)).ToArray
+            Dim textData = If(nullTerminated, data.TakeWhile(Function(b) b <> 0), data)
+            Dim result = (From b In textData Select Chr(b)).ToArray
+            Contract.Assume(result.Length <= data.Count)
+            Contract.Assume(nullTerminated OrElse result.Length = data.Count)
+            Return result
         End Function
 
         <Extension()> <Pure()>
