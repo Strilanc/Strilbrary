@@ -21,9 +21,10 @@ Namespace Streams
 
         Public Overrides Function Read(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer) As Integer
             Dim totalRead = 0
-            While totalRead < count And Not emptied
+            While totalRead < count AndAlso Not emptied
                 Contract.Assume(streams.Current IsNot Nothing)
                 Dim numRead = streams.Current().Read(buffer, offset + totalRead, count - totalRead)
+                Contract.Assume(totalRead + numRead <= count)
                 totalRead += numRead
                 If numRead = 0 Then
                     streams.Current.Close()

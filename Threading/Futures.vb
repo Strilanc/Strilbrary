@@ -77,7 +77,7 @@ Namespace Threading
                 Case FutureState.Failed
                     Call Me.Exception.RaiseAsUnexpected("Future exception ignored.")
                 Case FutureState.Unknown
-                    Call New InvalidStateException("Dangling Future.").RaiseAsUnexpected("Dangling Future.")
+                    Call New InvalidStateException("Dangling Future: {0}".Frmt(Me)).RaiseAsUnexpected("Dangling Future.")
             End Select
             MyBase.Finalize()
         End Sub
@@ -210,9 +210,9 @@ Namespace Threading
 
         Public Overrides Function ToString() As String
             Select Case State
-                Case FutureState.Unknown : Return "Not Ready"
-                Case FutureState.Succeeded : Return "Succeeded"
-                Case FutureState.Failed : Return "Failed: {0}".Frmt(Exception.Message)
+                Case FutureState.Unknown : Return "Future Not Ready"
+                Case FutureState.Succeeded : Return "Future Succeeded"
+                Case FutureState.Failed : Return "Future Failed: {0}: {1}".Frmt(Exception.GetType(), Exception.Message)
                 Case Else : Throw State.MakeImpossibleValueException()
             End Select
         End Function
@@ -269,9 +269,9 @@ Namespace Threading
 
         Public Overrides Function ToString() As String
             Select Case State
-                Case FutureState.Unknown : Return "Not Ready"
-                Case FutureState.Succeeded : Return "Succeeded: {0}".Frmt(Value)
-                Case FutureState.Failed : Return "Failed: {0}".Frmt(Exception.Message)
+                Case FutureState.Unknown : Return "Future {0} Not Ready".Frmt(GetType(TValue))
+                Case FutureState.Succeeded : Return "Future {0} Succeeded: {1}".Frmt(GetType(TValue), Value)
+                Case FutureState.Failed : Return "Future {0} Failed: {1}: {2}".Frmt(GetType(TValue), Exception.GetType(), Exception.Message)
                 Case Else : Throw State.MakeImpossibleValueException()
             End Select
         End Function

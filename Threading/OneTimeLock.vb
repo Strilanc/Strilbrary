@@ -17,16 +17,13 @@ Namespace Threading
         Public Function TryAcquire() As Boolean
             Contract.Ensures(Me.State = OnetimeLockState.Acquired)
             Dim result = Interlocked.Exchange(_acquired, 1) = 0
-            Contract.Assume(_acquired = 1)
+            Contract.Assume(State = OnetimeLockState.Acquired)
             Return result
         End Function
 
         '''<summary>Determines if the lock has been acquired.</summary>
         Public ReadOnly Property State As OnetimeLockState
             Get
-                Contract.Ensures(Contract.Result(Of OnetimeLockState)() = If(_acquired <> 0,
-                                                                             OnetimeLockState.Acquired,
-                                                                             OnetimeLockState.Unknown))
                 Return If(_acquired <> 0,
                           OnetimeLockState.Acquired,
                           OnetimeLockState.Unknown)
