@@ -97,19 +97,31 @@ Public Class ValueExtensionTest
 
     <TestMethod()>
     Public Sub ToUInt16Test()
+        Assert.IsTrue(New Byte() {}.ToUInt16(ByteOrder.LittleEndian) = 0)
+        Assert.IsTrue(New Byte() {1}.ToUInt16(ByteOrder.LittleEndian) = 1)
         Assert.IsTrue(New Byte() {1, 2}.ToUInt16(ByteOrder.LittleEndian) = &H201US)
+        Assert.IsTrue(New Byte() {}.ToUInt16(ByteOrder.BigEndian) = 0)
+        Assert.IsTrue(New Byte() {1}.ToUInt16(ByteOrder.BigEndian) = 1)
         Assert.IsTrue(New Byte() {1, 2}.ToUInt16(ByteOrder.BigEndian) = &H102US)
         Assert.IsTrue(New Byte() {3, 4}.ToUInt16(ByteOrder.BigEndian) = &H304US)
     End Sub
     <TestMethod()>
     Public Sub ToUInt32Test()
+        Assert.IsTrue(New Byte() {}.ToUInt32(ByteOrder.LittleEndian) = 0)
+        Assert.IsTrue(New Byte() {1}.ToUInt32(ByteOrder.LittleEndian) = 1)
         Assert.IsTrue(New Byte() {1, 2, 3, 4}.ToUInt32(ByteOrder.LittleEndian) = &H4030201UI)
+        Assert.IsTrue(New Byte() {}.ToUInt32(ByteOrder.BigEndian) = 0)
+        Assert.IsTrue(New Byte() {1}.ToUInt32(ByteOrder.BigEndian) = 1)
         Assert.IsTrue(New Byte() {1, 2, 3, 4}.ToUInt32(ByteOrder.BigEndian) = &H1020304UI)
         Assert.IsTrue(New Byte() {5, 6, 7, 8}.ToUInt32(ByteOrder.BigEndian) = &H5060708UI)
     End Sub
     <TestMethod()>
     Public Sub ToUInt64Test()
+        Assert.IsTrue(New Byte() {}.ToUInt64(ByteOrder.LittleEndian) = 0)
+        Assert.IsTrue(New Byte() {1}.ToUInt64(ByteOrder.LittleEndian) = 1)
         Assert.IsTrue(New Byte() {1, 2, 3, 4, 5, 6, 7, 8}.ToUInt64(ByteOrder.LittleEndian) = &H807060504030201UL)
+        Assert.IsTrue(New Byte() {}.ToUInt64(ByteOrder.BigEndian) = 0)
+        Assert.IsTrue(New Byte() {1}.ToUInt64(ByteOrder.BigEndian) = 1)
         Assert.IsTrue(New Byte() {1, 2, 3, 4, 5, 6, 7, 8}.ToUInt64(ByteOrder.BigEndian) = &H102030405060708UL)
         Assert.IsTrue(New Byte() {9, 10, 11, 12, 13, 14, 15, 16}.ToUInt64(ByteOrder.BigEndian) = &H90A0B0C0D0E0F10UL)
     End Sub
