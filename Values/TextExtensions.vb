@@ -157,7 +157,9 @@ Namespace Values
 
             Dim val = 0UL
             For Each c In chars
-                If Not HexDictionary.ContainsKey(c) Then Throw New ArgumentException("Invalid character.", "chars")
+                If Not HexDictionary.ContainsKey(c) Then
+                    Throw New ArgumentException("Invalid hex character: {0}.".frmt(c), "chars")
+                End If
                 val <<= 4
                 val += HexDictionary(c)
             Next c

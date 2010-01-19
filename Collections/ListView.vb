@@ -7,7 +7,6 @@ Namespace Collections
     ''' </summary>
     <DebuggerDisplay("{ToString}")>
     Public NotInheritable Class ListView(Of T)
-        Implements IEnumerable(Of T)
         Implements IReadableList(Of T)
 
         Private ReadOnly _items As IReadableList(Of T)
