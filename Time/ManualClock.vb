@@ -23,7 +23,7 @@ Namespace Time
             Contract.Assume(_time.Ticks = 0)
         End Sub
 
-        'verification disabled due to stupid verifier (1.2.30113.1)
+        'verification disabled due to stupid verifier (1.2.30118.5)
         <ContractVerification(False)>
         Public Sub Advance(ByVal dt As TimeSpan)
             Contract.Requires(dt.Ticks >= 0)
@@ -37,8 +37,8 @@ Namespace Time
                 End While
             End SyncLock
         End Sub
-        'verification disabled due to stupid verifier (1.2.30113.1)
         Public ReadOnly Property Time As TimeSpan
+            'verification disabled due to stupid verifier (1.2.30118.5)
             <ContractVerification(False)>
             Get
                 Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks >= 0)

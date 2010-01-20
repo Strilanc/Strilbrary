@@ -12,7 +12,7 @@
 
         Private ReadOnly _value As String
 
-        'verification disabled due to stupid verifier (1.2.30113.1)
+        'verification disabled due to stupid verifier (1.2.30118.5)
         <ContractVerification(False)>
         Public Sub New(ByVal value As String)
             Contract.Requires(value IsNot Nothing)
@@ -21,7 +21,7 @@
         End Sub
 
         Public ReadOnly Property Value As String
-            'verification disabled due to stupid verifier (1.2.30113.1)
+            'verification disabled due to stupid verifier (1.2.30118.5)
             <ContractVerification(False)>
             Get
                 Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
@@ -88,7 +88,7 @@
             Contract.Ensures(Contract.Result(Of InvariantString)().Value = value)
             Return New InvariantString(value)
         End Operator
-        'verification disabled due to stupid verifier (1.2.30113.1)
+        'verification disabled due to stupid verifier (1.2.30118.5)
         <ContractVerification(False)>
         Public Shared Widening Operator CType(ByVal value As InvariantString) As String
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
@@ -96,21 +96,21 @@
             Return value.Value
         End Operator
 
-        'verification disabled due to stupid verifier (1.2.30113.1)
+        'verification disabled due to stupid verifier (1.2.30118.5)
         <ContractVerification(False)>
         <Pure()>
         Public Function EndsWith(ByVal value As InvariantString) As Boolean
             Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.Length >= value.Length)
             Return Me.Value.EndsWith(value.Value, StringComparison.OrdinalIgnoreCase)
         End Function
-        'verification disabled due to stupid verifier (1.2.30113.1)
+        'verification disabled due to stupid verifier (1.2.30118.5)
         <ContractVerification(False)>
         <Pure()>
         Function StartsWith(ByVal value As InvariantString) As Boolean
             Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.Length >= value.Length)
             Return Me.Value.StartsWith(value.Value, StringComparison.OrdinalIgnoreCase)
         End Function
-        'verification disabled due to stupid verifier (1.2.30113.1)
+        'verification disabled due to stupid verifier (1.2.30118.5)
         <ContractVerification(False)>
         <Pure()>
         Public Function Substring(ByVal startIndex As Integer) As InvariantString
