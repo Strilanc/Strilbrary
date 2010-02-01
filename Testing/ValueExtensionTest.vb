@@ -1,4 +1,5 @@
 ﻿Imports System
+Imports System.Numerics
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports Strilbrary.Values
 Imports Strilbrary.Collections
@@ -22,64 +23,127 @@ Public Class ValueExtensionTest
 
     <TestMethod()>
     Public Sub ProperModTest()
-        Assert.IsTrue(27.ProperMod(27) = 0)
-        Assert.IsTrue(16.ProperMod(15) = 1)
-        Assert.IsTrue(15.ProperMod(16) = 15)
-        Assert.IsTrue(6.ProperMod(7) = 6)
-        Assert.IsTrue(18.ProperMod(9) = 0)
-        Assert.IsTrue((-5).ProperMod(10) = 5)
-        Assert.IsTrue((-5).ProperMod(9) = 4)
-        Assert.IsTrue(23.ProperMod(11) = 1)
-        Assert.IsTrue((-9).ProperMod(10) = 1)
-        Assert.IsTrue((-10).ProperMod(10) = 0)
-        Assert.IsTrue((-11).ProperMod(10) = 9)
-        Assert.IsTrue((9).ProperMod(10) = 9)
-        Assert.IsTrue((10).ProperMod(10) = 0)
-        Assert.IsTrue((11).ProperMod(10) = 1)
+        Dim vals = {{27, 27, 0},
+                    {16, 15, 1},
+                    {15, 16, 15},
+                    {6, 7, 6},
+                    {18, 9, 0},
+                    {-5, 10, 5},
+                    {-5, 9, 4},
+                    {23, 11, 1},
+                    {-9, 10, 1},
+                    {-10, 10, 0},
+                    {-11, 10, 9},
+                    {9, 10, 9},
+                    {10, 10, 0},
+                    {11, 10, 1}}
+
+        For i = 0 To vals.GetLength(0) - 1
+            Dim num = vals(i, 0)
+            Dim div = vals(i, 1)
+            Dim res = vals(i, 2)
+            Assert.IsTrue(CShort(num).ProperMod(CShort(div)) = CShort(res))
+            Assert.IsTrue(CInt(num).ProperMod(CInt(div)) = CInt(res))
+            Assert.IsTrue(CLng(num).ProperMod(CLng(div)) = CLng(res))
+            Assert.IsTrue(New BigInteger(num).ProperMod(New BigInteger(div)) = New BigInteger(res))
+        Next i
     End Sub
     <TestMethod()>
     Public Sub PositiveModTest()
-        Assert.IsTrue(27.PositiveMod(27) = 27)
-        Assert.IsTrue(16.PositiveMod(15) = 1)
-        Assert.IsTrue(15.PositiveMod(16) = 15)
-        Assert.IsTrue(6.PositiveMod(7) = 6)
-        Assert.IsTrue(18.PositiveMod(9) = 9)
-        Assert.IsTrue((-5).PositiveMod(10) = 5)
-        Assert.IsTrue((-5).PositiveMod(9) = 4)
-        Assert.IsTrue(23.PositiveMod(11) = 1)
-        Assert.IsTrue((-9).PositiveMod(10) = 1)
-        Assert.IsTrue((-10).PositiveMod(10) = 10)
-        Assert.IsTrue((-11).PositiveMod(10) = 9)
-        Assert.IsTrue((9).PositiveMod(10) = 9)
-        Assert.IsTrue((10).PositiveMod(10) = 10)
-        Assert.IsTrue((11).PositiveMod(10) = 1)
+        Dim vals = {{27, 27, 27},
+                    {16, 15, 1},
+                    {15, 16, 15},
+                    {6, 7, 6},
+                    {18, 9, 9},
+                    {-5, 10, 5},
+                    {-5, 9, 4},
+                    {23, 11, 1},
+                    {-9, 10, 1},
+                    {-10, 10, 10},
+                    {-11, 10, 9},
+                    {9, 10, 9},
+                    {10, 10, 10},
+                    {11, 10, 1}}
+
+        For i = 0 To vals.GetLength(0) - 1
+            Dim num = vals(i, 0)
+            Dim div = vals(i, 1)
+            Dim res = vals(i, 2)
+            Assert.IsTrue(CShort(num).PositiveMod(CShort(div)) = CShort(res))
+            Assert.IsTrue(CInt(num).PositiveMod(CInt(div)) = CInt(res))
+            Assert.IsTrue(CLng(num).PositiveMod(CLng(div)) = CLng(res))
+            Assert.IsTrue(New BigInteger(num).PositiveMod(New BigInteger(div)) = New BigInteger(res))
+            If num >= 0 AndAlso div >= 0 Then
+                Assert.IsTrue(CUShort(num).PositiveMod(CUShort(div)) = CUShort(res))
+                Assert.IsTrue(CUInt(num).PositiveMod(CUInt(div)) = CUInt(res))
+                Assert.IsTrue(CULng(num).PositiveMod(CULng(div)) = CULng(res))
+            End If
+        Next i
     End Sub
 
     <TestMethod()>
     Public Sub CeilingMultipleTest()
-        Assert.IsTrue(6.CeilingMultiple(7) = 7)
-        Assert.IsTrue(18.CeilingMultiple(9) = 18)
-        Assert.IsTrue((-5).CeilingMultiple(10) = 0)
-        Assert.IsTrue(23.CeilingMultiple(11) = 33)
-        Assert.IsTrue((-9).CeilingMultiple(10) = 0)
-        Assert.IsTrue((-10).CeilingMultiple(10) = -10)
-        Assert.IsTrue((-11).CeilingMultiple(10) = -10)
-        Assert.IsTrue((9).CeilingMultiple(10) = 10)
-        Assert.IsTrue((10).CeilingMultiple(10) = 10)
-        Assert.IsTrue((11).CeilingMultiple(10) = 20)
+        Dim vals = {{27, 27, 27},
+                    {16, 15, 30},
+                    {15, 16, 16},
+                    {6, 7, 7},
+                    {18, 9, 18},
+                    {-5, 10, 0},
+                    {-5, 9, 0},
+                    {23, 11, 33},
+                    {-9, 10, 0},
+                    {-10, 10, -10},
+                    {-11, 10, -10},
+                    {9, 10, 10},
+                    {10, 10, 10},
+                    {11, 10, 20}}
+
+        For i = 0 To vals.GetLength(0) - 1
+            Dim num = vals(i, 0)
+            Dim div = vals(i, 1)
+            Dim res = vals(i, 2)
+            Assert.IsTrue(CShort(num).CeilingMultiple(CShort(div)) = CShort(res))
+            Assert.IsTrue(CInt(num).CeilingMultiple(CInt(div)) = CInt(res))
+            Assert.IsTrue(CLng(num).CeilingMultiple(CLng(div)) = CLng(res))
+            Assert.IsTrue(New BigInteger(num).CeilingMultiple(New BigInteger(div)) = New BigInteger(res))
+            If num >= 0 AndAlso div >= 0 Then
+                Assert.IsTrue(CUShort(num).CeilingMultiple(CUShort(div)) = CUShort(res))
+                Assert.IsTrue(CUInt(num).CeilingMultiple(CUInt(div)) = CUInt(res))
+                Assert.IsTrue(CULng(num).CeilingMultiple(CULng(div)) = CULng(res))
+            End If
+        Next i
     End Sub
     <TestMethod()>
     Public Sub FloorMultipleTest()
-        Assert.IsTrue(6.FloorMultiple(7) = 0)
-        Assert.IsTrue(18.FloorMultiple(9) = 18)
-        Assert.IsTrue((-5).FloorMultiple(10) = -10)
-        Assert.IsTrue(23.FloorMultiple(11) = 22)
-        Assert.IsTrue((-9).FloorMultiple(10) = -10)
-        Assert.IsTrue((-10).FloorMultiple(10) = -10)
-        Assert.IsTrue((-11).FloorMultiple(10) = -20)
-        Assert.IsTrue((9).FloorMultiple(10) = 0)
-        Assert.IsTrue((10).FloorMultiple(10) = 10)
-        Assert.IsTrue((11).FloorMultiple(10) = 10)
+        Dim vals = {{27, 27, 27},
+                    {16, 15, 15},
+                    {15, 16, 0},
+                    {6, 7, 0},
+                    {18, 9, 18},
+                    {-5, 10, -10},
+                    {-5, 9, -9},
+                    {23, 11, 22},
+                    {-9, 10, -10},
+                    {-10, 10, -10},
+                    {-11, 10, -20},
+                    {9, 10, 0},
+                    {10, 10, 10},
+                    {11, 10, 10}}
+
+        For i = 0 To vals.GetLength(0) - 1
+            Dim num = vals(i, 0)
+            Dim div = vals(i, 1)
+            Dim res = vals(i, 2)
+            Assert.IsTrue(CShort(num).FloorMultiple(CShort(div)) = CShort(res))
+            Assert.IsTrue(CInt(num).FloorMultiple(CInt(div)) = CInt(res))
+            Assert.IsTrue(CLng(num).FloorMultiple(CLng(div)) = CLng(res))
+            Assert.IsTrue(New BigInteger(num).FloorMultiple(New BigInteger(div)) = New BigInteger(res))
+            If num >= 0 AndAlso div >= 0 Then
+                Assert.IsTrue(CUShort(num).FloorMultiple(CUShort(div)) = CUShort(res))
+                Assert.IsTrue(CUInt(num).FloorMultiple(CUInt(div)) = CUInt(res))
+                Assert.IsTrue(CULng(num).FloorMultiple(CULng(div)) = CULng(res))
+            End If
+        Next i
     End Sub
 
     <TestMethod()>

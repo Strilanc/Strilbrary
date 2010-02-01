@@ -31,60 +31,306 @@ Namespace Values
             Return reversedValue
         End Function
 
-        '''<summary>Determines the smallest non-negative remainder of the division of the value by the given divisor.</summary>
-        <Extension()> <Pure()>
-        Public Function ProperMod(ByVal value As Integer, ByVal divisor As Integer) As Integer
-            Contract.Requires(divisor > 0)
-            Contract.Ensures(Contract.Result(Of Integer)() >= 0)
-            Contract.Ensures(Contract.Result(Of Integer)() < divisor)
-            Contract.Ensures((value - Contract.Result(Of Integer)()) Mod divisor = 0)
-            Dim result = value Mod divisor
-            If result < 0 Then result += divisor
-            Contract.Assume(result >= 0)
-            Contract.Assume((value - result) Mod divisor = 0)
-            Return result
-        End Function
-        '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
-        <Extension()> <Pure()>
-        Public Function PositiveMod(ByVal value As Integer, ByVal divisor As Integer) As Integer
-            Contract.Requires(divisor > 0)
-            Contract.Ensures(Contract.Result(Of Integer)() > 0)
-            Contract.Ensures(Contract.Result(Of Integer)() <= divisor)
-            Contract.Ensures((value - Contract.Result(Of Integer)()) Mod divisor = 0)
-            Dim result = value Mod divisor
-            If result <= 0 Then result += divisor
-            Contract.Assume(result > 0)
-            Contract.Assume((value - result) Mod divisor = 0)
-            Return result
-        End Function
-
-        '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
-        <Extension()> <Pure()>
-        Public Function CeilingMultiple(ByVal value As Integer, ByVal divisor As Integer) As Integer
-            Contract.Requires(divisor > 0)
-            Contract.Ensures(Contract.Result(Of Integer)() Mod divisor = 0)
-            Contract.Ensures(Contract.Result(Of Integer)() >= value)
-            Contract.Ensures(Contract.Result(Of Integer)() < value + divisor)
-            Dim result = value - (value.PositiveMod(divisor) - divisor)
-            Contract.Assume(result Mod divisor = 0)
-            Return result
-        End Function
-        '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
-        <Extension()> <Pure()>
-        Public Function FloorMultiple(ByVal value As Integer, ByVal divisor As Integer) As Integer
-            Contract.Requires(divisor > 0)
-            Contract.Ensures(Contract.Result(Of Integer)() Mod divisor = 0)
-            Contract.Ensures(Contract.Result(Of Integer)() <= value)
-            Contract.Ensures(Contract.Result(Of Integer)() > value - divisor)
-            Return value - value.ProperMod(divisor)
-        End Function
-
         '''<summary>Determines if a double is not positive infinity, negative infinity, or NaN.</summary>
         <Extension()> <Pure()>
         Public Function IsFinite(ByVal value As Double) As Boolean
             Contract.Ensures(Contract.Result(Of Boolean)() = (Not Double.IsInfinity(value) AndAlso Not Double.IsNaN(value)))
             Return Not Double.IsInfinity(value) AndAlso Not Double.IsNaN(value)
         End Function
+
+#Region "Mod/Multiple"
+        '''<summary>Determines the smallest non-negative remainder of the division of the value by the given divisor.</summary>
+        <Extension()> <Pure()>
+        Public Function ProperMod(ByVal value As BigInteger, ByVal divisor As BigInteger) As BigInteger
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of BigInteger)() >= 0)
+            Contract.Ensures(Contract.Result(Of BigInteger)() < divisor)
+            Contract.Ensures((value - Contract.Result(Of BigInteger)()) Mod divisor = 0)
+            Dim result = value Mod divisor
+            If result < 0 Then result += divisor
+            Contract.Assume(result >= 0)
+            Contract.Assume(result < divisor)
+            Contract.Assume((value - result) Mod divisor = 0)
+            Return result
+        End Function
+        '''<summary>Determines the smallest non-negative remainder of the division of the value by the given divisor.</summary>
+        <Extension()> <Pure()>
+        Public Function ProperMod(ByVal value As Int64, ByVal divisor As Int64) As Int64
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Int64)() >= 0)
+            Contract.Ensures(Contract.Result(Of Int64)() < divisor)
+            Contract.Ensures((value - Contract.Result(Of Int64)()) Mod divisor = 0)
+            Dim result = value Mod divisor
+            If result < 0 Then result += divisor
+            Contract.Assume(result >= 0)
+            Contract.Assume((value - result) Mod divisor = 0)
+            Return result
+        End Function
+        '''<summary>Determines the smallest non-negative remainder of the division of the value by the given divisor.</summary>
+        <Extension()> <Pure()>
+        Public Function ProperMod(ByVal value As Int32, ByVal divisor As Int32) As Int32
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Int32)() >= 0)
+            Contract.Ensures(Contract.Result(Of Int32)() < divisor)
+            Contract.Ensures((value - Contract.Result(Of Int32)()) Mod divisor = 0)
+            Dim result = value Mod divisor
+            If result < 0 Then result += divisor
+            Contract.Assume(result >= 0)
+            Contract.Assume((value - result) Mod divisor = 0)
+            Return result
+        End Function
+        '''<summary>Determines the smallest non-negative remainder of the division of the value by the given divisor.</summary>
+        <Extension()> <Pure()>
+        Public Function ProperMod(ByVal value As Int16, ByVal divisor As Int16) As Int16
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Int16)() >= 0)
+            Contract.Ensures(Contract.Result(Of Int16)() < divisor)
+            Contract.Ensures((value - Contract.Result(Of Int16)()) Mod divisor = 0)
+            Dim result = value Mod divisor
+            If result < 0 Then result += divisor
+            Contract.Assume(result < divisor)
+            Contract.Assume((value - result) Mod divisor = 0)
+            Return result
+        End Function
+
+        '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
+        <Extension()> <Pure()>
+        Public Function PositiveMod(ByVal value As BigInteger, ByVal divisor As BigInteger) As BigInteger
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of BigInteger)() > 0)
+            Contract.Ensures(Contract.Result(Of BigInteger)() <= divisor)
+            Contract.Ensures((value - Contract.Result(Of BigInteger)()) Mod divisor = 0)
+            Dim result = value Mod divisor
+            If result <= 0 Then result += divisor
+            Contract.Assume(result > 0)
+            Contract.Assume(result <= divisor)
+            Contract.Assume((value - result) Mod divisor = 0)
+            Return result
+        End Function
+        '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
+        <Extension()> <Pure()>
+        Public Function PositiveMod(ByVal value As Int64, ByVal divisor As Int64) As Int64
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Int64)() > 0)
+            Contract.Ensures(Contract.Result(Of Int64)() <= divisor)
+            Contract.Ensures((value - Contract.Result(Of Int64)()) Mod divisor = 0)
+            Dim result = value Mod divisor
+            If result <= 0 Then result += divisor
+            Contract.Assume(result > 0)
+            Contract.Assume((value - result) Mod divisor = 0)
+            Return result
+        End Function
+        '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
+        <Extension()> <Pure()>
+        Public Function PositiveMod(ByVal value As Int32, ByVal divisor As Int32) As Int32
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Int32)() > 0)
+            Contract.Ensures(Contract.Result(Of Int32)() <= divisor)
+            Contract.Ensures((value - Contract.Result(Of Int32)()) Mod divisor = 0)
+            Dim result = value Mod divisor
+            If result <= 0 Then result += divisor
+            Contract.Assume(result > 0)
+            Contract.Assume((value - result) Mod divisor = 0)
+            Return result
+        End Function
+        '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
+        <Extension()> <Pure()>
+        Public Function PositiveMod(ByVal value As Int16, ByVal divisor As Int16) As Int16
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Int16)() > 0)
+            Contract.Ensures(Contract.Result(Of Int16)() <= divisor)
+            Contract.Ensures((value - Contract.Result(Of Int16)()) Mod divisor = 0)
+            Dim result = value Mod divisor
+            If result <= 0 Then result += divisor
+            Contract.Assume(result <= divisor)
+            Contract.Assume((value - result) Mod divisor = 0)
+            Return result
+        End Function
+        '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
+        <Extension()> <Pure()>
+        <ContractVerification(False)>
+        Public Function PositiveMod(ByVal value As UInt64, ByVal divisor As UInt64) As UInt64
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of UInt64)() > 0)
+            Contract.Ensures(Contract.Result(Of UInt64)() <= divisor)
+            Contract.Ensures((value - Contract.Result(Of UInt64)()) Mod divisor = 0)
+            Dim result = value Mod divisor
+            If result <= 0 Then result += divisor
+            Return result
+        End Function
+        '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
+        <Extension()> <Pure()>
+        Public Function PositiveMod(ByVal value As UInt32, ByVal divisor As UInt32) As UInt32
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of UInt32)() > 0)
+            Contract.Ensures(Contract.Result(Of UInt32)() <= divisor)
+            Contract.Ensures((value - Contract.Result(Of UInt32)()) Mod divisor = 0)
+            Dim result = value Mod divisor
+            If result <= 0 Then result += divisor
+            Return result
+        End Function
+        '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
+        <Extension()> <Pure()>
+        Public Function PositiveMod(ByVal value As UInt16, ByVal divisor As UInt16) As UInt16
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of UInt16)() > 0)
+            Contract.Ensures(Contract.Result(Of UInt16)() <= divisor)
+            Contract.Ensures((value - Contract.Result(Of UInt16)()) Mod divisor = 0)
+            Dim result = value Mod divisor
+            If result <= 0 Then result += divisor
+            Contract.Assume(result <= divisor)
+            Contract.Assume((value - result) Mod divisor = 0)
+            Return result
+        End Function
+
+        '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        Public Function CeilingMultiple(ByVal value As BigInteger, ByVal divisor As BigInteger) As BigInteger
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of BigInteger)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of BigInteger)() >= value)
+            Contract.Ensures(Contract.Result(Of BigInteger)() < value + divisor)
+            Dim result = value + divisor - value.PositiveMod(divisor)
+            Contract.Assume(result Mod divisor = 0)
+            Contract.Assume(result >= value)
+            Contract.Assume(result < value + divisor)
+            Return result
+        End Function
+        '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        Public Function CeilingMultiple(ByVal value As Int64, ByVal divisor As Int64) As Int64
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Int64)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of Int64)() >= value)
+            Contract.Ensures(Contract.Result(Of Int64)() < value + divisor)
+            Dim result = value + divisor - value.PositiveMod(divisor)
+            Contract.Assume(result Mod divisor = 0)
+            Return result
+        End Function
+        '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        Public Function CeilingMultiple(ByVal value As Int32, ByVal divisor As Int32) As Int32
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Int32)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of Int32)() >= value)
+            Contract.Ensures(Contract.Result(Of Int32)() < value + divisor)
+            Dim result = value + divisor - value.PositiveMod(divisor)
+            Contract.Assume(result Mod divisor = 0)
+            Return result
+        End Function
+        '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        Public Function CeilingMultiple(ByVal value As Int16, ByVal divisor As Int16) As Int16
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Int16)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of Int16)() >= value)
+            Contract.Ensures(Contract.Result(Of Int16)() < value + divisor)
+            Dim result = value + divisor - value.PositiveMod(divisor)
+            Contract.Assume(result Mod divisor = 0)
+            Return result
+        End Function
+        '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        <ContractVerification(False)>
+        Public Function CeilingMultiple(ByVal value As UInt64, ByVal divisor As UInt64) As UInt64
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of UInt64)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of UInt64)() >= value)
+            Contract.Ensures(Contract.Result(Of UInt64)() < value + divisor)
+            Return value + divisor - value.PositiveMod(divisor)
+        End Function
+        '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        Public Function CeilingMultiple(ByVal value As UInt32, ByVal divisor As UInt32) As UInt32
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of UInt32)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of UInt32)() >= value)
+            Contract.Ensures(Contract.Result(Of UInt32)() < value + divisor)
+            Dim result = value + divisor - value.PositiveMod(divisor)
+            Contract.Assume(result Mod divisor = 0)
+            Return result
+        End Function
+        '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        Public Function CeilingMultiple(ByVal value As UInt16, ByVal divisor As UInt16) As UInt16
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of UInt16)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of UInt16)() >= value)
+            Contract.Ensures(Contract.Result(Of UInt16)() < value + divisor)
+            Dim result = value + divisor - value.PositiveMod(divisor)
+            Contract.Assume(result Mod divisor = 0)
+            Contract.Assume(result >= value)
+            Return result
+        End Function
+
+        '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        <ContractVerification(False)>
+        Public Function FloorMultiple(ByVal value As BigInteger, ByVal divisor As BigInteger) As BigInteger
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of BigInteger)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of BigInteger)() <= value)
+            Contract.Ensures(Contract.Result(Of BigInteger)() > value - divisor)
+            Return value - value.ProperMod(divisor)
+        End Function
+        '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        Public Function FloorMultiple(ByVal value As Int64, ByVal divisor As Int64) As Int64
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Int64)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of Int64)() <= value)
+            Contract.Ensures(Contract.Result(Of Int64)() > value - divisor)
+            Return value - value.ProperMod(divisor)
+        End Function
+        '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        Public Function FloorMultiple(ByVal value As Int32, ByVal divisor As Int32) As Int32
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Int32)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of Int32)() <= value)
+            Contract.Ensures(Contract.Result(Of Int32)() > value - divisor)
+            Return value - value.ProperMod(divisor)
+        End Function
+        '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        Public Function FloorMultiple(ByVal value As Int16, ByVal divisor As Int16) As Int16
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of Int16)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of Int16)() <= value)
+            Contract.Ensures(Contract.Result(Of Int16)() > value - divisor)
+            Return value - value.ProperMod(divisor)
+        End Function
+        '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        <ContractVerification(False)>
+        Public Function FloorMultiple(ByVal value As UInt64, ByVal divisor As UInt64) As UInt64
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of UInt64)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of UInt64)() <= value)
+            Contract.Ensures(Contract.Result(Of UInt64)() + divisor > value)
+            Return value - value Mod divisor
+        End Function
+        '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        <ContractVerification(False)>
+        Public Function FloorMultiple(ByVal value As UInt32, ByVal divisor As UInt32) As UInt32
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of UInt32)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of UInt32)() <= value)
+            Contract.Ensures(Contract.Result(Of UInt32)() + divisor > value)
+            Return value - value Mod divisor
+        End Function
+        '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
+        <Extension()> <Pure()>
+        <ContractVerification(False)>
+        Public Function FloorMultiple(ByVal value As UInt16, ByVal divisor As UInt16) As UInt16
+            Contract.Requires(divisor > 0)
+            Contract.Ensures(Contract.Result(Of UInt16)() Mod divisor = 0)
+            Contract.Ensures(Contract.Result(Of UInt16)() <= value)
+            Contract.Ensures(Contract.Result(Of UInt16)() + divisor > value)
+            Return value - value Mod divisor
+        End Function
+#End Region
 
 #Region "Bytes"
         <Extension()> <Pure()>
