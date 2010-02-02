@@ -22,11 +22,11 @@ Public Class TimeTest
     <TestMethod()>
     Public Sub ManualTimeTest()
         Dim c = New ManualClock()
-        Assert.IsTrue(c.Time = 0.Seconds)
+        Assert.IsTrue(c.ElapsedTime = 0.Seconds)
         c.Advance(5.Seconds)
-        Assert.IsTrue(c.Time = 5.Seconds)
+        Assert.IsTrue(c.ElapsedTime = 5.Seconds)
         c.Advance(4.Seconds)
-        Assert.IsTrue(c.Time = 9.Seconds)
+        Assert.IsTrue(c.ElapsedTime = 9.Seconds)
     End Sub
     <TestMethod()>
     Public Sub ManualAsyncWaitTest_Positive()
@@ -77,19 +77,19 @@ Public Class TimeTest
         Assert.IsTrue(f.State = FutureState.Succeeded)
     End Sub
     <TestMethod()>
-    Public Sub ManualTimerTest()
+    Public Sub ClockAfterResetTest()
         Dim c = New ManualClock()
+        Dim r0 = c.AfterReset()
+        Assert.IsTrue(r0.ElapsedTime = 0.Seconds)
         c.Advance(5.Seconds)
-        Dim t = c.StartTimer()
-        Assert.IsTrue(t.ElapsedTime = 0.Seconds)
+        Dim r1 = c.AfterReset()
+        Assert.IsTrue(r0.ElapsedTime = 5.Seconds)
+        Assert.IsTrue(r1.ElapsedTime = 0.Seconds)
         c.Advance(3.Seconds)
-        Assert.IsTrue(t.ElapsedTime = 3.Seconds)
-        c.Advance(2.Seconds)
-        Assert.IsTrue(t.Reset = 5.Seconds)
-        Assert.IsTrue(t.ElapsedTime = 0.Seconds)
-        Assert.IsTrue(t.Reset = 0.Seconds)
-        c.Advance(2.Seconds)
-        Assert.IsTrue(t.ElapsedTime = 2.Seconds)
+        Assert.IsTrue(r0.ElapsedTime = 8.Seconds)
+        Assert.IsTrue(r1.ElapsedTime = 3.Seconds)
+        Assert.IsTrue(r0.StartingTimeOnParentClock = 0.Seconds)
+        Assert.IsTrue(r1.StartingTimeOnParentClock = 5.Seconds)
     End Sub
 
     <TestMethod()>
@@ -108,13 +108,10 @@ Public Class TimeTest
         Assert.IsTrue(f.State = FutureState.Succeeded)
     End Sub
     <TestMethod()>
-    Public Sub SystemTimerTest()
+    Public Sub SystemTimeTest()
         Dim c = New SystemClock()
-        Dim t = c.StartTimer()
         Threading.Thread.Sleep(50)
-        Dim m = t.ElapsedTime
+        Dim m = c.ElapsedTime
         Assert.IsTrue(m > 0.Milliseconds)
-        Assert.IsTrue(t.Reset >= m)
-        Assert.IsTrue(t.ElapsedTime >= 0.Milliseconds)
     End Sub
 End Class

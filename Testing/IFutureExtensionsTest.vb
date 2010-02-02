@@ -3,6 +3,7 @@ Imports System
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports Strilbrary.Threading
 Imports System.Threading
+Imports Strilbrary.Time
 
 <TestClass()>
 Public Class IFutureExtensionsTest

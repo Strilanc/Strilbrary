@@ -3,10 +3,25 @@ Imports Strilbrary.Values
 
 Namespace Time
     ''' <summary>
-    ''' A clock which advances in real time.
+    ''' A clock which advances relative to the system tick count.
     ''' </summary>
+    <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")>
     Public Class SystemClock
         Implements IClock
+        Private _elapsedTime As TimeSpan
+        Private _lastTick As ModInt32
+        Private ReadOnly _lock As New Object()
+
+        <ContractInvariantMethod()> Private Sub ObjectInvariant()
+            Contract.Invariant(_lock IsNot Nothing)
+            Contract.Invariant(_elapsedTime.Ticks >= 0)
+        End Sub
+
+        'verification disabled due to stupid verifier (1.2.30118.5)
+        <ContractVerification(False)>
+        Public Sub New()
+            Me._lastTick = Environment.TickCount
+        End Sub
 
         Public Function AsyncWait(ByVal dt As TimeSpan) As IFuture Implements IClock.AsyncWait
             Dim result = New FutureAction
@@ -24,28 +39,17 @@ Namespace Time
             Return result
         End Function
 
-        <Pure()>
-        Public Function StartTimer() As ITimer Implements IClock.StartTimer
-            Return New SystemTimer()
-        End Function
-
-        Private Class SystemTimer
-            Implements ITimer
-            Private _startTime As ModInt32
-
-            Public Sub New()
-                _startTime = Environment.TickCount
-            End Sub
-
-            Public Function ElapsedTime() As TimeSpan Implements ITimer.ElapsedTime
-                Return CUInt(Environment.TickCount - _startTime).Milliseconds
-            End Function
-
-            Public Function Reset() As TimeSpan Implements ITimer.Reset
-                Dim dt = Environment.TickCount - _startTime
-                _startTime += dt
-                Return CUInt(dt).Milliseconds
-            End Function
-        End Class
+        Public ReadOnly Property ElapsedTime As TimeSpan Implements IClock.ElapsedTime
+            'verification disabled due to stupid verifier (1.2.30118.5)
+            <ContractVerification(False)>
+            Get
+                SyncLock _lock
+                    Dim tick = Environment.TickCount
+                    _elapsedTime += CUInt(tick - _lastTick).Milliseconds
+                    _lastTick = tick
+                    Return _elapsedTime
+                End SyncLock
+            End Get
+        End Property
     End Class
 End Namespace

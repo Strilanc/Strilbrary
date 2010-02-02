@@ -1,5 +1,13 @@
 Namespace Time
     Public Module TimeExtensions
+        '''<summary>Returns clock which advances relative to the given clock, starting at the current time.</summary>
+        <Extension()>
+        Public Function AfterReset(ByVal this As IClock) As RelativeClock
+            Contract.Requires(this IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of RelativeClock)() IsNot Nothing)
+            Return New RelativeClock(parentClock:=this, startingtime:=this.ElapsedTime)
+        End Function
+
         'verification disabled due to lack of TimeSpan contracts
         <ContractVerification(False)>
         <Extension()> <Pure()>

@@ -132,6 +132,7 @@
     <Compile Include="Exceptions\Exception Extensions.vb" />
     <Compile Include="Time\Clock Interfaces.vb" />
     <Compile Include="Threading\Futures.vb" />
+    <Compile Include="Time\RelativeClock.vb" />
     <Compile Include="Time\SystemClock.vb" />
     <Compile Include="Time\ManualClock.vb" />
     <Compile Include="Time\Time Extensions.vb" />

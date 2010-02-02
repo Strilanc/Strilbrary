@@ -9,11 +9,11 @@ Namespace Time
         ''' The resulting future is instantly ready if the given time is non-positive.
         ''' </summary>
         Function AsyncWait(ByVal dt As TimeSpan) As IFuture
+
         ''' <summary>
-        ''' Returns a timer, which can measure time elapsed on the clock.
+        ''' Determines the time elapsed on the clock since it was started.
         ''' </summary>
-        <Pure()>
-        Function StartTimer() As ITimer
+        ReadOnly Property ElapsedTime() As TimeSpan
 
         <ContractClassFor(GetType(IClock))>
         NotInheritable Class ContractClass
@@ -23,38 +23,12 @@ Namespace Time
                 Contract.Ensures(dt.Ticks > 0 OrElse Contract.Result(Of IFuture)().State = FutureState.Succeeded)
                 Throw New NotSupportedException
             End Function
-            <Pure()>
-            Public Function StartTimer() As ITimer Implements IClock.StartTimer
-                Contract.Ensures(Contract.Result(Of ITimer)() IsNot Nothing)
-                Throw New NotSupportedException
-            End Function
-        End Class
-    End Interface
-
-    <ContractClass(GetType(ITimer.ContractClass))>
-    Public Interface ITimer
-        ''' <summary>
-        ''' Returns the time elapsed on the parent clock since the timer started.
-        ''' </summary>
-        <Pure()>
-        Function ElapsedTime() As TimeSpan
-        ''' <summary>
-        ''' Returns the time elapsed on the parent clock since the timer started and restarts the timer.
-        ''' </summary>
-        Function Reset() As TimeSpan
-
-        <ContractClassFor(GetType(ITimer))>
-        NotInheritable Class ContractClass
-            Implements ITimer
-            <Pure()>
-            Public Function ElapsedTime() As TimeSpan Implements ITimer.ElapsedTime
-                Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks >= 0)
-                Throw New NotSupportedException
-            End Function
-            Public Function Reset() As System.TimeSpan Implements ITimer.Reset
-                Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks >= 0)
-                Throw New NotSupportedException
-            End Function
+            Public ReadOnly Property ElapsedTime() As TimeSpan Implements IClock.ElapsedTime
+                Get
+                    Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks >= 0)
+                    Throw New NotSupportedException
+                End Get
+            End Property
         End Class
     End Interface
 End Namespace
