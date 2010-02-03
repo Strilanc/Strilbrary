@@ -79,10 +79,10 @@ Public Class TimeTest
     <TestMethod()>
     Public Sub ClockAfterResetTest()
         Dim c = New ManualClock()
-        Dim r0 = c.AfterReset()
+        Dim r0 = c.Restarted()
         Assert.IsTrue(r0.ElapsedTime = 0.Seconds)
         c.Advance(5.Seconds)
-        Dim r1 = c.AfterReset()
+        Dim r1 = c.Restarted()
         Assert.IsTrue(r0.ElapsedTime = 5.Seconds)
         Assert.IsTrue(r1.ElapsedTime = 0.Seconds)
         c.Advance(3.Seconds)
