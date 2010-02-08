@@ -1,4 +1,5 @@
 ﻿Imports Strilbrary.Values
+Imports Strilbrary.Collections
 
 Namespace Streams
     Public Module StreamExtensions
@@ -158,6 +159,93 @@ Namespace Streams
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanWrite)
             stream.Write(value.Bytes(byteOrder))
+        End Sub
+    End Module
+
+    Public Module StreamInterfaceExtensions
+        ''' <summary>
+        ''' Reads exactly byteCount bytes from the stream.
+        ''' Throws an IOException if the stream ends prematurely.
+        ''' </summary>
+        <Extension()>
+        Public Function ReadExact(ByVal stream As IReadableStream,
+                                  ByVal exactCount As Integer) As IReadableList(Of Byte)
+            Contract.Requires(stream IsNot Nothing)
+            Contract.Requires(exactCount > 0)
+            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))().Count = exactCount)
+            Dim result = New List(Of Byte)(capacity:=exactCount)
+            While result.Count < exactCount
+                Dim read = stream.Read(exactCount - result.Count)
+                If read.Count = 0 Then Throw New IO.IOException("Stream ended before enough data could be read.")
+                result.AddRange(stream.Read(exactCount - result.Count))
+            End While
+            Return result.AsReadableList
+        End Function
+
+        ''' <summary>
+        ''' Reads a Byte from the stream.
+        ''' Throws an IOException if the stream ends prematurely.
+        ''' </summary>
+        <Extension()>
+        Public Function ReadByte(ByVal stream As IReadableStream) As Byte
+            Contract.Requires(stream IsNot Nothing)
+            Return stream.ReadExact(exactCount:=1)(0)
+        End Function
+        ''' <summary>
+        ''' Reads a UInt16 from the stream.
+        ''' Throws an IOException if the stream ends prematurely.
+        ''' </summary>
+        <Extension()>
+        Public Function ReadUInt16(ByVal stream As IReadableStream,
+                                   Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
+            Contract.Requires(stream IsNot Nothing)
+            Return stream.ReadExact(exactCount:=2).ToUInt16(byteOrder)
+        End Function
+        ''' <summary>
+        ''' Reads a UInt32 from the stream.
+        ''' Throws an IOException if the stream ends prematurely.
+        ''' </summary>
+        <Extension()>
+        Public Function ReadUInt32(ByVal stream As IReadableStream,
+                                   Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt32
+            Contract.Requires(stream IsNot Nothing)
+            Return stream.ReadExact(exactCount:=4).ToUInt32(byteOrder)
+        End Function
+        ''' <summary>
+        ''' Reads a UInt64 from the stream.
+        ''' Throws an IOException if the stream ends prematurely.
+        ''' </summary>
+        <Extension()>
+        Public Function ReadUInt64(ByVal stream As IReadableStream,
+                                   Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt64
+            Contract.Requires(stream IsNot Nothing)
+            Return stream.ReadExact(exactCount:=8).ToUInt64(byteOrder)
+        End Function
+
+        '''<summary>Writes a UInt16 to the stream.</summary>
+        <Extension()>
+        Public Sub Write(ByVal stream As IWritableStream,
+                         ByVal value As UInt16,
+                         Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian)
+            Contract.Requires(stream IsNot Nothing)
+            stream.Write(value.Bytes(byteOrder).AsReadableList)
+        End Sub
+        '''<summary>Writes a UInt32 to the stream.</summary>
+        <Extension()>
+        Public Sub Write(ByVal stream As IWritableStream,
+                         ByVal value As UInt32,
+                         Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian)
+            Contract.Requires(stream IsNot Nothing)
+            stream.Write(value.Bytes(byteOrder).AsReadableList)
+        End Sub
+        '''<summary>Writes a UInt64 to the stream.</summary>
+        <Extension()>
+        Public Sub Write(ByVal stream As IWritableStream,
+                         ByVal value As UInt64,
+                         Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian)
+            Contract.Requires(stream IsNot Nothing)
+            stream.Write(value.Bytes(byteOrder).AsReadableList)
         End Sub
     End Module
 End Namespace
