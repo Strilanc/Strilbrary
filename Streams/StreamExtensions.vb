@@ -168,6 +168,7 @@ Namespace Streams
         ''' Throws an IOException if the stream ends prematurely.
         ''' </summary>
         <Extension()>
+        <ContractVerification(False)>
         Public Function ReadExact(ByVal stream As IReadableStream,
                                   ByVal exactCount As Integer) As IReadableList(Of Byte)
             Contract.Requires(stream IsNot Nothing)
@@ -178,8 +179,9 @@ Namespace Streams
             While result.Count < exactCount
                 Dim read = stream.Read(exactCount - result.Count)
                 If read.Count = 0 Then Throw New IO.IOException("Stream ended before enough data could be read.")
-                result.AddRange(stream.Read(exactCount - result.Count))
+                result.AddRange(read)
             End While
+            Contract.Assume(result.Count = exactCount)
             Return result.AsReadableList
         End Function
 
@@ -188,6 +190,7 @@ Namespace Streams
         ''' Throws an IOException if the stream ends prematurely.
         ''' </summary>
         <Extension()>
+        <ContractVerification(False)>
         Public Function ReadByte(ByVal stream As IReadableStream) As Byte
             Contract.Requires(stream IsNot Nothing)
             Return stream.ReadExact(exactCount:=1)(0)

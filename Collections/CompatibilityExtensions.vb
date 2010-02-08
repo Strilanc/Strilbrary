@@ -153,9 +153,9 @@ Namespace Collections
 
             Public Overrides Function ToString() As String
                 If Me.Count > 10 Then
-                    Return Me.Take(10).StringJoin(", ") + "..."
+                    Return "[{0}, ...".Frmt(Me.Take(10).StringJoin(", "))
                 Else
-                    Return Me.StringJoin(", ")
+                    Return "[{0}]".Frmt(Me.StringJoin(", "))
                 End If
             End Function
         End Class
