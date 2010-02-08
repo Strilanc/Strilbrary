@@ -70,7 +70,7 @@
     <CodeContractsCustomRewriterClass />
     <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
     <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
-    <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
+    <CodeContractsRuntimeThrowOnFailure>False</CodeContractsRuntimeThrowOnFailure>
     <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
     <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
     <CodeContractsBuildReferenceAssembly>True</CodeContractsBuildReferenceAssembly>
@@ -130,6 +130,8 @@
     <Compile Include="Collections\IReadableCollection.vb" />
     <Compile Include="Exceptions\Exception Types.vb" />
     <Compile Include="Exceptions\Exception Extensions.vb" />
+    <Compile Include="Streams\Stream Interface Converters.vb" />
+    <Compile Include="Streams\Stream Interfaces.vb" />
     <Compile Include="Time\Clock Interfaces.vb" />
     <Compile Include="Threading\Futures.vb" />
     <Compile Include="Time\RelativeClock.vb" />

@@ -104,7 +104,7 @@ Namespace Streams
         ''' </summary>
         <Extension()>
         Public Function ReadUInt16(ByVal stream As IO.Stream,
-                                   Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt32
+                                   Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanRead)
             Return stream.ReadBytesExact(length:=2).ToUInt16(byteOrder)
