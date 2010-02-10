@@ -164,7 +164,7 @@ Namespace Streams
 
     Public Module StreamInterfaceExtensions
         ''' <summary>
-        ''' Reads exactly byteCount bytes from the stream.
+        ''' Reads an exact amount of bytes from the stream (as opposed to the default Read which may return fewer bytes).
         ''' Throws an IOException if the stream ends prematurely.
         ''' </summary>
         <Extension()>
@@ -183,6 +183,41 @@ Namespace Streams
             End While
             Contract.Assume(result.Count = exactCount)
             Return result.AsReadableList
+        End Function
+        ''' <summary>
+        ''' Writes bytes to the stream, starting at the given position.
+        ''' </summary>
+        <Extension()>
+        <ContractVerification(False)>
+        Public Sub WriteAt(ByVal stream As IRandomWritableStream,
+                           ByVal position As Long,
+                           ByVal data As IReadableList(Of Byte))
+            Contract.Requires(stream IsNot Nothing)
+            Contract.Requires(data IsNot Nothing)
+            Contract.Requires(position >= 0)
+            Contract.Requires(position <= stream.Length)
+            Contract.Ensures(stream.Position = position + data.Count)
+            stream.Position = position
+            stream.Write(data)
+        End Sub
+        ''' <summary>
+        ''' Reads an exact amount of bytes from the stream, starting at the given position.
+        ''' Throws an IOException if the stream ends prematurely.
+        ''' </summary>
+        <Extension()>
+        <ContractVerification(False)>
+        Public Function ReadExactAt(ByVal stream As IRandomReadableStream,
+                                    ByVal position As Long,
+                                    ByVal exactCount As Integer) As IReadableList(Of Byte)
+            Contract.Requires(stream IsNot Nothing)
+            Contract.Requires(position >= 0)
+            Contract.Requires(exactCount > 0)
+            Contract.Requires(position + exactCount <= stream.Length)
+            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))().Count = exactCount)
+            Contract.Ensures(stream.Position = position + exactCount)
+            stream.Position = position
+            Return stream.ReadExact(exactCount)
         End Function
 
         ''' <summary>
@@ -225,7 +260,32 @@ Namespace Streams
             Contract.Requires(stream IsNot Nothing)
             Return stream.ReadExact(exactCount:=8).ToUInt64(byteOrder)
         End Function
+        ''' <summary>
+        ''' Reads a Single from the stream.
+        ''' Throws an IOException if the stream ends prematurely.
+        ''' </summary>
+        <Extension()>
+        Public Function ReadSingle(ByVal stream As IReadableStream) As Single
+            Contract.Requires(stream IsNot Nothing)
+            Return BitConverter.ToSingle(stream.ReadExact(4).ToArray, 0)
+        End Function
+        ''' <summary>
+        ''' Reads a Double from the stream.
+        ''' Throws an IOException if the stream ends prematurely.
+        ''' </summary>
+        <Extension()>
+        Public Function ReadDouble(ByVal stream As IReadableStream) As Double
+            Contract.Requires(stream IsNot Nothing)
+            Return BitConverter.ToDouble(stream.ReadExact(8).ToArray, 0)
+        End Function
 
+        '''<summary>Writes a Byte to the stream.</summary>
+        <Extension()>
+        Public Sub Write(ByVal stream As IWritableStream,
+                         ByVal value As Byte)
+            Contract.Requires(stream IsNot Nothing)
+            stream.Write({value}.AsReadableList)
+        End Sub
         '''<summary>Writes a UInt16 to the stream.</summary>
         <Extension()>
         Public Sub Write(ByVal stream As IWritableStream,
@@ -249,6 +309,20 @@ Namespace Streams
                          Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian)
             Contract.Requires(stream IsNot Nothing)
             stream.Write(value.Bytes(byteOrder).AsReadableList)
+        End Sub
+        '''<summary>Writes a Single to the stream.</summary>
+        <Extension()>
+        Public Sub Write(ByVal stream As IWritableStream,
+                         ByVal value As Single)
+            Contract.Requires(stream IsNot Nothing)
+            stream.Write(BitConverter.GetBytes(value).AsReadableList)
+        End Sub
+        '''<summary>Writes a Double to the stream.</summary>
+        <Extension()>
+        Public Sub Write(ByVal stream As IWritableStream,
+                         ByVal value As Double)
+            Contract.Requires(stream IsNot Nothing)
+            stream.Write(BitConverter.GetBytes(value).AsReadableList)
         End Sub
     End Module
 End Namespace
