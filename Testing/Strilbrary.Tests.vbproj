@@ -77,7 +77,6 @@
     <Compile Include="IFutureExtensionsTest.vb" />
     <Compile Include="ModInt32Test.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
-    <Compile Include="PushEnumeratorTest.vb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Strilbrary.vbproj">

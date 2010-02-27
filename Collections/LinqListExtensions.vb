@@ -1,6 +1,4 @@
-﻿Imports Strilbrary.Enumeration
-
-Namespace Collections
+﻿Namespace Collections
     Public Module LinqListExtensions
         '''<summary>Creates a list containing all the elements of an IList.</summary>
         <Extension()> <Pure()>

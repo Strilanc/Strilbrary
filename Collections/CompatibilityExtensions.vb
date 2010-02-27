@@ -1,5 +1,4 @@
-﻿Imports Strilbrary.Enumeration
-Imports Strilbrary.Values
+﻿Imports Strilbrary.Values
 
 Namespace Collections
     Public Module CompatibilityExtensions

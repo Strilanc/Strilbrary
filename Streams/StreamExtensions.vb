@@ -222,6 +222,18 @@ Namespace Streams
 
         ''' <summary>
         ''' Reads a Byte from the stream.
+        ''' Returns nothing if at the end of the stream.
+        ''' </summary>
+        <Extension()>
+        <ContractVerification(False)>
+        Public Function TryReadByte(ByVal stream As IReadableStream) As Byte?
+            Contract.Requires(stream IsNot Nothing)
+            Dim read = stream.Read(1)
+            Return If(read.Count = 1, read.Single, CType(Nothing, Byte?))
+        End Function
+
+        ''' <summary>
+        ''' Reads a Byte from the stream.
         ''' Throws an IOException if the stream ends prematurely.
         ''' </summary>
         <Extension()>
@@ -324,5 +336,19 @@ Namespace Streams
             Contract.Requires(stream IsNot Nothing)
             stream.Write(BitConverter.GetBytes(value).AsReadableList)
         End Sub
+
+        '''<summary>Reads all remaining data from the stream.</summary>
+        <Extension()>
+        Public Function ReadRemaining(ByVal stream As IReadableStream) As IReadableList(Of Byte)
+            Contract.Requires(stream IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))() IsNot Nothing)
+            Dim result = New List(Of Byte)(capacity:=1024)
+            Do
+                Dim read = stream.Read(1024)
+                If read.Count = 0 Then Exit Do
+                result.AddRange(read)
+            Loop
+            Return result.AsReadableList
+        End Function
     End Module
 End Namespace

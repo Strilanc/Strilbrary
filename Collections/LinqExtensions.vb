@@ -1,6 +1,4 @@
-﻿Imports Strilbrary.Enumeration
-
-Namespace Collections
+﻿Namespace Collections
     Public Module LinqExtensions
 #Region "Count"
         '''<summary>Determines if a sequence has no elements.</summary>
