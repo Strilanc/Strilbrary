@@ -192,29 +192,29 @@ Public Class ValueExtensionTest
 
     <TestMethod()>
     Public Sub BytesUInt16Test()
-        Assert.IsTrue(&H201US.Bytes(ByteOrder.LittleEndian).HasSameItemsAs({1, 2}))
-        Assert.IsTrue(&H201US.Bytes(ByteOrder.BigEndian).HasSameItemsAs({2, 1}))
-        Assert.IsTrue(&H304US.Bytes(ByteOrder.BigEndian).HasSameItemsAs({3, 4}))
+        Assert.IsTrue(&H201US.Bytes(ByteOrder.LittleEndian).SequenceEqual({1, 2}))
+        Assert.IsTrue(&H201US.Bytes(ByteOrder.BigEndian).SequenceEqual({2, 1}))
+        Assert.IsTrue(&H304US.Bytes(ByteOrder.BigEndian).SequenceEqual({3, 4}))
     End Sub
     <TestMethod()>
     Public Sub BytesUInt32Test()
-        Assert.IsTrue(&H4030201UI.Bytes(ByteOrder.LittleEndian).HasSameItemsAs({1, 2, 3, 4}))
-        Assert.IsTrue(&H1020304UI.Bytes(ByteOrder.BigEndian).HasSameItemsAs({1, 2, 3, 4}))
-        Assert.IsTrue(&H5060708UI.Bytes(ByteOrder.BigEndian).HasSameItemsAs({5, 6, 7, 8}))
+        Assert.IsTrue(&H4030201UI.Bytes(ByteOrder.LittleEndian).SequenceEqual({1, 2, 3, 4}))
+        Assert.IsTrue(&H1020304UI.Bytes(ByteOrder.BigEndian).SequenceEqual({1, 2, 3, 4}))
+        Assert.IsTrue(&H5060708UI.Bytes(ByteOrder.BigEndian).SequenceEqual({5, 6, 7, 8}))
     End Sub
     <TestMethod()>
     Public Sub BytesUInt64Test()
-        Assert.IsTrue(&H807060504030201UL.Bytes(ByteOrder.LittleEndian).HasSameItemsAs({1, 2, 3, 4, 5, 6, 7, 8}))
-        Assert.IsTrue(&H102030405060708UL.Bytes(ByteOrder.BigEndian).HasSameItemsAs({1, 2, 3, 4, 5, 6, 7, 8}))
-        Assert.IsTrue(&H90A0B0C0D0E0F10UL.Bytes(ByteOrder.BigEndian).HasSameItemsAs({9, 10, 11, 12, 13, 14, 15, 16}))
+        Assert.IsTrue(&H807060504030201UL.Bytes(ByteOrder.LittleEndian).SequenceEqual({1, 2, 3, 4, 5, 6, 7, 8}))
+        Assert.IsTrue(&H102030405060708UL.Bytes(ByteOrder.BigEndian).SequenceEqual({1, 2, 3, 4, 5, 6, 7, 8}))
+        Assert.IsTrue(&H90A0B0C0D0E0F10UL.Bytes(ByteOrder.BigEndian).SequenceEqual({9, 10, 11, 12, 13, 14, 15, 16}))
     End Sub
 
     <TestMethod()>
     Public Sub ToAscBytesTest()
-        Assert.IsTrue(" 0a".ToAscBytes.HasSameItemsAs({&H20, &H30, &H61}))
-        Assert.IsTrue("".ToAscBytes.HasSameItemsAs({}))
-        Assert.IsTrue("A".ToAscBytes.HasSameItemsAs({&H41}))
-        Assert.IsTrue(("B" + Chr(0) + "C").ToAscBytes(nullTerminate:=True).HasSameItemsAs({&H42, 0, &H43, 0}))
+        Assert.IsTrue(" 0a".ToAscBytes.SequenceEqual({&H20, &H30, &H61}))
+        Assert.IsTrue("".ToAscBytes.SequenceEqual({}))
+        Assert.IsTrue("A".ToAscBytes.SequenceEqual({&H41}))
+        Assert.IsTrue(("B" + Chr(0) + "C").ToAscBytes(nullTerminate:=True).SequenceEqual({&H42, 0, &H43, 0}))
     End Sub
     <TestMethod()>
     Public Sub ParseChrStringTest()
@@ -232,9 +232,9 @@ Public Class ValueExtensionTest
     End Sub
     <TestMethod()>
     Public Sub FromHexStringToBytesTest()
-        Assert.IsTrue("FF 10 AB 24 05".FromHexStringToBytes.HasSameItemsAs({&HFF, &H10, &HAB, &H24, &H5}))
-        Assert.IsTrue("ff 10 ab 24 5".FromHexStringToBytes.HasSameItemsAs({&HFF, &H10, &HAB, &H24, &H5}))
-        Assert.IsTrue("1 2 3".FromHexStringToBytes.HasSameItemsAs({1, 2, 3}))
+        Assert.IsTrue("FF 10 AB 24 05".FromHexStringToBytes.SequenceEqual({&HFF, &H10, &HAB, &H24, &H5}))
+        Assert.IsTrue("ff 10 ab 24 5".FromHexStringToBytes.SequenceEqual({&HFF, &H10, &HAB, &H24, &H5}))
+        Assert.IsTrue("1 2 3".FromHexStringToBytes.SequenceEqual({1, 2, 3}))
     End Sub
 
     <TestMethod()>

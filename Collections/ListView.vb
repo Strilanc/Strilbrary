@@ -6,7 +6,7 @@ Namespace Collections
     ''' Exposes a contiguous subset of a readable list as a readable list.
     ''' </summary>
     <DebuggerDisplay("{ToString}")>
-    Public NotInheritable Class ListView(Of T)
+    Friend NotInheritable Class ListView(Of T)
         Implements IReadableList(Of T)
 
         Private ReadOnly _items As IReadableList(Of T)

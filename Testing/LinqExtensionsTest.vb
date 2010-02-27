@@ -158,4 +158,25 @@ Public Class LinqExtensionsTest
         Assert.IsTrue(e3.SequenceEqual({1, 2}))
         Assert.IsTrue(L.SequenceEqual({5, 2}))
     End Sub
+
+    <TestMethod()>
+    Public Sub ToListTest()
+        Assert.IsTrue({1, 2, 3}.ToList.SequenceEqual({1, 2, 3}))
+    End Sub
+    <TestMethod()>
+    Public Sub ToArrayTest()
+        Assert.IsTrue({1, 2, 3}.ToArray.SequenceEqual({1, 2, 3}))
+    End Sub
+    <TestMethod()>
+    Public Sub ReverseTest()
+        Assert.IsTrue(TypeOf {1, 2, 3}.Reverse Is IList(Of Int32))
+        Assert.IsTrue({1, 2, 3}.Reverse.SequenceEqual({3, 2, 1}))
+    End Sub
+    <TestMethod()>
+    Public Sub SubViewTest()
+        Assert.IsTrue({1, 2, 3}.AsReadableList.SubView(0).SequenceEqual({1, 2, 3}))
+        Assert.IsTrue({1, 2, 3}.AsReadableList.SubView(1).SequenceEqual({2, 3}))
+        Assert.IsTrue({1, 2, 3}.AsReadableList.SubView(1, 1).SequenceEqual({2}))
+        Assert.IsTrue({1, 2, 3}.AsReadableList.SubView(1, 0).SequenceEqual({}))
+    End Sub
 End Class
