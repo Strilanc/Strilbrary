@@ -60,6 +60,8 @@
   <ItemGroup>
     <Compile Include="BitBufferTest.vb" />
     <Compile Include="CallQueueTest.vb" />
+    <Compile Include="LinqExtensionsTest.vb" />
+    <Compile Include="MiscTest.vb" />
     <Compile Include="PriorityQueueTest.vb" />
     <Compile Include="TimeTest.vb" />
     <Compile Include="InvariantStringTest.vb" />

@@ -405,4 +405,33 @@ Public Class ValueExtensionTest
         Assert.IsTrue(&H1UL.ShiftRotateRight(65) = &H8000000000000000UL)
         Assert.IsTrue(&H6UL.ShiftRotateRight(0) = &H6UL)
     End Sub
+
+    <TestMethod()>
+    Public Sub BetweenTest()
+        Assert.IsTrue(1.Between(2, 3) = 2)
+        Assert.IsTrue(1.Between(3, 2) = 2)
+        Assert.IsTrue(2.Between(1, 3) = 2)
+        Assert.IsTrue(2.Between(3, 1) = 2)
+        Assert.IsTrue(3.Between(1, 2) = 2)
+        Assert.IsTrue(3.Between(2, 1) = 2)
+        Assert.IsTrue(1.Between(1, 2) = 1)
+        Assert.IsTrue(1.Between(1, 0) = 1)
+        Assert.IsTrue(0.Between(1, 1) = 1)
+        Assert.IsTrue(2.Between(1, 1) = 1)
+        Assert.IsTrue(1.Between(1, 1) = 1)
+    End Sub
+
+    <TestMethod()>
+    Public Sub ClampAtOrAboveTest()
+        Assert.IsTrue(1.ClampAtOrAbove(0) = 1)
+        Assert.IsTrue(0.ClampAtOrAbove(2) = 2)
+        Assert.IsTrue(3.ClampAtOrAbove(3) = 3)
+    End Sub
+
+    <TestMethod()>
+    Public Sub ClampAtOrBelowTest()
+        Assert.IsTrue(1.ClampAtOrBelow(-1) = -1)
+        Assert.IsTrue(0.ClampAtOrBelow(2) = 0)
+        Assert.IsTrue(3.ClampAtOrAbove(3) = 3)
+    End Sub
 End Class

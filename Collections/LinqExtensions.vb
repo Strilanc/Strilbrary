@@ -138,7 +138,7 @@ Namespace Collections
 
         '''<summary>Concatenates a sequence of sequences into a single sequence.</summary>
         <Pure()> <Extension()>
-        Public Function Fold(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
+        Public Function Concat(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
             Contract.Requires(sequences IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
             Return New Enumerable(Of T)(
@@ -148,6 +148,27 @@ Namespace Collections
                                                                         controller.Sequence(e.Current),
                                                                         controller.Break()))
                 End Function)
+        End Function
+
+        '''<summary>Concatenates an array of sequences into a single sequence.</summary>
+        <Pure()>
+        Public Function Concat(Of T)(ByVal sequence1 As IEnumerable(Of T),
+                                     ByVal sequence2 As IEnumerable(Of T),
+                                     ByVal ParamArray sequences() As IEnumerable(Of T)) As IEnumerable(Of T)
+            Contract.Requires(sequence1 IsNot Nothing)
+            Contract.Requires(sequence2 IsNot Nothing)
+            Contract.Requires(sequences IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
+            Return {sequence1, sequence2}.Concat(sequences).Concat
+        End Function
+
+        '''<summary>Appends values to a sequence.</summary>
+        <Pure()> <Extension()>
+        Public Function Append(Of T)(ByVal sequence As IEnumerable(Of T), ByVal ParamArray values() As T) As IEnumerable(Of T)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(values IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
+            Return sequence.Concat(values)
         End Function
 
         '''<summary>Caches all the items in a sequence, preventing changes to the sequence from affecting the resulting sequence.</summary>

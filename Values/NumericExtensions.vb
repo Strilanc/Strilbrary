@@ -605,5 +605,19 @@ Namespace Values
             Contract.Ensures(Contract.Result(Of T)().CompareTo(value2) <= 0)
             Return If(value1.CompareTo(value2) <= 0, value1, value2)
         End Function
+        <Pure()> <Extension()>
+        Public Function Between(Of T As IComparable(Of T))(ByVal value1 As T,
+                                                           ByVal value2 As T,
+                                                           ByVal value3 As T) As T
+            Contract.Requires(value1 IsNot Nothing)
+            Contract.Requires(value2 IsNot Nothing)
+            Contract.Requires(value3 IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of T)() IsNot Nothing)
+            'recursive sort
+            If value2.CompareTo(value1) > 0 Then Return Between(value2, value1, value3)
+            If value2.CompareTo(value3) < 0 Then Return Between(value1, value3, value2)
+            'median
+            Return value2
+        End Function
     End Module
 End Namespace

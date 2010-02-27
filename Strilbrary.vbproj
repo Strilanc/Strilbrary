@@ -182,7 +182,6 @@
     <Compile Include="Streams\ConcatStream.vb" />
     <Compile Include="Streams\WrappedStream.vb" />
     <Compile Include="Streams\ZLibStream.vb" />
-    <Compile Include="Misc\Common.vb" />
     <Compile Include="Enumeration\Converter.vb" />
     <Compile Include="Threading\FutureDisposable.vb" />
     <Compile Include="Collections\LinqListExtensions.vb" />
