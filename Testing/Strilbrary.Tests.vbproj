@@ -69,7 +69,6 @@
     <Compile Include="ModByteTest.vb" />
     <Compile Include="ModInt16Test.vb" />
     <Compile Include="CoroutineTest.vb" />
-    <Compile Include="FiniteDoubleTest.vb" />
     <Compile Include="FutureActionTest.vb" />
     <Compile Include="FutureBaseTest.vb" />
     <Compile Include="FutureFunctionTest.vb" />

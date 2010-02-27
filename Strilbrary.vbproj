@@ -130,6 +130,7 @@
     <Compile Include="Collections\IReadableCollection.vb" />
     <Compile Include="Exceptions\Exception Types.vb" />
     <Compile Include="Exceptions\Exception Extensions.vb" />
+    <Compile Include="Misc\DelegatedDisposable.vb" />
     <Compile Include="Streams\Stream Interface Converters.vb" />
     <Compile Include="Streams\Stream Interfaces.vb" />
     <Compile Include="Time\Clock Interfaces.vb" />
@@ -147,7 +148,6 @@
     <Compile Include="Values\InvariantString.vb" />
     <Compile Include="Values\ModByte.vb" />
     <Compile Include="Values\ModInt16.vb" />
-    <Compile Include="Values\FiniteDouble.vb" />
     <Compile Include="Streams\StreamExtensions.vb" />
     <Compile Include="Threading\IFutureExtensions.vb" />
     <Compile Include="Threading\AbstractLockFreeConsumer.vb" />

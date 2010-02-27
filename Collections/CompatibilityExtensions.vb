@@ -22,6 +22,12 @@ Namespace Collections
             Contract.Ensures(Contract.Result(Of IReadableList(Of T))().Count = this.Count)
             Return New ListToReadableListBridge(Of T)(this)
         End Function
+        <Extension()> <Pure()>
+        Public Function ToReadableList(Of T)(ByVal sequence As IEnumerable(Of T)) As IReadableList(Of T)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IReadableList(Of T))() IsNot Nothing)
+            Return If(TryCast(sequence, IReadableList(Of T)), sequence.ToArray.AsReadableList)
+        End Function
 
         <DebuggerDisplay("{ToString}")>
         Private Class ReadableListToListBridge(Of T)

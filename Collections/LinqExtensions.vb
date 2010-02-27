@@ -60,6 +60,82 @@ Namespace Collections
         End Function
 #End Region
 
+#Region "Min/Max"
+        '''<summary>Determines the maximum element in a sequence based on the given comparison function.</summary>
+        <Extension()> <Pure()>
+        Public Function Max(Of T)(ByVal sequence As IEnumerable(Of T),
+                                  ByVal comparator As Func(Of T, T, Integer)) As T
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(comparator IsNot Nothing)
+            Contract.Requires(sequence.Any)
+            Return sequence.Aggregate(Function(e1, e2) If(comparator(e1, e2) >= 0, e1, e2))
+        End Function
+        '''<summary>Determines the minimum element in a sequence based on the given comparison function.</summary>
+        <Extension()> <Pure()>
+        Public Function Min(Of T)(ByVal sequence As IEnumerable(Of T),
+                                  ByVal comparator As Func(Of T, T, Integer)) As T
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(comparator IsNot Nothing)
+            Contract.Requires(sequence.Any)
+            Return sequence.Aggregate(Function(e1, e2) If(comparator(e1, e2) <= 0, e1, e2))
+        End Function
+
+        '''<summary>Determines the maximum element in a sequence.</summary>
+        <Pure()> <Extension()>
+        Public Function Max(Of T As IComparable(Of T))(ByVal sequence As IEnumerable(Of T)) As T
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(sequence.Any)
+            Return sequence.Max(Function(e) e)
+        End Function
+        '''<summary>Determines the minimum element in a sequence.</summary>
+        <Pure()> <Extension()>
+        Public Function Min(Of T As IComparable(Of T))(ByVal sequence As IEnumerable(Of T)) As T
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(sequence.Any)
+            Return sequence.Min(Function(e) e)
+        End Function
+
+        '''<summary>Determines the maximum element in a sequence based on the comparable result of a projection.</summary>
+        <Pure()> <Extension()>
+        <ContractVerification(False)>
+        Public Function MaxRelativeTo(Of TInput, TComparable As IComparable(Of TComparable))(
+                        ByVal sequence As IEnumerable(Of TInput),
+                        ByVal projection As Func(Of TInput, TComparable)) As TInput
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(projection IsNot Nothing)
+            Contract.Requires(sequence.Any)
+            Return (From item In sequence
+                    Let image = projection(item)
+                    ).Max(Function(e1, e2) e1.image.CompareTo(e2.image)
+                    ).item
+        End Function
+        '''<summary>Determines the minimum element in a sequence based on the comparable result of a projection.</summary>
+        <Pure()> <Extension()>
+        <ContractVerification(False)>
+        Public Function MinRelativeTo(Of TInput, TComparable As IComparable(Of TComparable))(
+                        ByVal sequence As IEnumerable(Of TInput),
+                        ByVal projection As Func(Of TInput, TComparable)) As TInput
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(projection IsNot Nothing)
+            Contract.Requires(sequence.Any)
+            Return (From item In sequence
+                    Let image = projection(item)
+                    ).Min(Function(e1, e2) e1.image.CompareTo(e2.image)
+                    ).item
+        End Function
+#End Region
+
+        '''<summary>Zips the elements of two sequences into a sequence of pairs of elements.</summary>
+        <Extension()> <Pure()>
+        <ContractVerification(False)>
+        Public Function Zip(Of T1, T2)(ByVal sequence As IEnumerable(Of T1),
+                                       ByVal sequence2 As IEnumerable(Of T2)) As IEnumerable(Of Tuple(Of T1, T2))
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(sequence2 IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of T1, T2)))() IsNot Nothing)
+            Return Enumerable.Zip(sequence, sequence2, Function(e1, e2) Tuple.Create(e1, e2))
+        End Function
+
         '''<summary>Concatenates a sequence of sequences into a single sequence.</summary>
         <Pure()> <Extension()>
         Public Function Fold(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
@@ -74,76 +150,12 @@ Namespace Collections
                 End Function)
         End Function
 
-#Region "Transformations"
-        '''<summary>Determines the maximum element in a sequence based on the given comparison function.</summary>
-        <Extension()> <Pure()>
-        Public Function Max(Of T)(ByVal sequence As IEnumerable(Of T),
-                                  ByVal comparator As Func(Of T, T, Integer)) As T
+        '''<summary>Caches all the items in a sequence, preventing changes to the sequence from affecting the resulting sequence.</summary>
+        <Extension()>
+        Public Function Cache(Of T)(ByVal sequence As IEnumerable(Of T)) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(comparator IsNot Nothing)
-            Dim any = False
-            Dim maxElement As T = Nothing
-
-            For Each e In sequence
-                If Not any OrElse comparator(maxElement, e) < 0 Then
-                    maxElement = e
-                End If
-                any = True
-            Next e
-
-            Return maxElement
-        End Function
-
-        '''<summary>Determines the element with the maximum output from a transformation function.</summary>
-        <Pure()> <Extension()>
-        Public Function MaxPair(Of TSequence, TComparable As IComparable)(ByVal sequence As IEnumerable(Of TSequence),
-                                                                          ByVal transformation As Func(Of TSequence, TComparable),
-                                                                          ByRef outElement As TSequence,
-                                                                          ByRef outImage As TComparable) As Boolean
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(transformation IsNot Nothing)
-            Dim any = False
-            Dim maxElement = outElement
-            Dim maxImage = outImage
-
-            For Each e In sequence
-                Dim f = transformation(e)
-                If Not any OrElse f.CompareTo(maxImage) > 0 Then
-                    maxElement = e
-                    maxImage = f
-                End If
-                any = True
-            Next e
-
-            If any Then
-                outElement = maxElement
-                outImage = maxImage
-            End If
-            Return any
-        End Function
-
-        '''<summary>Folds a sequence using the given reduction function.</summary>
-        <Extension()> <Pure()>
-        Public Function ReduceUsing(Of TSource, TResult)(ByVal sequence As IEnumerable(Of TSource),
-                                                         ByVal reduction As Func(Of TResult, TSource, TResult),
-                                                         Optional ByVal initialValue As TResult = Nothing) As TResult
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(reduction IsNot Nothing)
-            Dim accumulator = initialValue
-            For Each item In sequence
-                accumulator = reduction(accumulator, item)
-            Next item
-            Return accumulator
-        End Function
-
-        '''<summary>Folds a sequence using the given reduction function.</summary>
-        <Extension()> <Pure()>
-        Public Function ReduceUsing(Of T)(ByVal sequence As IEnumerable(Of T),
-                                          ByVal reduction As Func(Of T, T, T),
-                                          Optional ByVal initialValue As T = Nothing) As T
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(reduction IsNot Nothing)
-            Return ReduceUsing(Of T, T)(sequence, reduction, initialValue)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
+            Return sequence.ToArray
         End Function
 
         '''<summary>Partitions a sequence into fixed sized blocks, with the last block potentially being smaller.</summary>
@@ -187,6 +199,5 @@ Namespace Collections
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TOut))() IsNot Nothing)
             Return New Enumerable(Of TOut)(Function() transformation(sequence.GetEnumerator()))
         End Function
-#End Region
     End Module
 End Namespace

@@ -584,5 +584,26 @@ Namespace Values
             Return (value >> offset) Or (value << (64 - offset))
         End Function
 #End Region
+
+        <Pure()> <Extension()>
+        <ContractVerification(False)>
+        Public Function ClampAtOrAbove(Of T As IComparable(Of T))(ByVal value1 As T, ByVal value2 As T) As T
+            Contract.Requires(value1 IsNot Nothing)
+            Contract.Requires(value2 IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of T)() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of T)().CompareTo(value1) >= 0)
+            Contract.Ensures(Contract.Result(Of T)().CompareTo(value2) >= 0)
+            Return If(value1.CompareTo(value2) >= 0, value1, value2)
+        End Function
+        <Pure()> <Extension()>
+        <ContractVerification(False)>
+        Public Function ClampAtOrBelow(Of T As IComparable(Of T))(ByVal value1 As T, ByVal value2 As T) As T
+            Contract.Requires(value1 IsNot Nothing)
+            Contract.Requires(value2 IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of T)() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of T)().CompareTo(value1) <= 0)
+            Contract.Ensures(Contract.Result(Of T)().CompareTo(value2) <= 0)
+            Return If(value1.CompareTo(value2) <= 0, value1, value2)
+        End Function
     End Module
 End Namespace
