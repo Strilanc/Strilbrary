@@ -70,7 +70,7 @@ Namespace Collections
                 End Get
             End Property
             Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
-                Return _subList.AsEnumerable.GetEnumerator()
+                Return _subList.GetEnumerator()
             End Function
             Public Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
                 Return _subList.GetEnumerator()
@@ -150,7 +150,7 @@ Namespace Collections
                 End Get
             End Property
             Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
-                Return _subList.AsEnumerable.GetEnumerator
+                Return _subList.GetEnumerator
             End Function
             Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements IEnumerable.GetEnumerator
                 Return _subList.GetEnumerator

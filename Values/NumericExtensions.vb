@@ -11,9 +11,19 @@ Namespace Values
 
     Public Module NumericExtensions
         <Extension()> <Pure()>
+        Public Function ReversedByteOrder(ByVal value As UInt16) As UInt16
+            Dim reversedValue = 0US
+            For i = 0 To 2 - 1
+                reversedValue <<= 8
+                reversedValue = reversedValue Or (value And &HFFUS)
+                value >>= 8
+            Next i
+            Return reversedValue
+        End Function
+        <Extension()> <Pure()>
         Public Function ReversedByteOrder(ByVal value As UInt32) As UInt32
             Dim reversedValue = 0UI
-            For i = 0 To 3
+            For i = 0 To 4 - 1
                 reversedValue <<= 8
                 reversedValue = reversedValue Or (value And &HFFUI)
                 value >>= 8
@@ -23,7 +33,7 @@ Namespace Values
         <Extension()> <Pure()>
         Public Function ReversedByteOrder(ByVal value As UInt64) As UInt64
             Dim reversedValue = 0UL
-            For i = 0 To 7
+            For i = 0 To 8 - 1
                 reversedValue <<= 8
                 reversedValue = reversedValue Or (value And &HFFUL)
                 value >>= 8
@@ -380,86 +390,171 @@ Namespace Values
         End Function
 
         ''' <summary>
-        ''' Determines the value of a sequence of up to 2 bytes treated as base-256 digits.
+        ''' Determines the value of a sequence of 2 bytes treated as base-256 digits.
         ''' </summary>
         <Extension()> <Pure()>
+        <ContractVerification(False)>
         Public Function ToUInt16(ByVal data As IEnumerable(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
-            Contract.Requires(data IsNot Nothing)
             Const size As Integer = 2
-            If data.CountIsGreaterThan(size) Then Throw New ArgumentOutOfRangeException("data", "Data has too many bytes.")
+            Contract.Requires(data IsNot Nothing)
+            If data.Count <> size Then Throw New ArgumentOutOfRangeException("data", "Incorrect number of bytes.")
 
-            'Arrange bytes for conversion
-            Dim bytes = data.Take(size).ToArray
-            Contract.Assume(bytes.Length <= size)
-            Dim padding = Enumerable.Repeat(CByte(0), size - bytes.Length)
+            'Handle endian-ness
+            Dim reverse = False
             Select Case byteOrder
-                Case byteOrder.BigEndian
-                    bytes = padding.Concat(bytes).ToArray
-                    If BitConverter.IsLittleEndian Then bytes = bytes.Reverse.ToArray
-                Case byteOrder.LittleEndian
-                    bytes = bytes.Concat(padding).ToArray
-                    If Not BitConverter.IsLittleEndian Then bytes = bytes.Reverse.ToArray
-                Case Else
-                    Throw byteOrder.MakeArgumentValueException("byteOrder")
+                Case byteOrder.BigEndian : reverse = BitConverter.IsLittleEndian
+                Case byteOrder.LittleEndian : reverse = Not BitConverter.IsLittleEndian
+                Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
             End Select
-            Contract.Assume(bytes.Length = size)
+
+            'Copy bytes into array
+            Dim bytes(0 To size - 1) As Byte
+            Dim i = 0
+            For Each b In data
+                bytes(If(reverse, size - i - 1, i)) = b
+                i += 1
+            Next b
 
             Return BitConverter.ToUInt16(bytes, 0)
         End Function
         ''' <summary>
-        ''' Determines the value of a sequence of up to 4 bytes treated as base-256 digits.
+        ''' Determines the value of a sequence of 4 bytes treated as base-256 digits.
         ''' </summary>
         <Extension()> <Pure()>
+        <ContractVerification(False)>
         Public Function ToUInt32(ByVal data As IEnumerable(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt32
-            Contract.Requires(data IsNot Nothing)
             Const size As Integer = 4
-            If data.CountIsGreaterThan(size) Then Throw New ArgumentOutOfRangeException("data", "Data has too many bytes.")
+            Contract.Requires(data IsNot Nothing)
+            If data.Count <> size Then Throw New ArgumentOutOfRangeException("data", "Incorrect number of bytes.")
 
-            'Arrange bytes for conversion
-            Dim bytes = data.Take(size).ToArray
-            Contract.Assume(bytes.Length <= size)
-            Dim padding = Enumerable.Repeat(CByte(0), size - bytes.Length)
+            'Handle endian-ness
+            Dim reverse = False
             Select Case byteOrder
-                Case byteOrder.BigEndian
-                    bytes = padding.Concat(bytes).ToArray
-                    If BitConverter.IsLittleEndian Then bytes = bytes.Reverse.ToArray
-                Case byteOrder.LittleEndian
-                    bytes = bytes.Concat(padding).ToArray
-                    If Not BitConverter.IsLittleEndian Then bytes = bytes.Reverse.ToArray
-                Case Else
-                    Throw byteOrder.MakeArgumentValueException("byteOrder")
+                Case byteOrder.BigEndian : reverse = BitConverter.IsLittleEndian
+                Case byteOrder.LittleEndian : reverse = Not BitConverter.IsLittleEndian
+                Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
             End Select
-            Contract.Assume(bytes.Length = size)
+
+            'Copy bytes into array
+            Dim bytes(0 To size - 1) As Byte
+            Dim i = 0
+            For Each b In data
+                bytes(If(reverse, size - i - 1, i)) = b
+                i += 1
+            Next b
 
             Return BitConverter.ToUInt32(bytes, 0)
         End Function
         ''' <summary>
-        ''' Determines the value of a sequence of up to 8 bytes treated as base-256 digits.
+        ''' Determines the value of a sequence of 8 bytes treated as base-256 digits.
         ''' </summary>
         <Extension()> <Pure()>
+        <ContractVerification(False)>
         Public Function ToUInt64(ByVal data As IEnumerable(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt64
-            Contract.Requires(data IsNot Nothing)
             Const size As Integer = 8
-            If data.CountIsGreaterThan(size) Then Throw New ArgumentOutOfRangeException("data", "Data has too many bytes.")
+            Contract.Requires(data IsNot Nothing)
+            If data.Count <> size Then Throw New ArgumentOutOfRangeException("data", "Incorrect number of bytes.")
 
-            'Arrange bytes for conversion
-            Dim bytes = data.Take(size).ToArray
-            Contract.Assume(bytes.Length <= size)
-            Dim padding = Enumerable.Repeat(CByte(0), size - bytes.Length)
+            'Handle endian-ness
+            Dim reverse = False
             Select Case byteOrder
-                Case byteOrder.BigEndian
-                    bytes = padding.Concat(bytes).ToArray
-                    If BitConverter.IsLittleEndian Then bytes = bytes.Reverse.ToArray
-                Case byteOrder.LittleEndian
-                    bytes = bytes.Concat(padding).ToArray
-                    If Not BitConverter.IsLittleEndian Then bytes = bytes.Reverse.ToArray
-                Case Else
-                    Throw byteOrder.MakeArgumentValueException("byteOrder")
+                Case byteOrder.BigEndian : reverse = BitConverter.IsLittleEndian
+                Case byteOrder.LittleEndian : reverse = Not BitConverter.IsLittleEndian
+                Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
             End Select
-            Contract.Assume(bytes.Length = size)
+
+            'Copy bytes into array
+            Dim bytes(0 To size - 1) As Byte
+            Dim i = 0
+            For Each b In data
+                bytes(If(reverse, size - i - 1, i)) = b
+                i += 1
+            Next b
+
+            Return BitConverter.ToUInt64(bytes, 0)
+        End Function
+
+        ''' <summary>
+        ''' Determines the value of a list of 2 bytes treated as base-256 digits.
+        ''' </summary>
+        <Extension()> <Pure()>
+        <ContractVerification(False)>
+        Public Function ToUInt16(ByVal data As IReadableList(Of Byte),
+                                 Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
+            Const size As Integer = 2
+            Contract.Requires(data IsNot Nothing)
+            Contract.Requires(data.Count = size)
+
+            'Handle endian-ness
+            Dim reverse = False
+            Select Case byteOrder
+                Case byteOrder.BigEndian : reverse = BitConverter.IsLittleEndian
+                Case byteOrder.LittleEndian : reverse = Not BitConverter.IsLittleEndian
+                Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
+            End Select
+
+            'Pack bytes
+            Dim bytes(0 To size - 1) As Byte
+            For i = 0 To size - 1
+                bytes(If(reverse, size - i - 1, i)) = data(i)
+            Next i
+
+            Return BitConverter.ToUInt16(bytes, 0)
+        End Function
+        ''' <summary>
+        ''' Determines the value of a list of 4 bytes treated as base-256 digits.
+        ''' </summary>
+        <Extension()> <Pure()>
+        <ContractVerification(False)>
+        Public Function ToUInt32(ByVal data As IReadableList(Of Byte),
+                                 Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt32
+            Const size As Integer = 4
+            Contract.Requires(data IsNot Nothing)
+            Contract.Requires(data.Count = size)
+
+            'Handle endian-ness
+            Dim reverse = False
+            Select Case byteOrder
+                Case byteOrder.BigEndian : reverse = BitConverter.IsLittleEndian
+                Case byteOrder.LittleEndian : reverse = Not BitConverter.IsLittleEndian
+                Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
+            End Select
+
+            'Pack bytes
+            Dim bytes(0 To size - 1) As Byte
+            For i = 0 To size - 1
+                bytes(If(reverse, size - i - 1, i)) = data(i)
+            Next i
+
+            Return BitConverter.ToUInt32(bytes, 0)
+        End Function
+        ''' <summary>
+        ''' Determines the value of a list of 8 bytes treated as base-256 digits.
+        ''' </summary>
+        <Extension()> <Pure()>
+        <ContractVerification(False)>
+        Public Function ToUInt64(ByVal data As IReadableList(Of Byte),
+                                 Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt64
+            Const size As Integer = 8
+            Contract.Requires(data IsNot Nothing)
+            Contract.Requires(data.Count = size)
+
+            'Handle endian-ness
+            Dim reverse = False
+            Select Case byteOrder
+                Case byteOrder.BigEndian : reverse = BitConverter.IsLittleEndian
+                Case byteOrder.LittleEndian : reverse = Not BitConverter.IsLittleEndian
+                Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
+            End Select
+
+            'Pack bytes
+            Dim bytes(0 To size - 1) As Byte
+            For i = 0 To size - 1
+                bytes(If(reverse, size - i - 1, i)) = data(i)
+            Next i
 
             Return BitConverter.ToUInt64(bytes, 0)
         End Function

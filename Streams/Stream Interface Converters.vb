@@ -23,10 +23,10 @@ Namespace Streams
             End Property
 
             <ContractVerification(False)>
-            Public Function Read(ByVal maxLength As Integer) As Collections.IReadableList(Of Byte) Implements IReadableStream.Read
+            Public Function Read(ByVal maxLength As Integer) As IReadableList(Of Byte) Implements IReadableStream.Read
                 Dim buffer(0 To maxLength - 1) As Byte
                 Dim n = _stream.Read(buffer, 0, maxLength)
-                Return buffer.AsReadableList.SubView(0, n)
+                Return New ListView(Of Byte)(buffer.AsReadableList, 0, n)
             End Function
 
             Public Sub Write(ByVal data As Collections.IReadableList(Of Byte)) Implements IWritableStream.Write

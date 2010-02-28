@@ -19,7 +19,7 @@
         Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
             Get
                 Contract.Requires(index >= 0)
-                Contract.Requires(index < Me.Count)
+                Contract.Requires(index < Count)
                 Throw New NotSupportedException
             End Get
         End Property

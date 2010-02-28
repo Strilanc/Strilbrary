@@ -1,5 +1,6 @@
 ﻿Imports Strilbrary.Values
 Imports Strilbrary.Collections
+Imports Strilbrary.Exceptions
 
 Namespace Streams
     Public Module StreamExtensions
@@ -177,9 +178,15 @@ Namespace Streams
             Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))().Count = exactCount)
             Dim result = New List(Of Byte)(capacity:=exactCount)
             While result.Count < exactCount
-                Dim read = stream.Read(exactCount - result.Count)
-                If read.Count = 0 Then Throw New IO.IOException("Stream ended before enough data could be read.")
-                result.AddRange(read)
+                Dim readData = stream.Read(exactCount - result.Count)
+                Select Case readData.Count
+                    Case 0
+                        Throw New IO.IOException("Stream ended before enough data could be read.")
+                    Case exactCount
+                        Return readData
+                    Case Else
+                        result.AddRange(readData)
+                End Select
             End While
             Contract.Assume(result.Count = exactCount)
             Return result.AsReadableList

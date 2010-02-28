@@ -49,7 +49,7 @@
             Contract.Requires(list IsNot Nothing)
             Contract.Ensures(Contract.Result(Of ListView(Of T))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of ListView(Of T))().Count = list.Count)
-            Return If(TryCast(list, ListView(Of T)), New ListView(Of T)(list))
+            Return If(TryCast(list, ListView(Of T)), New ListView(Of T)(list, 0, list.Count))
         End Function
         '''<summary>Returns a list containing a contiguous subset of the given list starting at the given offset.</summary>
         <Extension()> <Pure()>

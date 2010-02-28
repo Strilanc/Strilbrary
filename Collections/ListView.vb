@@ -19,14 +19,9 @@ Namespace Collections
             Contract.Invariant(_offset + _length <= _items.Count)
         End Sub
 
-        Public Sub New(ByVal items As IReadableList(Of T))
-            Me.New(items, 0, items.Count)
-            Contract.Requires(items IsNot Nothing)
-            Contract.Ensures(Me.Count = items.Count)
-        End Sub
-        Private Sub New(ByVal items As IReadableList(Of T),
-                        ByVal offset As Integer,
-                        ByVal length As Integer)
+        Public Sub New(ByVal items As IReadableList(Of T),
+                       ByVal offset As Integer,
+                       ByVal length As Integer)
             Contract.Requires(items IsNot Nothing)
             Contract.Requires(offset >= 0)
             Contract.Requires(length >= 0)
@@ -86,13 +81,7 @@ Namespace Collections
             Return -1
         End Function
         Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
-            Dim nextIndex = 0
-            Return New Enumerator(Of T)(Function(controller)
-                                            If nextIndex >= Me.Count Then Return controller.Break()
-                                            Dim e = Item(nextIndex)
-                                            nextIndex += 1
-                                            Return e
-                                        End Function)
+            Return New Enumerator(Me)
         End Function
         Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
             Return GetEnumerator()
@@ -105,5 +94,49 @@ Namespace Collections
                 Return "[{0}]".Frmt(Me.StringJoin(", "))
             End If
         End Function
+
+        Private Class Enumerator
+            Implements IEnumerator(Of T)
+
+            Private _index As Int32 = -1
+            Private ReadOnly _list As IReadableList(Of T)
+
+            <ContractInvariantMethod()> Private Sub ObjectInvariant()
+                Contract.Invariant(_list IsNot Nothing)
+            End Sub
+
+            Public Sub New(ByVal list As IReadableList(Of T))
+                Contract.Requires(list IsNot Nothing)
+                Me._list = list
+            End Sub
+
+            Public ReadOnly Property Current As T Implements IEnumerator(Of T).Current
+                <ContractVerification(False)>
+                Get
+                    If _index < 0 Then Throw New InvalidOperationException("Enumerator not started.")
+                    If _index >= _list.Count Then Throw New InvalidOperationException("Enumerator finished.")
+                    Return _list(_index)
+                End Get
+            End Property
+
+            Private ReadOnly Property CurrentObj As Object Implements System.Collections.IEnumerator.Current
+                Get
+                    Return Current
+                End Get
+            End Property
+
+            Public Function MoveNext() As Boolean Implements System.Collections.IEnumerator.MoveNext
+                _index += 1
+                Return _index < _list.Count
+            End Function
+
+            Public Sub Reset() Implements System.Collections.IEnumerator.Reset
+                Throw New NotSupportedException
+            End Sub
+
+            Private Sub Dispose() Implements IDisposable.Dispose
+                _index = _list.Count
+            End Sub
+        End Class
     End Class
 End Namespace

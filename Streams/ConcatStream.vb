@@ -1,45 +1,50 @@
+Imports Strilbrary.Collections
+
 Namespace Streams
     '''<summary>A read-only stream which reads through the contents of multiple readable streams.</summary>
     Public NotInheritable Class ConcatStream
-        Inherits ReadOnlyStream
-        Private ReadOnly streams As IEnumerator(Of IO.Stream)
-        Private emptied As Boolean
+        Implements IReadableStream
+        Private ReadOnly _streams As IEnumerator(Of IReadableStream)
+        Private _emptied As Boolean
 
         <ContractInvariantMethod()> Private Shadows Sub ObjectInvariant()
-            Contract.Invariant(streams IsNot Nothing)
+            Contract.Invariant(_streams IsNot Nothing)
         End Sub
 
-        Public Sub New(ByVal streams As IEnumerable(Of IO.Stream))
+        Public Sub New(ByVal streams As IEnumerable(Of IReadableStream))
             Contract.Requires(streams IsNot Nothing)
-            If (From stream In streams Where stream Is Nothing OrElse Not stream.CanRead).Any Then
-                Throw New ArgumentException("streams contains a null or non-readable member.")
+            If (From stream In streams Where stream Is Nothing).Any Then
+                Throw New ArgumentException("Null stream.")
             End If
 
-            Me.streams = streams.GetEnumerator()
-            emptied = Not Me.streams.MoveNext()
+            Me._streams = streams.GetEnumerator()
+            _emptied = Not Me._streams.MoveNext()
         End Sub
 
-        Public Overrides Function Read(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer) As Integer
-            Dim totalRead = 0
-            While totalRead < count AndAlso Not emptied
-                Contract.Assume(streams.Current IsNot Nothing)
-                Dim numRead = streams.Current().Read(buffer, offset + totalRead, count - totalRead)
-                Contract.Assume(totalRead + numRead <= count)
-                totalRead += numRead
-                If numRead = 0 Then
-                    streams.Current.Close()
-                    emptied = Not Me.streams.MoveNext()
-                End If
+        Public Function Read(ByVal maxCount As Integer) As IReadableList(Of Byte) Implements IReadableStream.Read
+            Dim result = New List(Of Byte)
+            While result.Count < maxCount AndAlso Not _emptied
+                Contract.Assume(_streams.Current IsNot Nothing)
+                Dim data = _streams.Current().Read(maxCount - result.Count)
+                Select Case data.Count
+                    Case 0
+                        _streams.Current.Dispose()
+                        _emptied = Not Me._streams.MoveNext()
+                    Case maxCount
+                        Return data
+                    Case Else
+                        result.AddRange(data)
+                End Select
             End While
-            Contract.Assert(totalRead <= count)
-            Return totalRead
+            Contract.Assume(result.Count <= maxCount)
+            Return result.AsReadableList
         End Function
 
-        Public Overrides Sub Close()
-            Do Until emptied
-                Contract.Assume(streams.Current IsNot Nothing)
-                streams.Current.Close()
-                emptied = Not streams.MoveNext
+        Public Sub Dispose() Implements IDisposable.Dispose
+            Do Until _emptied
+                Contract.Assume(_streams.Current IsNot Nothing)
+                _streams.Current.Dispose()
+                _emptied = Not _streams.MoveNext
             Loop
         End Sub
     End Class
