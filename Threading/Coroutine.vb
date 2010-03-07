@@ -25,7 +25,7 @@ Namespace Threading
     ''' </summary>
     ''' <remarks>Uses locks and an alternate thread. Not very lightweight.</remarks>
     Public NotInheritable Class Coroutine
-        Inherits FutureDisposable
+        Inherits DisposableWithTask
         Implements ICoroutineController
         Private started As Boolean
         Private finished As Boolean
@@ -55,7 +55,7 @@ Namespace Threading
                         coexception = ex
                     End Try
 
-                    If FutureDisposed.State <> FutureState.Unknown Then
+                    If Me.IsDisposed Then
                         coexception = New ObjectDisposedException(Me.GetType.Name, coexception)
                     End If
                     finished = True
@@ -66,7 +66,7 @@ Namespace Threading
         End Sub
 
         Public Function [Continue]() As CoroutineOutcome
-            CheckNotDisposed()
+            If Me.IsDisposed Then Throw New ObjectDisposedException(Me.GetType.Name)
 
             lockProducer.Reset()
             lockConsumer.Set()
@@ -81,25 +81,21 @@ Namespace Threading
                 Dispose()
                 Return CoroutineOutcome.FinishedAndDisposed
             Else
-                CheckNotDisposed()
+                If Me.IsDisposed Then Throw New ObjectDisposedException(Me.GetType.Name)
                 Return CoroutineOutcome.Continuing
             End If
         End Function
         Private Sub [Yield]() Implements ICoroutineController.Yield
-            CheckNotDisposed()
+            If Me.IsDisposed Then Throw New ObjectDisposedException(Me.GetType.Name)
 
             lockConsumer.Reset()
             lockProducer.Set()
             lockConsumer.WaitOne()
 
-            CheckNotDisposed()
+            If Me.IsDisposed Then Throw New ObjectDisposedException(Me.GetType.Name)
         End Sub
 
-        Private Sub CheckNotDisposed()
-            If FutureDisposed.State <> FutureState.Unknown Then Throw New ObjectDisposedException(Me.GetType.Name)
-        End Sub
-
-        Protected Overrides Function PerformDispose(ByVal finalizing As Boolean) As IFuture
+        Protected Overrides Function PerformDispose(ByVal finalizing As Boolean) As Task
             If finalizing Then Return Nothing
             lockProducer.Dispose()
             lockConsumer.Dispose()

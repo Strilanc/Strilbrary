@@ -15,6 +15,8 @@ Namespace Threading
     ''' - (How does this compare to CAS-based implementations in terms of average throughput? It should be higher?)
     ''' </remarks>
     Public NotInheritable Class SingleConsumerLockFreeQueue(Of T)
+        Implements IEnumerable(Of T)
+
         ''' <summary>
         ''' Owned by the consumer.
         ''' This node is the end marker of the consumed nodes.
@@ -138,6 +140,23 @@ Namespace Threading
             If head.next Is Nothing Then Throw New InvalidOperationException("Empty Queue")
             head = head.next
             Return head.value
+        End Function
+
+        ''' <summary>
+        ''' Iterates over items in the queue.
+        ''' Might include items added after enumeration has started.
+        ''' Might not include items BeginEnqueued before enumeration started.
+        ''' </summary>
+        Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
+            Dim cur = head
+            Return New Collections.Enumerator(Of T)(Function(controller)
+                                                        If cur.next Is Nothing Then Return controller.Break
+                                                        cur = cur.next
+                                                        Return cur.value
+                                                    End Function)
+        End Function
+        Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+            Return GetEnumerator()
         End Function
     End Class
 End Namespace

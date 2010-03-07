@@ -8,7 +8,7 @@ Namespace Time
         ''' Returns a future which becomes ready after the given amount of time has passed on the clock.
         ''' The resulting future is instantly ready if the given time is non-positive.
         ''' </summary>
-        Function AsyncWait(ByVal dt As TimeSpan) As IFuture
+        Function AsyncWait(ByVal dt As TimeSpan) As Task
 
         ''' <summary>
         ''' Determines the time elapsed on the clock since it was started.
@@ -18,9 +18,8 @@ Namespace Time
         <ContractClassFor(GetType(IClock))>
         NotInheritable Class ContractClass
             Implements IClock
-            Public Function AsyncWait(ByVal dt As TimeSpan) As Threading.IFuture Implements IClock.AsyncWait
-                Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-                Contract.Ensures(dt.Ticks > 0 OrElse Contract.Result(Of IFuture)().State = FutureState.Succeeded)
+            Public Function AsyncWait(ByVal dt As TimeSpan) As Task Implements IClock.AsyncWait
+                Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
                 Throw New NotSupportedException
             End Function
             Public ReadOnly Property ElapsedTime() As TimeSpan Implements IClock.ElapsedTime

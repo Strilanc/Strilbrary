@@ -4,7 +4,7 @@
         Private ReadOnly _cooldown As TimeSpan
         Private _nextAction As Action
         Private _running As Boolean
-        Private ReadOnly inQueue As ICallQueue = New ThreadPooledCallQueue()
+        Private ReadOnly inQueue As CallQueue = New TaskedCallQueue()
         Private ReadOnly _clock As Time.IClock
 
         <ContractInvariantMethod()>
@@ -41,7 +41,7 @@
                     _nextAction = Nothing
                     If actionToRun IsNot Nothing Then
                         Call ThreadPooledAction(actionToRun)
-                        _clock.AsyncWait(_cooldown).CallOnSuccess(AddressOf OnReadyToRun)
+                        _clock.AsyncWait(_cooldown).ContinueWithAction(AddressOf OnReadyToRun)
                     Else
                         _running = False
                     End If

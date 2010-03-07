@@ -48,7 +48,7 @@ Namespace Time
             End Get
         End Property
 
-        Public Function AsyncWait(ByVal dt As TimeSpan) As IFuture Implements IClock.AsyncWait
+        Public Function AsyncWait(ByVal dt As TimeSpan) As Task Implements IClock.AsyncWait
             Return _parentClock.AsyncWait(dt)
         End Function
 

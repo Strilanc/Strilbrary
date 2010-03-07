@@ -2,7 +2,7 @@
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports Strilbrary.Time
 Imports Strilbrary.Threading
-Imports StrilbraryTests.IFutureExtensionsTest
+Imports StrilbraryTests.TaskExtensionsTest
 
 <TestClass()>
 Public Class TimeTest
@@ -32,11 +32,11 @@ Public Class TimeTest
     Public Sub ManualAsyncWaitTest_Positive()
         Dim c = New ManualClock()
         Dim f = c.AsyncWait(3.Seconds)
-        Assert.IsTrue(f.State = FutureState.Unknown)
+        ExpectTaskToIdle(f)
         c.Advance(2.Seconds)
-        Assert.IsTrue(f.State = FutureState.Unknown)
+        ExpectTaskToIdle(f)
         c.Advance(2.Seconds)
-        Assert.IsTrue(f.State = FutureState.Succeeded)
+        WaitForTaskToSucceed(f)
     End Sub
     <TestMethod()>
     Public Sub ManualAsyncWaitTest_Multiple()
@@ -45,18 +45,18 @@ Public Class TimeTest
         Dim f1 = c.AsyncWait(1.Seconds)
         Dim f3 = c.AsyncWait(3.Seconds)
         c.Advance(500.Milliseconds)
-        Assert.IsTrue(f1.State = FutureState.Unknown)
-        Assert.IsTrue(f2.State = FutureState.Unknown)
-        Assert.IsTrue(f3.State = FutureState.Unknown)
+        ExpectTaskToIdle(f1)
+        ExpectTaskToIdle(f2)
+        ExpectTaskToIdle(f3)
         c.Advance(1.Seconds)
-        Assert.IsTrue(f1.State = FutureState.Succeeded)
-        Assert.IsTrue(f2.State = FutureState.Unknown)
-        Assert.IsTrue(f3.State = FutureState.Unknown)
+        WaitForTaskToSucceed(f1)
+        ExpectTaskToIdle(f2)
+        ExpectTaskToIdle(f3)
         c.Advance(1.Seconds)
-        Assert.IsTrue(f2.State = FutureState.Succeeded)
-        Assert.IsTrue(f3.State = FutureState.Unknown)
+        WaitForTaskToSucceed(f2)
+        ExpectTaskToIdle(f3)
         c.Advance(1.Seconds)
-        Assert.IsTrue(f3.State = FutureState.Succeeded)
+        WaitForTaskToSucceed(f3)
     End Sub
     <TestMethod()>
     Public Sub ManualAsyncWaitTest_Duplicate()
@@ -64,17 +64,17 @@ Public Class TimeTest
         Dim f2 = c.AsyncWait(1.Seconds)
         Dim f1 = c.AsyncWait(1.Seconds)
         c.Advance(500.Milliseconds)
-        Assert.IsTrue(f1.State = FutureState.Unknown)
-        Assert.IsTrue(f2.State = FutureState.Unknown)
+        ExpectTaskToIdle(f1)
+        ExpectTaskToIdle(f2)
         c.Advance(1.Seconds)
-        Assert.IsTrue(f1.State = FutureState.Succeeded)
-        Assert.IsTrue(f2.State = FutureState.Succeeded)
+        WaitForTaskToSucceed(f1)
+        WaitForTaskToSucceed(f2)
     End Sub
     <TestMethod()>
     Public Sub ManualAsyncWaitTest_Instant()
         Dim c = New ManualClock()
         Dim f = c.AsyncWait(-1.Seconds)
-        Assert.IsTrue(f.State = FutureState.Succeeded)
+        Assert.IsTrue(f.Status = TaskStatus.RanToCompletion)
     End Sub
     <TestMethod()>
     Public Sub ClockAfterResetTest()
@@ -96,16 +96,14 @@ Public Class TimeTest
     Public Sub SystemAsyncWaitTest_Positive()
         Dim c = New SystemClock()
         Dim f = c.AsyncWait(2.Seconds)
-        BlockOnFuture(f, timeout:=1.Seconds)
-        Assert.IsTrue(f.State = FutureState.Unknown)
-        BlockOnFuture(f, timeout:=2.Seconds)
-        Assert.IsTrue(f.State = FutureState.Succeeded)
+        ExpectTaskToIdle(f, timeoutMilliseconds:=1000)
+        WaitForTaskToSucceed(f, timeoutMilliseconds:=2000)
     End Sub
     <TestMethod()>
     Public Sub SystemAsyncWaitTest_Instant()
         Dim c = New ManualClock()
         Dim f = c.AsyncWait(-1.Seconds)
-        Assert.IsTrue(f.State = FutureState.Succeeded)
+        Assert.IsTrue(f.Status = TaskStatus.RanToCompletion)
     End Sub
     <TestMethod()>
     Public Sub SystemTimeTest()

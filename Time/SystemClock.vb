@@ -23,20 +23,21 @@ Namespace Time
             Me._lastTick = Environment.TickCount
         End Sub
 
-        Public Function AsyncWait(ByVal dt As TimeSpan) As IFuture Implements IClock.AsyncWait
-            Dim result = New FutureAction
+        <ContractVerification(False)>
+        Public Function AsyncWait(ByVal dt As TimeSpan) As Task Implements IClock.AsyncWait
+            Dim result = New TaskCompletionSource(Of Boolean)
             If dt.Ticks <= 0 Then
-                result.SetSucceeded()
+                result.SetResult(True)
             Else
                 Dim timer = New Timers.Timer(dt.TotalMilliseconds)
                 AddHandler timer.Elapsed, Sub()
                                               timer.Dispose()
-                                              result.SetSucceeded()
+                                              result.SetResult(True)
                                           End Sub
                 timer.AutoReset = False
                 timer.Start()
             End If
-            Return result
+            Return result.Task
         End Function
 
         Public ReadOnly Property ElapsedTime As TimeSpan Implements IClock.ElapsedTime

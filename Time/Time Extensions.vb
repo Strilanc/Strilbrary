@@ -28,9 +28,9 @@ Namespace Time
             callback = Sub()
                            If stopFlag Then Return
                            Call action()
-                           clock.AsyncWait(period).CallOnSuccess(callback)
+                           clock.AsyncWait(period).ContinueWithAction(callback)
                        End Sub
-            clock.AsyncWait(period).CallOnSuccess(callback)
+            clock.AsyncWait(period).ContinueWithAction(callback)
             Return New DelegatedDisposable(Sub() stopFlag = True)
         End Function
 

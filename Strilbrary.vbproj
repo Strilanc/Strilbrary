@@ -118,6 +118,7 @@
     <Import Include="System.Linq" />
     <Import Include="System.Numerics" />
     <Import Include="System.Runtime.CompilerServices" />
+    <Import Include="System.Threading.Tasks" />
     <Import Include="System.Windows.Forms" />
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
@@ -133,8 +134,8 @@
     <Compile Include="Misc\DelegatedDisposable.vb" />
     <Compile Include="Streams\Stream Interface Converters.vb" />
     <Compile Include="Streams\Stream Interfaces.vb" />
+    <Compile Include="Threading\TaskExtensions.vb" />
     <Compile Include="Time\Clock Interfaces.vb" />
-    <Compile Include="Threading\Futures.vb" />
     <Compile Include="Time\RelativeClock.vb" />
     <Compile Include="Time\SystemClock.vb" />
     <Compile Include="Time\ManualClock.vb" />
@@ -148,8 +149,7 @@
     <Compile Include="Values\ModByte.vb" />
     <Compile Include="Values\ModInt16.vb" />
     <Compile Include="Streams\StreamExtensions.vb" />
-    <Compile Include="Threading\IFutureExtensions.vb" />
-    <Compile Include="Threading\AbstractLockFreeConsumer.vb" />
+    <Compile Include="Threading\LockFreeConsumer.vb" />
     <Compile Include="Threading\SingleConsumerLockFreeQueue.vb" />
     <Compile Include="Threading\OneTimeLock.vb" />
     <Compile Include="Values\ModInt32.vb" />
@@ -179,7 +179,7 @@
     <Compile Include="Streams\ConcatStream.vb" />
     <Compile Include="Streams\WrappedStream.vb" />
     <Compile Include="Streams\ZLibStream.vb" />
-    <Compile Include="Threading\FutureDisposable.vb" />
+    <Compile Include="Threading\DisposableWithTask.vb" />
     <Compile Include="Collections\LinqListExtensions.vb" />
   </ItemGroup>
   <ItemGroup>

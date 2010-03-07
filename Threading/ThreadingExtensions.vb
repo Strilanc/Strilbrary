@@ -1,193 +1,135 @@
 ﻿Imports System.Threading
 
 Namespace Threading
+    'Verification disabled due to missing task contracts
+    <ContractVerification(False)>
     Public Module ThreadingExtensions
-#Region "Async Eval"
-        '''<summary>Determines a future for running an action in a new thread.</summary>
-        Public Function ThreadedAction(ByVal action As Action) As IFuture
+        '''<summary>Determines a task for running an action in a new thread.</summary>
+        Public Function ThreadedAction(ByVal action As Action) As Task
             Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Dim result = New FutureAction
+            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
+            Dim result = New TaskCompletionSource(Of Boolean)
             Call New Thread(Sub() result.SetByCalling(action)).Start()
-            Return result
+            Return result.Task
         End Function
-        '''<summary>Determines a future value for running a function in a new thread.</summary>
-        Public Function ThreadedFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
+        '''<summary>Determines a task value for running a function in a new thread.</summary>
+        Public Function ThreadedFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Dim result = New FutureFunction(Of TReturn)
+            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
+            Dim result = New TaskCompletionSource(Of TReturn)
             Call New Thread(Sub() result.SetByEvaluating(func)).Start()
-            Return result
+            Return result.Task
         End Function
 
-        '''<summary>Determines a future for running an action as a task.</summary>
-        Public Function TaskedAction(ByVal action As Action) As IFuture
+        '''<summary>Determines a task for running an action as a task.</summary>
+        Public Function TaskedAction(ByVal action As Action) As Task
             Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Dim result = New FutureAction
-            Contract.Assume(Tasks.Task.Factory IsNot Nothing)
-            Tasks.Task.Factory.StartNew(Sub() result.SetByCalling(action))
-            Return result
+            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
+            Return Task.Factory.StartNew(action)
         End Function
-        '''<summary>Determines a future value for running a function as a task.</summary>
-        Public Function TaskedFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
+        '''<summary>Determines a task value for running a function as a task.</summary>
+        Public Function TaskedFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Dim result = New FutureFunction(Of TReturn)
+            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
+            Dim result = New TaskCompletionSource(Of TReturn)
             Contract.Assume(Tasks.Task.Factory IsNot Nothing)
             Tasks.Task.Factory.StartNew(Sub() result.SetByEvaluating(func))
-            Return result
+            Return result.Task
         End Function
 
-        '''<summary>Determines a future for running an action in the thread pool.</summary>
-        Public Function ThreadPooledAction(ByVal action As Action) As IFuture
+        '''<summary>Determines a task for running an action in the thread pool.</summary>
+        Public Function ThreadPooledAction(ByVal action As Action) As Task
             Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Dim result = New FutureAction
+            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
+            Dim result = New TaskCompletionSource(Of Boolean)
             ThreadPool.QueueUserWorkItem(Sub() result.SetByCalling(action))
-            Return result
+            Return result.Task
         End Function
-        '''<summary>Determines a future value for running a function in the thread pool.</summary>
-        Public Function ThreadPooledFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
+        '''<summary>Determines a task value for running a function in the thread pool.</summary>
+        Public Function ThreadPooledFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Dim result = New FutureFunction(Of TReturn)
+            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
+            Dim result = New TaskCompletionSource(Of TReturn)
             ThreadPool.QueueUserWorkItem(Sub() result.SetByEvaluating(func))
-            Return result
+            Return result.Task
         End Function
 
-        '''<summary>Determines a future for invoking an action on a control's thread.</summary>
+        '''<summary>Determines a task for invoking an action on a control's thread.</summary>
         <Extension()>
-        Public Function AsyncInvokedAction(ByVal control As Control, ByVal action As Action) As IFuture
+        Public Function AsyncInvokedAction(ByVal control As Control, ByVal action As Action) As Task
             Contract.Requires(control IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Dim result = New FutureAction()
+            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
+            Dim result = New TaskCompletionSource(Of Boolean)
             result.DependentCall(Sub() control.BeginInvoke(Sub() result.SetByCalling(action)))
-            Return result
+            Return result.Task
         End Function
-        '''<summary>Determines a future value for invoking a function on a control's thread.</summary>
+        '''<summary>Determines a task value for invoking a function on a control's thread.</summary>
         <Extension()>
-        Public Function AsyncInvokedFunc(Of T)(ByVal control As Control, ByVal func As Func(Of T)) As IFuture(Of T)
+        Public Function AsyncInvokedFunc(Of TReturn)(ByVal control As Control, ByVal func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(control IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of T))() IsNot Nothing)
-            Dim result = New FutureFunction(Of T)()
+            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
+            Dim result = New TaskCompletionSource(Of TReturn)
             result.DependentCall(Sub() control.BeginInvoke(Sub() result.SetByEvaluating(func)))
-            Return result
+            Return result.Task
         End Function
-#End Region
 
-#Region "WhenReady"
+        '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
         <Extension()>
-        Public Function QueueCallWhenReady(ByVal future As IFuture,
-                                           ByVal queue As ICallQueue,
-                                           ByVal action As Action(Of Exception)) As IFuture
-            Contract.Requires(future IsNot Nothing)
+        Public Function QueueContinueWithAction(ByVal task As Task,
+                                                ByVal queue As CallQueue,
+                                                ByVal action As Action) As Task
+            Contract.Requires(task IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Return future.EvalWhenReady(Function(exception) queue.QueueAction(
-                                        Sub() action(exception))).Defuturized
+            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
+            Return task.ContinueWithFunc(Function() queue.QueueAction(action)).Unwrap
         End Function
-
+        '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
         <Extension()>
-        Public Function QueueCallWhenValueReady(Of TArg)(ByVal future As IFuture(Of TArg),
-                                                         ByVal queue As ICallQueue,
-                                                         ByVal action As Action(Of TArg, Exception)) As IFuture
-            Contract.Requires(future IsNot Nothing)
+        Public Function QueueContinueWithAction(Of TArg)(ByVal task As Task(Of TArg),
+                                                         ByVal queue As CallQueue,
+                                                         ByVal action As Action(Of TArg)) As Task
+            Contract.Requires(task IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Return future.EvalWhenValueReady(Function(value, valueException) queue.QueueAction(
-                                             Sub() action(value, valueException))).Defuturized
+            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
+            Return task.ContinueWithFunc(Function(result) queue.QueueAction(Sub() action(result))).Unwrap
         End Function
-
+        '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
         <Extension()>
-        Public Function QueueEvalWhenReady(Of TReturn)(ByVal future As IFuture,
-                                                       ByVal queue As ICallQueue,
-                                                       ByVal func As Func(Of Exception, TReturn)) As IFuture(Of TReturn)
-            Contract.Requires(future IsNot Nothing)
+        Public Function QueueContinueWithFunc(Of TReturn)(ByVal task As Task,
+                                                          ByVal queue As CallQueue,
+                                                          ByVal func As Func(Of TReturn)) As Task(Of TReturn)
+            Contract.Requires(task IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Return future.EvalWhenReady(Function(exception) queue.QueueFunc(
-                                        Function() func(exception))).Defuturized
+            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
+            Return task.ContinueWithFunc(Function() queue.QueueFunc(func)).Unwrap
         End Function
-
+        '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
         <Extension()>
-        Public Function QueueEvalWhenValueReady(Of TArg, TReturn)(ByVal future As IFuture(Of TArg),
-                                                                  ByVal queue As ICallQueue,
-                                                                  ByVal func As Func(Of TArg, Exception, TReturn)) As IFuture(Of TReturn)
-            Contract.Requires(future IsNot Nothing)
+        Public Function QueueContinueWithFunc(Of TArg, TReturn)(ByVal task As Task(Of TArg),
+                                                                ByVal queue As CallQueue,
+                                                                ByVal func As Func(Of TArg, TReturn)) As Task(Of TReturn)
+            Contract.Requires(task IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Return future.EvalWhenValueReady(Function(value, valueException) queue.QueueFunc(
-                                             Function() func(value, valueException))).Defuturized
+            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
+            Return task.ContinueWithFunc(Function(result) queue.QueueFunc(Function() func(result))).Unwrap
         End Function
-#End Region
-
-#Region "OnSuccess"
+        '''<summary>Creates a continuation which executes on a queue if a task faults.</summary>
         <Extension()>
-        Public Function QueueCallOnSuccess(ByVal future As IFuture,
-                                           ByVal queue As ICallQueue,
-                                           ByVal action As Action) As IFuture
-            Contract.Requires(future IsNot Nothing)
+        Public Function QueueCatch(ByVal task As Task,
+                                   ByVal queue As CallQueue,
+                                   ByVal action As Action(Of AggregateException)) As Task
+            Contract.Requires(task IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Return future.EvalOnSuccess(Function() queue.QueueAction(action)).Defuturized
-        End Function
-
-        <Extension()>
-        Public Function QueueCallOnValueSuccess(Of TArg)(ByVal future As IFuture(Of TArg),
-                                                         ByVal queue As ICallQueue,
-                                                         ByVal action As Action(Of TArg)) As IFuture
-            Contract.Requires(future IsNot Nothing)
-            Contract.Requires(queue IsNot Nothing)
-            Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Return future.Select(Function(result) queue.QueueAction(Sub() action(result))).Defuturized
-        End Function
-
-        <Extension()>
-        Public Function QueueEvalOnSuccess(Of TReturn)(ByVal future As IFuture,
-                                                       ByVal queue As ICallQueue,
-                                                       ByVal func As Func(Of TReturn)) As IFuture(Of TReturn)
-            Contract.Requires(future IsNot Nothing)
-            Contract.Requires(queue IsNot Nothing)
-            Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Return future.EvalOnSuccess(Function() queue.QueueFunc(func)).Defuturized
-        End Function
-
-        <Extension()>
-        Public Function QueueEvalOnValueSuccess(Of TArg, TReturn)(ByVal future As IFuture(Of TArg),
-                                                                  ByVal queue As ICallQueue,
-                                                                  ByVal func As Func(Of TArg, TReturn)) As IFuture(Of TReturn)
-            Contract.Requires(future IsNot Nothing)
-            Contract.Requires(queue IsNot Nothing)
-            Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture(Of TReturn))() IsNot Nothing)
-            Return future.Select(Function(result) queue.QueueFunc(Function() func(result))).Defuturized
-        End Function
-#End Region
-
-        <Extension()>
-        Public Function QueueCatch(ByVal future As IFuture,
-                                   ByVal queue As ICallQueue,
-                                   ByVal action As Action(Of Exception)) As IFuture
-            Contract.Requires(future IsNot Nothing)
-            Contract.Requires(queue IsNot Nothing)
-            Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IFuture)() IsNot Nothing)
-            Return future.EvalWhenReady(Function(exception) queue.QueueAction(
-                Sub()
-                    If exception IsNot Nothing Then
-                        Call action(exception)
-                    End If
-                End Sub)).Defuturized
+            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
+            Return task.ContinueWith(Function(t) queue.QueueAction(Sub() If t.Status = TaskStatus.Faulted Then action(t.Exception)),
+                                     TaskContinuationOptions.NotOnCanceled).Unwrap
         End Function
     End Module
 End Namespace

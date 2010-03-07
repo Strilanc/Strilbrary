@@ -9,7 +9,7 @@ Namespace Time
     Public Class ManualClock
         Implements IClock
         Private _time As New TimeSpan(ticks:=0)
-        Private ReadOnly _asyncWaits As New PriorityQueue(Of Tuple(Of TimeSpan, FutureAction))(Function(x, y) -x.item1.compareto(y.item1))
+        Private ReadOnly _asyncWaits As New PriorityQueue(Of Tuple(Of TimeSpan, TaskCompletionSource(Of Boolean)))(Function(x, y) -x.item1.compareto(y.item1))
         Private ReadOnly _lock As New Object()
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
@@ -32,7 +32,7 @@ Namespace Time
                 While _asyncWaits.Count > 0 AndAlso _asyncWaits.Peek.Item1 <= ElapsedTime
                     Dim futureAction = _asyncWaits.Dequeue.Item2
                     Contract.Assume(futureAction IsNot Nothing)
-                    futureAction.SetSucceeded()
+                    futureAction.SetResult(True)
                 End While
             End SyncLock
         End Sub
@@ -47,16 +47,17 @@ Namespace Time
             End Get
         End Property
 
-        Public Function AsyncWait(ByVal dt As TimeSpan) As IFuture Implements IClock.AsyncWait
-            Dim result = New FutureAction()
+        <ContractVerification(False)>
+        Public Function AsyncWait(ByVal dt As TimeSpan) As Task Implements IClock.AsyncWait
+            Dim result = New TaskCompletionSource(Of Boolean)
             If dt.Ticks <= 0 Then
-                result.SetSucceeded()
+                result.SetResult(True)
             Else
                 SyncLock _lock
-                    _asyncWaits.Enqueue(New Tuple(Of TimeSpan, FutureAction)(ElapsedTime + dt, result))
+                    _asyncWaits.Enqueue(Tuple.Create(ElapsedTime + dt, result))
                 End SyncLock
             End If
-            Return result
+            Return result.Task
         End Function
     End Class
 End Namespace

@@ -1,6 +1,6 @@
 ﻿Imports Strilbrary.Threading
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-Imports StrilbraryTests.IFutureExtensionsTest
+Imports StrilbraryTests.TaskExtensionsTest
 Imports Strilbrary.Time
 
 <TestClass()>
@@ -10,16 +10,14 @@ Public Class CallQueueTest
         Dim flag = False
         Dim q = New ThreadPooledCallQueue()
         Dim result = q.QueueAction(Sub() flag = True)
-        BlockOnFuture(result)
-        Assert.IsTrue(result.State = FutureState.Succeeded)
+        WaitForTaskToSucceed(result)
         Assert.IsTrue(flag)
     End Sub
     <TestMethod()>
     Public Sub QueueActionTest_Fail()
         Dim q = New ThreadPooledCallQueue()
         Dim result = q.QueueAction(Sub() Throw New InvalidOperationException("Test"))
-        BlockOnFuture(result)
-        Assert.IsTrue(result.State = FutureState.Failed)
+        WaitForTaskToFault(result)
     End Sub
 
     <TestMethod()>
@@ -30,10 +28,9 @@ Public Class CallQueueTest
                                      flag = True
                                      Return 5
                                  End Function)
-        BlockOnFuture(result)
-        Assert.IsTrue(result.State = FutureState.Succeeded)
+        WaitForTaskToSucceed(result)
         Assert.IsTrue(flag)
-        Assert.IsTrue(result.Value = 5)
+        Assert.IsTrue(result.Result = 5)
     End Sub
     <TestMethod()>
     Public Sub QueueFuncTest_Fail()
@@ -41,37 +38,33 @@ Public Class CallQueueTest
         Dim result = q.QueueFunc(Function() As Object
                                      Throw New InvalidOperationException("Test")
                                  End Function)
-        BlockOnFuture(result)
-        Assert.IsTrue(result.State = FutureState.Failed)
+        WaitForTaskToFault(result)
     End Sub
 
     <TestMethod()>
     Public Sub StartableTest_Dangle()
         Dim flag = True
-        Dim q = New StartableCallQueue(subQueue:=New ThreadPooledCallQueue())
+        Dim q = New ThreadPooledCallQueue(initiallyStarted:=False)
         Dim result = q.QueueAction(Sub() flag = False)
-        BlockOnFuture(result, timeout:=100.Milliseconds)
-        Assert.IsTrue(result.State = FutureState.Unknown)
+        ExpectTaskToIdle(result)
         Assert.IsTrue(flag)
     End Sub
     <TestMethod()>
     Public Sub StartableTest_StartAfter()
         Dim flag = False
-        Dim q = New StartableCallQueue(subQueue:=New ThreadPooledCallQueue())
+        Dim q = New ThreadPooledCallQueue(initiallyStarted:=False)
         Dim result = q.QueueAction(Sub() flag = True)
         q.Start()
-        BlockOnFuture(result)
-        Assert.IsTrue(result.State = FutureState.Succeeded)
+        WaitForTaskToSucceed(result)
         Assert.IsTrue(flag)
     End Sub
     <TestMethod()>
     Public Sub StartableTest_StartBefore()
         Dim flag = False
-        Dim q = New StartableCallQueue(subQueue:=New ThreadPooledCallQueue())
+        Dim q = New ThreadPooledCallQueue(initiallyStarted:=False)
         q.Start()
         Dim result = q.QueueAction(Sub() flag = True)
-        BlockOnFuture(result)
-        Assert.IsTrue(result.State = FutureState.Succeeded)
+        WaitForTaskToSucceed(result)
         Assert.IsTrue(flag)
     End Sub
 End Class

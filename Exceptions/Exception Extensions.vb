@@ -8,7 +8,7 @@
                                      ByVal context As String)
             Contract.Requires(context IsNot Nothing)
             Contract.Requires(exception IsNot Nothing)
-            Strilbrary.Threading.TaskedAction(Sub() RaiseEvent UnexpectedException(exception, context)).SetHandled()
+            Strilbrary.Threading.TaskedAction(Sub() RaiseEvent UnexpectedException(exception, context))
         End Sub
 
         <Extension()>
