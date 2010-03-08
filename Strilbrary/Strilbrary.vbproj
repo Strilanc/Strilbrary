@@ -146,13 +146,10 @@
     <Compile Include="Values\TextExtensions.vb" />
     <Compile Include="Values\EnumExtensions.vb" />
     <Compile Include="Values\InvariantString.vb" />
-    <Compile Include="Values\ModByte.vb" />
-    <Compile Include="Values\ModInt16.vb" />
     <Compile Include="Streams\StreamExtensions.vb" />
     <Compile Include="Threading\LockFreeConsumer.vb" />
     <Compile Include="Threading\SingleConsumerLockFreeQueue.vb" />
     <Compile Include="Threading\OneTimeLock.vb" />
-    <Compile Include="Values\ModInt32.vb" />
     <Compile Include="Collections\ListView.vb" />
     <Compile Include="Collections\Enumeration.vb" />
     <Compile Include="Streams\ReadOnlyStream.vb" />
@@ -203,7 +200,12 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\StrilbraryUnchecked\StrilbraryUnchecked.vbproj">
+      <Project>{55BF0DF9-DFAD-4575-BF9C-D1F536233A6D}</Project>
+      <Name>StrilbraryUnchecked</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
     <PostBuildEvent>

@@ -1,150 +1,123 @@
 ﻿Namespace Values
-    '''<summary>An 8-bit integer which explicitely allows overflow and underflow.</summary>
+    '''<summary>A 8-bit integer which explicitely allows overflow and underflow.</summary>
     <DebuggerDisplay("{ToString} (mod 2^8)")>
     Public Structure ModByte
         Implements IEquatable(Of ModByte)
-        Private ReadOnly value As Byte
+        Private ReadOnly _value As Byte
 
-#Region "Constructors"
         Public Sub New(ByVal value As Byte)
-            Me.value = value
+            Me._value = value
         End Sub
-        Private Sub New(ByVal value As UInt16)
-            Me.value = CByte(value And CUShort(Byte.MaxValue))
-        End Sub
-        Private Sub New(ByVal value As UInt32)
-            Me.value = CByte(value And CUInt(Byte.MaxValue))
-        End Sub
-        Private Sub New(ByVal value As UInt64)
-            Me.value = CByte(value And CULng(Byte.MaxValue))
-        End Sub
-
         Public Sub New(ByVal value As SByte)
-            Me.value = CByte(value + If(value < 0, &H100, 0))
+            Me._value = CByte(value)
         End Sub
-        Private Sub New(ByVal value As Int16)
-            Me.value = CByte(value And CShort(Byte.MaxValue))
-        End Sub
-        Private Sub New(ByVal value As Int32)
-            Me.value = CByte(value And CInt(Byte.MaxValue))
-        End Sub
-        Private Sub New(ByVal value As Int64)
-            Me.value = CByte(value And CLng(Byte.MaxValue))
-        End Sub
-#End Region
 
-#Region "Operators"
         Public Shared Operator *(ByVal value1 As ModByte, ByVal value2 As ModByte) As ModByte
-            Return New ModByte(CUShort(value1.value) * CUShort(value2.value))
+            Return value1._value * value2._value
         End Operator
         Public Shared Operator +(ByVal value1 As ModByte, ByVal value2 As ModByte) As ModByte
-            Return New ModByte(CUShort(value1.value) + CUShort(value2.value))
+            Return value1._value + value2._value
         End Operator
         Public Shared Operator -(ByVal value1 As ModByte, ByVal value2 As ModByte) As ModByte
-            Return New ModByte(CShort(value1.value) - CShort(value2.value))
+            Return value1._value - value2._value
         End Operator
         Public Shared Operator And(ByVal value1 As ModByte, ByVal value2 As ModByte) As ModByte
-            Return New ModByte(value1.value And value2.value)
+            Return value1._value And value2._value
         End Operator
         Public Shared Operator Xor(ByVal value1 As ModByte, ByVal value2 As ModByte) As ModByte
-            Return New ModByte(value1.value Xor value2.value)
+            Return value1._value Xor value2._value
         End Operator
         Public Shared Operator Or(ByVal value1 As ModByte, ByVal value2 As ModByte) As ModByte
-            Return New ModByte(value1.value Or value2.value)
+            Return value1._value Or value2._value
         End Operator
         Public Shared Operator Not(ByVal value As ModByte) As ModByte
-            Return New ModByte(Not value.value)
+            Return Not value._value
         End Operator
         Public Shared Operator >>(ByVal value As ModByte, ByVal offset As Integer) As ModByte
-            Return New ModByte(value.value >> offset)
+            Return value._value >> offset
         End Operator
         Public Shared Operator <<(ByVal value As ModByte, ByVal offset As Integer) As ModByte
-            Return New ModByte(value.value << offset)
+            Return value._value << offset
         End Operator
         Public Shared Operator =(ByVal value1 As ModByte, ByVal value2 As ModByte) As Boolean
-            Return value1.value = value2.value
+            Return value1._value = value2._value
         End Operator
         Public Shared Operator <>(ByVal value1 As ModByte, ByVal value2 As ModByte) As Boolean
-            Return value1.value <> value2.value
+            Return value1._value <> value2._value
         End Operator
         Public Function ShiftRotateLeft(ByVal offset As Integer) As ModByte
-            Return value.ShiftRotateLeft(offset)
+            offset = offset And (8 - 1)
+            Return (_value << offset) Or (_value >> (8 - offset))
         End Function
         Public Function ShiftRotateRight(ByVal offset As Integer) As ModByte
-            Return value.ShiftRotateRight(offset)
+            offset = offset And (8 - 1)
+            Return (_value >> offset) Or (_value << (8 - offset))
         End Function
-#End Region
 
-#Region "Methods"
         Public Overrides Function GetHashCode() As Integer
-            Return (value.GetHashCode)
+            Return (_value.GetHashCode)
         End Function
         Public Overrides Function Equals(ByVal obj As Object) As Boolean
             If Not TypeOf obj Is ModByte Then Return False
-            Return Me.value = CType(obj, ModByte).value
+            Return Me._value = CType(obj, ModByte)._value
         End Function
         Public Overloads Function Equals(ByVal other As ModByte) As Boolean Implements IEquatable(Of ModByte).Equals
-            Return Me.value = other.value
+            Return Me._value = other._value
         End Function
         Public Overrides Function ToString() As String
-            Return value.ToString(Globalization.CultureInfo.InvariantCulture)
+            Return _value.ToString(Globalization.CultureInfo.InvariantCulture)
         End Function
-#End Region
 
-#Region " -> ModByte"
         Public Shared Narrowing Operator CType(ByVal value As UInt64) As ModByte
-            Return New ModByte(value)
+            Return New ModByte(CByte(value))
         End Operator
         Public Shared Narrowing Operator CType(ByVal value As UInt32) As ModByte
-            Return New ModByte(value)
+            Return New ModByte(CByte(value))
         End Operator
         Public Shared Narrowing Operator CType(ByVal value As UInt16) As ModByte
-            Return New ModByte(value)
+            Return New ModByte(CByte(value))
         End Operator
         Public Shared Widening Operator CType(ByVal value As Byte) As ModByte
             Return New ModByte(value)
         End Operator
 
         Public Shared Narrowing Operator CType(ByVal value As Int64) As ModByte
-            Return New ModByte(value)
+            Return New ModByte(CByte(value))
         End Operator
         Public Shared Narrowing Operator CType(ByVal value As Int32) As ModByte
-            Return New ModByte(value)
+            Return New ModByte(CByte(value))
         End Operator
         Public Shared Narrowing Operator CType(ByVal value As Int16) As ModByte
-            Return New ModByte(value)
+            Return New ModByte(CByte(value))
         End Operator
         Public Shared Widening Operator CType(ByVal value As SByte) As ModByte
             Return New ModByte(value)
         End Operator
-#End Region
 
-#Region "ModByte -> "
         Public Shared Widening Operator CType(ByVal value As ModByte) As Byte
-            Return value.value
+            Return value._value
         End Operator
         Public Shared Widening Operator CType(ByVal value As ModByte) As UInt16
-            Return value.value
+            Return value._value
         End Operator
         Public Shared Widening Operator CType(ByVal value As ModByte) As UInt32
-            Return value.value
+            Return value._value
         End Operator
         Public Shared Widening Operator CType(ByVal value As ModByte) As UInt64
-            Return value.value
+            Return value._value
         End Operator
 
         Public Shared Widening Operator CType(ByVal value As ModByte) As SByte
-            Return CSByte(value.value - If(value.value > SByte.MaxValue, &H100, 0))
+            Return CSByte(value._value)
         End Operator
         Public Shared Widening Operator CType(ByVal value As ModByte) As Int16
-            Return value.value
+            Return value._value
         End Operator
         Public Shared Widening Operator CType(ByVal value As ModByte) As Int32
-            Return value.value
+            Return value._value
         End Operator
         Public Shared Widening Operator CType(ByVal value As ModByte) As Int64
-            Return value.value
+            Return value._value
         End Operator
-#End Region
     End Structure
 End Namespace

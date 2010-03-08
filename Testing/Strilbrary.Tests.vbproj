@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="BitBufferTest.vb" />
     <Compile Include="CallQueueTest.vb" />
+    <Compile Include="ModInt64Test.vb" />
     <Compile Include="LinqExtensionsTest.vb" />
     <Compile Include="MiscTest.vb" />
     <Compile Include="PriorityQueueTest.vb" />
@@ -77,7 +78,11 @@
     <Compile Include="My Project\AssemblyInfo.vb" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Strilbrary.vbproj">
+    <ProjectReference Include="..\StrilbraryUnchecked\StrilbraryUnchecked.vbproj">
+      <Project>{55BF0DF9-DFAD-4575-BF9C-D1F536233A6D}</Project>
+      <Name>StrilbraryUnchecked</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Strilbrary\Strilbrary.vbproj">
       <Project>{F2E9A78E-A519-4FAF-8BA5-3B43866F49BA}</Project>
       <Name>Strilbrary</Name>
     </ProjectReference>

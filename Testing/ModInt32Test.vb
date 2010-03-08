@@ -51,7 +51,7 @@ Public Class ModInt32Test
 
     <TestMethod()>
     Public Sub op_Conversion()
-        Assert.IsTrue(CUShort(CType(&H100000005UL, ModInt16)) = 5)
+        Assert.IsTrue(CUShort(CType(&H100000005UL, ModInt32)) = 5)
         Assert.IsTrue(CUInt(CType(5, ModInt32)) = 5)
         Assert.IsTrue(CUInt(CType(-1, ModInt32)) = UInteger.MaxValue)
         Assert.IsTrue(CInt(CType(UInteger.MaxValue, ModInt32)) = -1)
