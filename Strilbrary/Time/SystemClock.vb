@@ -46,7 +46,7 @@ Namespace Time
             Get
                 SyncLock _lock
                     Dim tick = Environment.TickCount
-                    _elapsedTime += CUInt(tick - _lastTick).Milliseconds
+                    _elapsedTime += (tick - _lastTick).UnsignedValue.Milliseconds
                     _lastTick = tick
                     Return _elapsedTime
                 End SyncLock

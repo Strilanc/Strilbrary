@@ -4,6 +4,39 @@ Imports Strilbrary.Values
 <TestClass()>
 Public Class ModByteTest
     <TestMethod()>
+    Public Sub ConstructionTest()
+        Assert.IsTrue(New ModByte(CByte(3)).SignedValue = 3)
+        Assert.IsTrue(New ModByte(CByte(3)).UnsignedValue = 3)
+        Assert.IsTrue(New ModByte(Byte.MinValue).SignedValue = 0)
+        Assert.IsTrue(New ModByte(Byte.MinValue).UnsignedValue = 0)
+        Assert.IsTrue(New ModByte(Byte.MaxValue).SignedValue = -1)
+        Assert.IsTrue(New ModByte(Byte.MaxValue).UnsignedValue = &HFF)
+
+        Assert.IsTrue(New ModByte(CSByte(-3)).SignedValue = -3)
+        Assert.IsTrue(New ModByte(CSByte(-3)).UnsignedValue = &HFD)
+        Assert.IsTrue(New ModByte(SByte.MinValue).SignedValue = -&H80)
+        Assert.IsTrue(New ModByte(SByte.MinValue).UnsignedValue = &H80)
+        Assert.IsTrue(New ModByte(SByte.MaxValue).SignedValue = &H7F)
+        Assert.IsTrue(New ModByte(SByte.MaxValue).UnsignedValue = &H7F)
+    End Sub
+    <TestMethod()>
+    Public Sub op_ConversionTest()
+        Assert.IsTrue(CType(CByte(3), ModByte).SignedValue = 3)
+        Assert.IsTrue(CType(CByte(3), ModByte).UnsignedValue = 3)
+        Assert.IsTrue(CType(Byte.MinValue, ModByte).SignedValue = 0)
+        Assert.IsTrue(CType(Byte.MinValue, ModByte).UnsignedValue = 0)
+        Assert.IsTrue(CType(Byte.MaxValue, ModByte).SignedValue = -1)
+        Assert.IsTrue(CType(Byte.MaxValue, ModByte).UnsignedValue = Byte.MaxValue)
+
+        Assert.IsTrue(CType(CSByte(-3), ModByte).SignedValue = -3)
+        Assert.IsTrue(CType(CSByte(-3), ModByte).UnsignedValue = &HFD)
+        Assert.IsTrue(CType(SByte.MinValue, ModByte).SignedValue = SByte.MinValue)
+        Assert.IsTrue(CType(SByte.MinValue, ModByte).UnsignedValue = &H80)
+        Assert.IsTrue(CType(SByte.MaxValue, ModByte).SignedValue = SByte.MaxValue)
+        Assert.IsTrue(CType(SByte.MaxValue, ModByte).UnsignedValue = &H7F)
+    End Sub
+
+    <TestMethod()>
     Public Sub op_SubtractionTest()
         Assert.IsTrue(New ModByte(0) - CByte(1) = Byte.MaxValue)
         Assert.IsTrue(New ModByte(Byte.MaxValue) - CSByte(-1) = CByte(0))
@@ -47,15 +80,6 @@ Public Class ModByteTest
         Assert.IsTrue(New ModByte(2) <> CByte(1))
         Assert.IsTrue(New ModByte(2) <> CSByte(-1))
         Assert.IsTrue(New ModByte(Byte.MaxValue).Equals(New ModByte(-1)))
-    End Sub
-
-    <TestMethod()>
-    Public Sub op_Conversion()
-        Assert.IsTrue(CUShort(CType(&H105, ModByte)) = 5)
-        Assert.IsTrue(CByte(CType(5, ModByte)) = 5)
-        Assert.IsTrue(CByte(CType(-1, ModByte)) = Byte.MaxValue)
-        Assert.IsTrue(CSByte(CType(Byte.MaxValue, ModByte)) = -1)
-        Assert.IsTrue(CSByte(CType(4, ModByte)) = 4)
     End Sub
 
     <TestMethod()>

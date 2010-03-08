@@ -4,6 +4,39 @@ Imports Strilbrary.Values
 <TestClass()>
 Public Class ModInt64Test
     <TestMethod()>
+    Public Sub ConstructionTest()
+        Assert.IsTrue(New ModInt64(3UL).SignedValue = 3)
+        Assert.IsTrue(New ModInt64(3UL).UnsignedValue = 3)
+        Assert.IsTrue(New ModInt64(UInt64.MinValue).SignedValue = 0)
+        Assert.IsTrue(New ModInt64(UInt64.MinValue).UnsignedValue = 0)
+        Assert.IsTrue(New ModInt64(UInt64.MaxValue).SignedValue = -1)
+        Assert.IsTrue(New ModInt64(UInt64.MaxValue).UnsignedValue = UInt64.MaxValue)
+
+        Assert.IsTrue(New ModInt64(-3L).SignedValue = -3)
+        Assert.IsTrue(New ModInt64(-3L).UnsignedValue = &HFFFFFFFFFFFFFFFDUL)
+        Assert.IsTrue(New ModInt64(Int64.MinValue).SignedValue = Int64.MinValue)
+        Assert.IsTrue(New ModInt64(Int64.MinValue).UnsignedValue = &H8000000000000000UL)
+        Assert.IsTrue(New ModInt64(Int64.MaxValue).SignedValue = Int64.MaxValue)
+        Assert.IsTrue(New ModInt64(Int64.MaxValue).UnsignedValue = &H7FFFFFFFFFFFFFFFUL)
+    End Sub
+    <TestMethod()>
+    Public Sub op_ConversionTest()
+        Assert.IsTrue(CType(3UL, ModInt64).SignedValue = 3)
+        Assert.IsTrue(CType(3UL, ModInt64).UnsignedValue = 3)
+        Assert.IsTrue(CType(UInt64.MinValue, ModInt64).SignedValue = 0)
+        Assert.IsTrue(CType(UInt64.MinValue, ModInt64).UnsignedValue = 0)
+        Assert.IsTrue(CType(UInt64.MaxValue, ModInt64).SignedValue = -1)
+        Assert.IsTrue(CType(UInt64.MaxValue, ModInt64).UnsignedValue = UInt64.MaxValue)
+
+        Assert.IsTrue(CType(-3L, ModInt64).SignedValue = -3)
+        Assert.IsTrue(CType(-3L, ModInt64).UnsignedValue = &HFFFFFFFFFFFFFFFDUL)
+        Assert.IsTrue(CType(Int64.MinValue, ModInt64).SignedValue = Int64.MinValue)
+        Assert.IsTrue(CType(Int64.MinValue, ModInt64).UnsignedValue = &H8000000000000000UL)
+        Assert.IsTrue(CType(Int64.MaxValue, ModInt64).SignedValue = Int64.MaxValue)
+        Assert.IsTrue(CType(Int64.MaxValue, ModInt64).UnsignedValue = &H7FFFFFFFFFFFFFFFUL)
+    End Sub
+
+    <TestMethod()>
     Public Sub op_SubtractionTest()
         Assert.IsTrue(New ModInt64(0) - 1 = UInt64.MaxValue)
         Assert.IsTrue(New ModInt64(UInt64.MaxValue) - -1 = 0)
@@ -47,16 +80,6 @@ Public Class ModInt64Test
         Assert.IsTrue(New ModInt64(2) <> 1)
         Assert.IsTrue(New ModInt64(2) <> -1)
         Assert.IsTrue(New ModInt64(UInt64.MaxValue).Equals(New ModInt64(-1)))
-    End Sub
-
-    <TestMethod()>
-    Public Sub op_Conversion()
-        Assert.IsTrue(CULng(CType(&H100000005UL, ModInt64)) = &H100000005UL)
-        Assert.IsTrue(CULng(CType(5, ModInt64)) = 5)
-        Assert.IsTrue(CULng(CType(-1, ModInt64)) = UInt64.MaxValue)
-        Assert.IsTrue(CLng(CType(UInt64.MaxValue, ModInt64)) = -1)
-        Assert.IsTrue(CLng(CType(UInt32.MaxValue, ModInt64)) = UInt32.MaxValue)
-        Assert.IsTrue(CLng(CType(4, ModInt64)) = 4)
     End Sub
 
     <TestMethod()>

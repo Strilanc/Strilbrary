@@ -12,6 +12,17 @@
             Me._value = CByte(value)
         End Sub
 
+        Public ReadOnly Property UnsignedValue As Byte
+            Get
+                Return _value
+            End Get
+        End Property
+        Public ReadOnly Property SignedValue As SByte
+            Get
+                Return CSByte(_value)
+            End Get
+        End Property
+
         Public Shared Operator *(ByVal value1 As ModByte, ByVal value2 As ModByte) As ModByte
             Return value1._value * value2._value
         End Operator
@@ -55,11 +66,10 @@
         End Function
 
         Public Overrides Function GetHashCode() As Integer
-            Return (_value.GetHashCode)
+            Return _value.GetHashCode
         End Function
         Public Overrides Function Equals(ByVal obj As Object) As Boolean
-            If Not TypeOf obj Is ModByte Then Return False
-            Return Me._value = CType(obj, ModByte)._value
+            Return TypeOf obj Is ModByte AndAlso Me._value = CType(obj, ModByte)._value
         End Function
         Public Overloads Function Equals(ByVal other As ModByte) As Boolean Implements IEquatable(Of ModByte).Equals
             Return Me._value = other._value
@@ -68,56 +78,11 @@
             Return _value.ToString(Globalization.CultureInfo.InvariantCulture)
         End Function
 
-        Public Shared Narrowing Operator CType(ByVal value As UInt64) As ModByte
-            Return New ModByte(CByte(value))
-        End Operator
-        Public Shared Narrowing Operator CType(ByVal value As UInt32) As ModByte
-            Return New ModByte(CByte(value))
-        End Operator
-        Public Shared Narrowing Operator CType(ByVal value As UInt16) As ModByte
-            Return New ModByte(CByte(value))
-        End Operator
         Public Shared Widening Operator CType(ByVal value As Byte) As ModByte
             Return New ModByte(value)
         End Operator
-
-        Public Shared Narrowing Operator CType(ByVal value As Int64) As ModByte
-            Return New ModByte(CByte(value))
-        End Operator
-        Public Shared Narrowing Operator CType(ByVal value As Int32) As ModByte
-            Return New ModByte(CByte(value))
-        End Operator
-        Public Shared Narrowing Operator CType(ByVal value As Int16) As ModByte
-            Return New ModByte(CByte(value))
-        End Operator
         Public Shared Widening Operator CType(ByVal value As SByte) As ModByte
             Return New ModByte(value)
-        End Operator
-
-        Public Shared Widening Operator CType(ByVal value As ModByte) As Byte
-            Return value._value
-        End Operator
-        Public Shared Widening Operator CType(ByVal value As ModByte) As UInt16
-            Return value._value
-        End Operator
-        Public Shared Widening Operator CType(ByVal value As ModByte) As UInt32
-            Return value._value
-        End Operator
-        Public Shared Widening Operator CType(ByVal value As ModByte) As UInt64
-            Return value._value
-        End Operator
-
-        Public Shared Widening Operator CType(ByVal value As ModByte) As SByte
-            Return CSByte(value._value)
-        End Operator
-        Public Shared Widening Operator CType(ByVal value As ModByte) As Int16
-            Return value._value
-        End Operator
-        Public Shared Widening Operator CType(ByVal value As ModByte) As Int32
-            Return value._value
-        End Operator
-        Public Shared Widening Operator CType(ByVal value As ModByte) As Int64
-            Return value._value
         End Operator
     End Structure
 End Namespace

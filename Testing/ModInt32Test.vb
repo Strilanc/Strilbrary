@@ -4,6 +4,39 @@ Imports Strilbrary.Values
 <TestClass()>
 Public Class ModInt32Test
     <TestMethod()>
+    Public Sub ConstructionTest()
+        Assert.IsTrue(New ModInt32(3UI).SignedValue = 3)
+        Assert.IsTrue(New ModInt32(3UI).UnsignedValue = 3)
+        Assert.IsTrue(New ModInt32(UInt32.MinValue).SignedValue = 0)
+        Assert.IsTrue(New ModInt32(UInt32.MinValue).UnsignedValue = 0)
+        Assert.IsTrue(New ModInt32(UInt32.MaxValue).SignedValue = -1)
+        Assert.IsTrue(New ModInt32(UInt32.MaxValue).UnsignedValue = UInt32.MaxValue)
+
+        Assert.IsTrue(New ModInt32(-3).SignedValue = -3)
+        Assert.IsTrue(New ModInt32(-3).UnsignedValue = &HFFFFFFFDUI)
+        Assert.IsTrue(New ModInt32(Int32.MinValue).SignedValue = Int32.MinValue)
+        Assert.IsTrue(New ModInt32(Int32.MinValue).UnsignedValue = &H80000000UI)
+        Assert.IsTrue(New ModInt32(Int32.MaxValue).SignedValue = Int32.MaxValue)
+        Assert.IsTrue(New ModInt32(Int32.MaxValue).UnsignedValue = &H7FFFFFFFUI)
+    End Sub
+    <TestMethod()>
+    Public Sub op_ConversionTest()
+        Assert.IsTrue(CType(3UI, ModInt32).SignedValue = 3)
+        Assert.IsTrue(CType(3UI, ModInt32).UnsignedValue = 3)
+        Assert.IsTrue(CType(UInt32.MinValue, ModInt32).SignedValue = 0)
+        Assert.IsTrue(CType(UInt32.MinValue, ModInt32).UnsignedValue = 0)
+        Assert.IsTrue(CType(UInt32.MaxValue, ModInt32).SignedValue = -1)
+        Assert.IsTrue(CType(UInt32.MaxValue, ModInt32).UnsignedValue = UInt32.MaxValue)
+
+        Assert.IsTrue(CType(-3, ModInt32).SignedValue = -3)
+        Assert.IsTrue(CType(-3, ModInt32).UnsignedValue = &HFFFFFFFDUI)
+        Assert.IsTrue(CType(Int32.MinValue, ModInt32).SignedValue = Int32.MinValue)
+        Assert.IsTrue(CType(Int32.MinValue, ModInt32).UnsignedValue = &H80000000UI)
+        Assert.IsTrue(CType(Int32.MaxValue, ModInt32).SignedValue = Int32.MaxValue)
+        Assert.IsTrue(CType(Int32.MaxValue, ModInt32).UnsignedValue = &H7FFFFFFFUI)
+    End Sub
+
+    <TestMethod()>
     Public Sub op_SubtractionTest()
         Assert.IsTrue(New ModInt32(0) - 1 = UInteger.MaxValue)
         Assert.IsTrue(New ModInt32(UInteger.MaxValue) - -1 = 0)
@@ -47,15 +80,6 @@ Public Class ModInt32Test
         Assert.IsTrue(New ModInt32(2) <> 1)
         Assert.IsTrue(New ModInt32(2) <> -1)
         Assert.IsTrue(New ModInt32(UInteger.MaxValue).Equals(New ModInt32(-1)))
-    End Sub
-
-    <TestMethod()>
-    Public Sub op_Conversion()
-        Assert.IsTrue(CUShort(CType(&H100000005UL, ModInt32)) = 5)
-        Assert.IsTrue(CUInt(CType(5, ModInt32)) = 5)
-        Assert.IsTrue(CUInt(CType(-1, ModInt32)) = UInteger.MaxValue)
-        Assert.IsTrue(CInt(CType(UInteger.MaxValue, ModInt32)) = -1)
-        Assert.IsTrue(CInt(CType(4, ModInt32)) = 4)
     End Sub
 
     <TestMethod()>

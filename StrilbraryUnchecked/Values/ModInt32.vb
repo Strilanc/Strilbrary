@@ -12,6 +12,17 @@
             Me._value = CUInt(value)
         End Sub
 
+        Public ReadOnly Property UnsignedValue As UInt32
+            Get
+                Return _value
+            End Get
+        End Property
+        Public ReadOnly Property SignedValue As Int32
+            Get
+                Return CInt(_value)
+            End Get
+        End Property
+
         Public Shared Operator *(ByVal value1 As ModInt32, ByVal value2 As ModInt32) As ModInt32
             Return value1._value * value2._value
         End Operator
@@ -68,56 +79,11 @@
             Return _value.ToString(Globalization.CultureInfo.InvariantCulture)
         End Function
 
-        Public Shared Narrowing Operator CType(ByVal value As UInt64) As ModInt32
-            Return New ModInt32(CUInt(value))
-        End Operator
         Public Shared Widening Operator CType(ByVal value As UInt32) As ModInt32
             Return New ModInt32(value)
         End Operator
-        Public Shared Widening Operator CType(ByVal value As UInt16) As ModInt32
-            Return New ModInt32(value)
-        End Operator
-        Public Shared Widening Operator CType(ByVal value As Byte) As ModInt32
-            Return New ModInt32(value)
-        End Operator
-
-        Public Shared Narrowing Operator CType(ByVal value As Int64) As ModInt32
-            Return New ModInt32(CUInt(value))
-        End Operator
         Public Shared Widening Operator CType(ByVal value As Int32) As ModInt32
             Return New ModInt32(value)
-        End Operator
-        Public Shared Widening Operator CType(ByVal value As Int16) As ModInt32
-            Return New ModInt32(value)
-        End Operator
-        Public Shared Widening Operator CType(ByVal value As SByte) As ModInt32
-            Return New ModInt32(value)
-        End Operator
-
-        Public Shared Narrowing Operator CType(ByVal value As ModInt32) As Byte
-            Return CByte(value._value)
-        End Operator
-        Public Shared Narrowing Operator CType(ByVal value As ModInt32) As UInt16
-            Return CUShort(value._value)
-        End Operator
-        Public Shared Widening Operator CType(ByVal value As ModInt32) As UInt32
-            Return value._value
-        End Operator
-        Public Shared Widening Operator CType(ByVal value As ModInt32) As UInt64
-            Return value._value
-        End Operator
-
-        Public Shared Narrowing Operator CType(ByVal value As ModInt32) As SByte
-            Return CSByte(value._value)
-        End Operator
-        Public Shared Narrowing Operator CType(ByVal value As ModInt32) As Int16
-            Return CShort(value._value)
-        End Operator
-        Public Shared Widening Operator CType(ByVal value As ModInt32) As Int32
-            Return CInt(value._value)
-        End Operator
-        Public Shared Widening Operator CType(ByVal value As ModInt32) As Int64
-            Return value._value
         End Operator
     End Structure
 End Namespace
