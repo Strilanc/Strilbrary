@@ -72,7 +72,6 @@
     <Compile Include="ThrottleTest.vb" />
     <Compile Include="ModByteTest.vb" />
     <Compile Include="ModInt16Test.vb" />
-    <Compile Include="CoroutineTest.vb" />
     <Compile Include="TaskExtensionsTest.vb" />
     <Compile Include="ModInt32Test.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

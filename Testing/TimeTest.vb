@@ -95,9 +95,9 @@ Public Class TimeTest
     <TestMethod()>
     Public Sub SystemAsyncWaitTest_Positive()
         Dim c = New SystemClock()
-        Dim f = c.AsyncWait(2.Seconds)
-        ExpectTaskToIdle(f, timeoutMilliseconds:=1000)
-        WaitForTaskToSucceed(f, timeoutMilliseconds:=2000)
+        Dim f = c.AsyncWait(100.Milliseconds)
+        ExpectTaskToIdle(f, timeoutMilliseconds:=50) '[safety margin of 50ms; might still fail sometimes due to bad luck]
+        WaitForTaskToSucceed(f)
     End Sub
     <TestMethod()>
     Public Sub SystemAsyncWaitTest_Instant()

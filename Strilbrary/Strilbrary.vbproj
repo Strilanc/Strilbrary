@@ -153,7 +153,6 @@
     <Compile Include="Collections\Enumeration.vb" />
     <Compile Include="Streams\ReadOnlyStream.vb" />
     <Compile Include="Streams\WrappedReadOnlyStream.vb" />
-    <Compile Include="Threading\Coroutine.vb" />
     <Compile Include="Threading\ThreadingExtensions.vb" />
     <Compile Include="Threading\CallQueue.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
