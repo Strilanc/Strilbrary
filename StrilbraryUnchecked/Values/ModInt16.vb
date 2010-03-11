@@ -1,5 +1,5 @@
 ﻿Namespace Values
-    '''<summary>A 16-bit integer which explicitely allows overflow and underflow.</summary>
+    '''<summary>A 16-bit integer which explicitly allows overflow and underflow.</summary>
     <DebuggerDisplay("{ToString} (mod 2^16)")>
     Public Structure ModInt16
         Implements IEquatable(Of ModInt16)

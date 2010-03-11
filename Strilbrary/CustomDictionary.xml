@@ -6,17 +6,15 @@
       <Word>Chr</Word>
       <Word>Combinator</Word>
       <Word>Coroutine</Word>
-      <Word>Defuturize</Word>
       <Word>Eval</Word>
       <Word>Frmt</Word>
-      <Word>Defuturized</Word>
-      <Word>Futurized</Word>
       <Word>Queueing</Word>
       <Word>Substream</Word>
       <Word>Recursor</Word>
       <Word>Cooldown</Word>
       <Word>Strilbrary</Word>
       <Word>Startable</Word>
+      <Word>Deinterleaved</Word>
     </Recognized>
   </Words>
 </Dictionary>

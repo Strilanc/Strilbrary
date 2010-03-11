@@ -10,6 +10,9 @@ Public Class LinqExtensionsTest
     Private Shared ReadOnly L0() As Int32 = {}
     Private Shared ReadOnly L1() As Int32 = {1}
     Private Shared ReadOnly L2() As Int32 = {1, 2}
+    Private Function SequenceSequenceEqual(Of T)(ByVal s1 As IEnumerable(Of IEnumerable(Of T)), ByVal s2 As IEnumerable(Of IEnumerable(Of T))) As Boolean
+        Return Enumerable.Zip(s1, s2, Function(e1, e2) e1.SequenceEqual(e2)).All(Function(x) x)
+    End Function
 
     <TestMethod()>
     Public Sub NoneTest()
@@ -125,12 +128,6 @@ Public Class LinqExtensionsTest
     End Sub
 
     <TestMethod()>
-    Public Sub ZipTest()
-        Assert.IsTrue({0, 1}.Zip({2, 3}).SequenceEqual({Tuple.Create(0, 2), Tuple.Create(1, 3)}))
-        Assert.IsTrue({0, 1, 2}.Zip({2, 3}).SequenceEqual({Tuple.Create(0, 2), Tuple.Create(1, 3)}))
-        Assert.IsTrue({0}.Zip({2, 3}).SequenceEqual({Tuple.Create(0, 2)}))
-    End Sub
-    <TestMethod()>
     Public Sub ConcatTest()
         Assert.IsTrue({New Int32() {0, 1}, New Int32() {2, 3}}.Concat.SequenceEqual({0, 1, 2, 3}))
         Assert.IsTrue({New Int32() {0, 1}, New Int32() {2, 3}, New Int32() {4, 5, 6}}.Concat.SequenceEqual({0, 1, 2, 3, 4, 5, 6}))
@@ -142,6 +139,11 @@ Public Class LinqExtensionsTest
     Public Sub AppendTest()
         Assert.IsTrue({0, 1}.Append(2, 3).SequenceEqual({0, 1, 2, 3}))
         Assert.IsTrue({1}.Append().Append(2).SequenceEqual({1, 2}))
+    End Sub
+    <TestMethod()>
+    Public Sub PrependTest()
+        Assert.IsTrue({0, 1}.Prepend(2, 3).SequenceEqual({2, 3, 0, 1}))
+        Assert.IsTrue({1}.Prepend().Prepend(2).SequenceEqual({2, 1}))
     End Sub
 
     <TestMethod()>
@@ -157,6 +159,59 @@ Public Class LinqExtensionsTest
         Assert.IsTrue(e2.SequenceEqual({1}))
         Assert.IsTrue(e3.SequenceEqual({1, 2}))
         Assert.IsTrue(L.SequenceEqual({5, 2}))
+    End Sub
+
+    <TestMethod()>
+    Public Sub RangeTest()
+        Assert.IsTrue(5.Range.SequenceEqual({0, 1, 2, 3, 4}))
+        Assert.IsTrue(2US.Range.SequenceEqual({0, 1}))
+        Assert.IsTrue(CByte(4).Range.SequenceEqual({0, 1, 2, 3}))
+        Assert.IsTrue(3UI.Range.SequenceEqual({0, 1, 2}))
+    End Sub
+
+    <TestMethod()>
+    Public Sub OffsetByTest()
+        Assert.IsTrue({2, 3, 5, 7, 2}.OffsetBy(2).SequenceEqual({4, 5, 7, 9, 4}))
+    End Sub
+    <TestMethod()>
+    Public Sub ZipTest()
+        Assert.IsTrue({0, 1}.Zip({2, 3}).SequenceEqual({Tuple.Create(0, 2), Tuple.Create(1, 3)}))
+        Assert.IsTrue({0, 1, 2}.Zip({2, 3}).SequenceEqual({Tuple.Create(0, 2), Tuple.Create(1, 3)}))
+        Assert.IsTrue({0}.Zip({2, 3}).SequenceEqual({Tuple.Create(0, 2)}))
+    End Sub
+    <TestMethod()>
+    Public Sub ZipWithIndexesTest()
+        Assert.IsTrue({2, 3, 5, 7, 2}.ZipWithIndexes.SequenceEqual({Tuple.Create(2, 0),
+                                                                    Tuple.Create(3, 1),
+                                                                    Tuple.Create(5, 2),
+                                                                    Tuple.Create(7, 3),
+                                                                    Tuple.Create(2, 4)}))
+    End Sub
+    <TestMethod()>
+    Public Sub RepeatedTest()
+        Assert.IsTrue(2.Repeated(5).SequenceEqual({2, 2, 2, 2, 2}))
+    End Sub
+    <TestMethod()>
+    Public Sub IndexesOfTest()
+        Assert.IsTrue({1, 2, 3, 2, 3, 2, 1}.IndexesOf(2).SequenceEqual({1, 3, 5}))
+    End Sub
+    <TestMethod()>
+    Public Sub InterleavedTest()
+        Assert.IsTrue({New Int32() {1, 2, 3, 2}}.Interleaved.SequenceEqual({1, 2, 3, 2}))
+        Assert.IsTrue({New Int32() {1, 2, 3, 2}, New Int32() {4, 5}}.Interleaved.SequenceEqual({1, 4, 2, 5, 3, 2}))
+        Assert.IsTrue({New Int32() {1, 2, 3, 2}, New Int32() {4}, New Int32() {6, 7}}.Interleaved.SequenceEqual({1, 4, 6, 2, 7, 3, 2}))
+    End Sub
+    <TestMethod()>
+    Public Sub DeinterleavedTest()
+        Assert.IsTrue(SequenceSequenceEqual({1, 2, 3, 4, 5, 6, 7}.Deinterleaved(2),
+                                            {New Int32() {1, 3, 5, 7}, New Int32() {2, 4, 6}}))
+        Assert.IsTrue(SequenceSequenceEqual({1, 2, 3, 4, 5, 6, 7}.Deinterleaved(3),
+                                            {New Int32() {1, 4, 7}, New Int32() {2, 5}, New Int32() {3, 6}}))
+    End Sub
+    <TestMethod()>
+    Public Sub PartitionedTest()
+        Assert.IsTrue(SequenceSequenceEqual({1, 2, 3, 4, 5, 6, 7}.Partitioned(3),
+                                            {New Int32() {1, 2, 3}, New Int32() {4, 5, 6}, New Int32() {7}}))
     End Sub
 
     <TestMethod()>

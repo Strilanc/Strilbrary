@@ -1,5 +1,5 @@
 ﻿Namespace Values
-    '''<summary>A 8-bit integer which explicitely allows overflow and underflow.</summary>
+    '''<summary>A 8-bit integer which explicitly allows overflow and underflow.</summary>
     <DebuggerDisplay("{ToString} (mod 2^8)")>
     Public Structure ModByte
         Implements IEquatable(Of ModByte)

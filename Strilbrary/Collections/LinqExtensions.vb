@@ -123,29 +123,14 @@
         End Function
 #End Region
 
-        '''<summary>Zips the elements of two sequences into a sequence of pairs of elements.</summary>
-        <Extension()> <Pure()>
-        <ContractVerification(False)>
-        Public Function Zip(Of T1, T2)(ByVal sequence As IEnumerable(Of T1),
-                                       ByVal sequence2 As IEnumerable(Of T2)) As IEnumerable(Of Tuple(Of T1, T2))
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(sequence2 IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of T1, T2)))() IsNot Nothing)
-            Return Enumerable.Zip(sequence, sequence2, Function(e1, e2) Tuple.Create(e1, e2))
-        End Function
-
         '''<summary>Concatenates a sequence of sequences into a single sequence.</summary>
         <Pure()> <Extension()>
         Public Function Concat(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
             Contract.Requires(sequences IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
-            Return New Enumerable(Of T)(
-                Function()
-                    Dim e = sequences.GetEnumerator
-                    Return New Enumerator(Of T)(Function(controller) If(e.MoveNext,
-                                                                        controller.Sequence(e.Current),
-                                                                        controller.Break()))
-                End Function)
+            Return From sequence In sequences
+                   From item In sequence
+                   Select item
         End Function
 
         '''<summary>Concatenates an array of sequences into a single sequence.</summary>
@@ -169,6 +154,15 @@
             Return sequence.Concat(values)
         End Function
 
+        '''<summary>Prepends values to a sequence.</summary>
+        <Pure()> <Extension()>
+        Public Function Prepend(Of T)(ByVal sequence As IEnumerable(Of T), ByVal ParamArray values() As T) As IEnumerable(Of T)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(values IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
+            Return values.Concat(sequence)
+        End Function
+
         '''<summary>Caches all the items in a sequence, preventing changes to the sequence from affecting the resulting sequence.</summary>
         <Extension()>
         Public Function Cache(Of T)(ByVal sequence As IEnumerable(Of T)) As IEnumerable(Of T)
@@ -177,46 +171,137 @@
             Return sequence.ToArray
         End Function
 
-        '''<summary>Partitions a sequence into fixed sized blocks, with the last block potentially being smaller.</summary>
-        <Extension()> <Pure()>
-        Public Function EnumBlocks(Of T)(ByVal sequence As IEnumerator(Of T),
-                                         ByVal blockSize As Integer) As IEnumerator(Of IList(Of T))
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(blockSize > 0)
-            Contract.Ensures(Contract.Result(Of IEnumerator(Of IList(Of T)))() IsNot Nothing)
-            Return New Enumerator(Of IList(Of T))(
-                Function(controller)
-                    If Not sequence.MoveNext Then Return controller.Break()
-
-                    Dim block = New List(Of T)(blockSize)
-                    block.Add(sequence.Current())
-                    While block.Count < blockSize AndAlso sequence.MoveNext
-                        block.Add(sequence.Current)
-                    End While
-                    Return block
-                End Function
-            )
+        '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
+        <Pure()> <Extension()>
+        Public Function Range(ByVal limit As Int32) As IEnumerable(Of Int32)
+            Contract.Requires(limit >= 0)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of Int32))() IsNot Nothing)
+            Return Enumerable.Range(0, limit)
+        End Function
+        '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
+        <Pure()> <Extension()>
+        Public Function Range(ByVal limit As UInt32) As IEnumerable(Of UInt32)
+            Contract.Requires(limit >= 0)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of UInt32))() IsNot Nothing)
+            Return From i In CInt(limit).Range Select CUInt(i)
+        End Function
+        '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
+        <Pure()> <Extension()>
+        Public Function Range(ByVal limit As UInt16) As IEnumerable(Of UInt16)
+            Contract.Requires(limit >= 0)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of UInt16))() IsNot Nothing)
+            Return From i In CInt(limit).Range Select CUShort(i)
+        End Function
+        '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
+        <Pure()> <Extension()>
+        Public Function Range(ByVal limit As Byte) As IEnumerable(Of Byte)
+            Contract.Requires(limit >= 0)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of Byte))() IsNot Nothing)
+            Return From i In CInt(limit).Range Select CByte(i)
         End Function
 
-        '''<summary>Partitions a sequence into fixed sized blocks, with the last block potentially being smaller.</summary>
-        <Extension()> <Pure()>
-        Public Function EnumBlocks(Of T)(ByVal sequence As IEnumerable(Of T),
-                                         ByVal blockSize As Integer) As IEnumerable(Of IList(Of T))
+        '''<summary>Enumerates items in the sequence, offset by the given amount.</summary>
+        <Pure()> <Extension()>
+        Public Function OffsetBy(ByVal sequence As IEnumerable(Of Int32), ByVal offset As Int32) As IEnumerable(Of Int32)
             Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(blockSize > 0)
-            Contract.Ensures(Contract.Result(Of IEnumerable(Of IList(Of T)))() IsNot Nothing)
-            Dim blockSize_ = blockSize
-            Return sequence.Transform(Function(enumerator) EnumBlocks(enumerator, blockSize_))
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of Int32))() IsNot Nothing)
+            Return From i In sequence Select i + offset
         End Function
 
-        '''<summary>Transforms an IEnumerable using a transformation function meant for an IEnumerator.</summary>
-        <Extension()> <Pure()>
-        Public Function Transform(Of TIn, TOut)(ByVal sequence As IEnumerable(Of TIn),
-                                                ByVal transformation As Func(Of IEnumerator(Of TIn), IEnumerator(Of TOut))) As IEnumerable(Of TOut)
+        '''<summary>Zips the elements of two sequences into a sequence of tuples.</summary>
+        <Pure()> <Extension()>
+        <ContractVerification(False)>
+        Public Function Zip(Of T1, T2)(ByVal sequence As IEnumerable(Of T1),
+                                       ByVal sequence2 As IEnumerable(Of T2)) As IEnumerable(Of Tuple(Of T1, T2))
             Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(transformation IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IEnumerable(Of TOut))() IsNot Nothing)
-            Return New Enumerable(Of TOut)(Function() transformation(sequence.GetEnumerator()))
+            Contract.Requires(sequence2 IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of T1, T2)))() IsNot Nothing)
+            Return Enumerable.Zip(sequence, sequence2, Function(e1, e2) Tuple.Create(e1, e2))
+        End Function
+
+        '''<summary>Zips a sequence's elements with their positions in the sequence.</summary>
+        <Pure()> <Extension()>
+        Public Function ZipWithIndexes(Of T)(ByVal sequence As IEnumerable(Of T)) As IEnumerable(Of Tuple(Of T, Integer))
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of T, Integer)))() IsNot Nothing)
+            Return sequence.Zip(Int32.MaxValue.Range)
+        End Function
+
+        '''<summary>Returns a sequence consisting of a repeated value.</summary>
+        <Pure()> <Extension()>
+        <ContractVerification(False)>
+        Public Function Repeated(Of T)(ByVal value As T, ByVal count As Integer) As IEnumerable(Of T)
+            Contract.Requires(count >= 0)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))().Count = count)
+            Return Enumerable.Repeat(value, count)
+        End Function
+
+        '''<summary>Pads a sequence to a given minimum length.</summary>
+        <Pure()> <Extension()>
+        Public Function PaddedTo(Of T)(ByVal sequence As IEnumerable(Of T),
+                                       ByVal minimumCount As Integer,
+                                       Optional ByVal paddingValue As T = Nothing) As IEnumerable(Of T)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(minimumCount >= 0)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
+            Return sequence.Concat(paddingValue.Repeated(Math.Max(0, minimumCount - sequence.Count)))
+        End Function
+
+        '''<summary>Determines the positions of items in the sequence equivalent to the given value.</summary>
+        <Pure()> <Extension()>
+        Public Function IndexesOf(Of T)(ByVal sequence As IEnumerable(Of T), ByVal value As T) As IEnumerable(Of Integer)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(value IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of Integer))() IsNot Nothing)
+            Return From pair In sequence.ZipWithIndexes
+                   Let item = pair.Item1
+                   Let position = pair.Item2
+                   Where value.Equals(item)
+                   Select position
+        End Function
+
+        '''<summary>Interleaves the items of multiple sequences into a single sequence.</summary>
+        <Pure()> <Extension()>
+        <ContractVerification(False)>
+        Public Function Interleaved(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
+            Contract.Requires(sequences IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
+            Dim result = New List(Of T)
+            Dim enumerators = (From sequence In sequences Select sequence.GetEnumerator).ToList
+            Dim index = 0
+            Do
+                While Not enumerators(index).MoveNext
+                    enumerators.RemoveAt(index)
+                    If enumerators.Count = 0 Then Exit Do
+                    index = index Mod enumerators.Count
+                End While
+
+                result.Add(enumerators(index).Current)
+                index = (index + 1) Mod enumerators.Count
+            Loop
+            Return result
+        End Function
+
+        '''<summary>Groups a sequence based on the position of items (modulo the given sequence count).</summary>
+        <Pure()> <Extension()>
+        Public Function Deinterleaved(Of T)(ByVal sequence As IEnumerable(Of T), ByVal sequenceCount As Integer) As IEnumerable(Of IEnumerable(Of T))
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(sequenceCount > 0)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of IEnumerable(Of T)))() IsNot Nothing)
+            Return sequence.ZipWithIndexes.GroupBy(keySelector:=Function(pair) pair.Item2 Mod sequenceCount,
+                                                   elementSelector:=Function(pair) pair.Item1).PaddedTo(sequenceCount)
+        End Function
+
+        '''<summary>Splits a sequence into continuous segments of a given size (with the last partition possibly being smaller).</summary>
+        <Pure()> <Extension()>
+        Public Function Partitioned(Of T)(ByVal sequence As IEnumerable(Of T),
+                                          ByVal partitionSize As Integer) As IEnumerable(Of IEnumerable(Of T))
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(partitionSize > 0)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of IEnumerable(Of T)))() IsNot Nothing)
+            Return sequence.ZipWithIndexes.GroupBy(keySelector:=Function(e) e.Item2 \ partitionSize,
+                                                   elementSelector:=Function(e) e.Item1)
         End Function
     End Module
 End Namespace
