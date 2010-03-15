@@ -137,8 +137,6 @@ Namespace Values
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 32)
             Stack(New BitWord64(value, 32))
         End Sub
-        'verification disabled due to stupid verifier (1.2.30118.5)
-        <ContractVerification(False)>
         Public Sub StackUInt64(ByVal value As UInt64)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 64)
             Stack(New BitWord64(value, 64))

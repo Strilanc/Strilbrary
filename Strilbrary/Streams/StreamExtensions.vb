@@ -169,7 +169,6 @@ Namespace Streams
         ''' Throws an IOException if the stream ends prematurely.
         ''' </summary>
         <Extension()>
-        <ContractVerification(False)>
         Public Function ReadExact(ByVal stream As IReadableStream,
                                   ByVal exactCount As Integer) As IReadableList(Of Byte)
             Contract.Requires(stream IsNot Nothing)
@@ -232,7 +231,6 @@ Namespace Streams
         ''' Returns nothing if at the end of the stream.
         ''' </summary>
         <Extension()>
-        <ContractVerification(False)>
         Public Function TryReadByte(ByVal stream As IReadableStream) As Byte?
             Contract.Requires(stream IsNot Nothing)
             Dim read = stream.Read(1)
@@ -244,7 +242,6 @@ Namespace Streams
         ''' Throws an IOException if the stream ends prematurely.
         ''' </summary>
         <Extension()>
-        <ContractVerification(False)>
         Public Function ReadByte(ByVal stream As IReadableStream) As Byte
             Contract.Requires(stream IsNot Nothing)
             Return stream.ReadExact(exactCount:=1)(0)

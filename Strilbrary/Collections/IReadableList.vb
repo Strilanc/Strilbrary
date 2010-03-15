@@ -12,14 +12,14 @@
     Public NotInheritable Class IReadableListContractClass(Of T)
         Implements IReadableList(Of T)
         Public Function IndexOf(ByVal item As T) As Integer Implements IReadableList(Of T).IndexOf
-            Contract.Ensures(Contract.Result(Of Integer)() < Me.Count)
+            Contract.Ensures(Contract.Result(Of Integer)() < CType(Me, IReadableList(Of T)).Count)
             Contract.Ensures(Contract.Result(Of Integer)() >= -1)
             Throw New NotSupportedException
         End Function
         Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
             Get
                 Contract.Requires(index >= 0)
-                Contract.Requires(index < Count)
+                Contract.Requires(index < CType(Me, IReadableList(Of T)).Count)
                 Throw New NotSupportedException
             End Get
         End Property

@@ -22,6 +22,7 @@ Namespace Threading
         End Function
 
         '''<summary>Determines a task for running an action as a task.</summary>
+        <ContractVerification(False)>
         Public Function TaskedAction(ByVal action As Action) As Task
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)

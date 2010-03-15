@@ -210,7 +210,6 @@
 
         '''<summary>Zips the elements of two sequences into a sequence of tuples.</summary>
         <Pure()> <Extension()>
-        <ContractVerification(False)>
         Public Function Zip(Of T1, T2)(ByVal sequence As IEnumerable(Of T1),
                                        ByVal sequence2 As IEnumerable(Of T2)) As IEnumerable(Of Tuple(Of T1, T2))
             Contract.Requires(sequence IsNot Nothing)

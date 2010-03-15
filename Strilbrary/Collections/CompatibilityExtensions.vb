@@ -137,8 +137,6 @@ Namespace Collections
                     Return _subList.Count
                 End Get
             End Property
-            'verification disabled due to stupid verifier (1.2.30118.5)
-            <ContractVerification(False)>
             Public Function IndexOf(ByVal item As T) As Integer Implements IReadableList(Of T).IndexOf
                 Return _subList.IndexOf(item)
             End Function

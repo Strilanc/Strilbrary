@@ -170,6 +170,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
         <Extension()> <Pure()>
+        <ContractVerification(False)>
         Public Function PositiveMod(ByVal value As UInt32, ByVal divisor As UInt32) As UInt32
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of UInt32)() > 0)
@@ -481,7 +482,6 @@ Namespace Values
         ''' Determines the value of a list of 2 bytes treated as base-256 digits.
         ''' </summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
         Public Function ToUInt16(ByVal data As IReadableList(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
             Const size As Integer = 2
@@ -508,7 +508,6 @@ Namespace Values
         ''' Determines the value of a list of 4 bytes treated as base-256 digits.
         ''' </summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
         Public Function ToUInt32(ByVal data As IReadableList(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt32
             Const size As Integer = 4
@@ -535,7 +534,6 @@ Namespace Values
         ''' Determines the value of a list of 8 bytes treated as base-256 digits.
         ''' </summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
         Public Function ToUInt64(ByVal data As IReadableList(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt64
             Const size As Integer = 8

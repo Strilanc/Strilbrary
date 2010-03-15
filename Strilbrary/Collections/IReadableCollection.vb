@@ -7,7 +7,6 @@
         ReadOnly Property Count As Integer
     End Interface
 
-    '[This class causes a code analysis bug in code contracts 1.2.30113.1 if moved into its target interface.]
     <ContractClassFor(GetType(IReadableCollection(Of )))>
     NotInheritable Class IReadableCollectionContractClass(Of T)
         Implements IReadableCollection(Of T)
@@ -18,7 +17,7 @@
             End Get
         End Property
         Public Function Contains(ByVal item As T) As Boolean Implements IReadableCollection(Of T).Contains
-            Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.Count > 0)
+            Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse CType(Me, IReadableCollection(Of T)).Count > 0)
             Throw New NotSupportedException
         End Function
 

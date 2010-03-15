@@ -52,6 +52,7 @@ Namespace Collections
         End Function
 
         '''<summary>Retrieves the highest-priority item in the priority queue, and removes it from the queue.</summary>
+        <ContractVerification(False)>
         Public Function Dequeue() As TValue
             Contract.Requires(Count > 0)
             Contract.Ensures(Contract.Result(Of TValue)() IsNot Nothing)

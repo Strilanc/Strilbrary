@@ -120,6 +120,7 @@
             Return Me.Value.Substring(startIndex)
         End Function
         <Pure()>
+        <ContractVerification(False)>
         Public Function Substring(ByVal startIndex As Integer, ByVal length As Integer) As InvariantString
             Contract.Requires(startIndex >= 0)
             Contract.Requires(length >= 0)

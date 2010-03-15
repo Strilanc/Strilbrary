@@ -38,8 +38,6 @@ Namespace Time
         End Sub
 
         Public ReadOnly Property ElapsedTime As TimeSpan Implements IClock.ElapsedTime
-            'verification disabled due to stupid verifier (1.2.30118.5)
-            <ContractVerification(False)>
             Get
                 SyncLock _lock
                     Return _time

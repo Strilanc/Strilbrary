@@ -3,11 +3,10 @@ Imports Strilbrary.Exceptions
 Imports System.Threading
 
 Namespace Threading
-    'Verification disabled due to missing task contracts
-    <ContractVerification(False)>
     Public Module TaskExtensions
         '''<summary>Wraps a value in an instantly completed task.</summary>
         <Extension()>
+        <ContractVerification(False)>
         Public Function AsTask(Of TValue)(ByVal value As TValue) As Task(Of TValue)
             Contract.Ensures(Contract.Result(Of Task(Of TValue))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TValue))().Status = TaskStatus.RanToCompletion)
@@ -20,6 +19,7 @@ Namespace Threading
         ''' The result faults if any of the sequence tasks fault.
         '''</summary>
         <Extension()>
+        <ContractVerification(False)>
         Public Function AsAggregateTask(ByVal sequence As IEnumerable(Of Task)) As Task
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
@@ -95,11 +95,14 @@ Namespace Threading
         End Sub
         <Extension()>
         Private Function PropagateFaultsFrom(Of T)(ByVal taskSource As TaskCompletionSource(Of T), ByVal task As Task) As Boolean
+            Contract.Requires(taskSource IsNot Nothing)
+            Contract.Requires(task IsNot Nothing)
             Select Case task.Status
                 Case TaskStatus.Canceled
                     taskSource.SetCanceled()
                     Return True
                 Case TaskStatus.Faulted
+                    Contract.Assume(task.Exception IsNot Nothing)
                     taskSource.SetException(task.Exception.InnerExceptions)
                     Return True
                 Case TaskStatus.RanToCompletion
@@ -111,6 +114,7 @@ Namespace Threading
 
         '''<summary>Creates a continuation which executes if a task succeeds, and propagates exceptions if it faults.</summary>
         <Extension()> <Pure()>
+        <ContractVerification(False)>
         Public Function ContinueWithAction(ByVal task As Task,
                                            ByVal action As action) As Task
             Contract.Requires(task IsNot Nothing)
@@ -131,6 +135,7 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes if a task succeeds, and propagates exceptions if it faults.</summary>
         <Extension()> <Pure()>
+        <ContractVerification(False)>
         Public Function ContinueWithFunc(Of TResult)(ByVal task As Task,
                                                      ByVal func As Func(Of TResult)) As Task(Of TResult)
             Contract.Requires(task IsNot Nothing)
@@ -151,6 +156,7 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes if a task faults, and propagates success if it succeeds.</summary>
         <Extension()> <Pure()>
+        <ContractVerification(False)>
         Public Function [Catch](ByVal task As Task,
                                 ByVal action As Action(Of AggregateException)) As Task
             Contract.Requires(task IsNot Nothing)
@@ -172,6 +178,7 @@ Namespace Threading
         '''<summary>Creates a chain of continuations which execute if a task succeeds, and propagates exceptions if it faults.</summary>
         '''<remarks>Linq provider for tasks.</remarks>
         <Extension()>
+        <ContractVerification(False)>
         Public Function SelectMany(Of TArg, TMid, TReturn)(ByVal task As Task(Of TArg),
                                                            ByVal projection1 As Func(Of TArg, Task(Of TMid)),
                                                            ByVal projection2 As Func(Of TArg, TMid, TReturn)) As Task(Of TReturn)

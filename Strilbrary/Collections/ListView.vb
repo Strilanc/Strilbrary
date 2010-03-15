@@ -111,7 +111,6 @@ Namespace Collections
             End Sub
 
             Public ReadOnly Property Current As T Implements IEnumerator(Of T).Current
-                <ContractVerification(False)>
                 Get
                     If _index < 0 Then Throw New InvalidOperationException("Enumerator not started.")
                     If _index >= _list.Count Then Throw New InvalidOperationException("Enumerator finished.")

@@ -29,7 +29,7 @@ Namespace Streams
                 Return New ListView(Of Byte)(buffer.AsReadableList, 0, n)
             End Function
 
-            Public Sub Write(ByVal data As Collections.IReadableList(Of Byte)) Implements IWritableStream.Write
+            Public Sub Write(ByVal data As IReadableList(Of Byte)) Implements IWritableStream.Write
                 Contract.Assume(_stream.CanWrite)
                 _stream.Write(data.ToArray)
             End Sub
@@ -130,7 +130,6 @@ Namespace Streams
                 End Get
             End Property
 
-            <ContractVerification(False)>
             Public Overrides Function Read(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer) As Integer
                 If _readStream Is Nothing Then Throw New NotSupportedException()
                 If count = 0 Then Return 0
@@ -155,7 +154,6 @@ Namespace Streams
                     If _seekStream Is Nothing Then Throw New NotSupportedException()
                     Return _seekStream.Position
                 End Get
-                <ContractVerification(False)>
                 Set(ByVal value As Long)
                     If _seekStream Is Nothing Then Throw New NotSupportedException()
                     If value > _seekStream.Length Then value = _seekStream.Length
