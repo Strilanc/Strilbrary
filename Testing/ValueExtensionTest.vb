@@ -451,4 +451,62 @@ Public Class ValueExtensionTest
         Assert.IsTrue(0.ClampAtOrBelow(2) = 0)
         Assert.IsTrue(3.ClampAtOrAbove(3) = 3)
     End Sub
+
+    Private Enum EV
+        v1 = 1
+        v3 = 3
+        v10 = 10
+    End Enum
+    Private Enum FV
+        None = 0
+        f0 = 1 << 0
+        f2 = 1 << 2
+        f5 = 1 << 5
+        f8 = 1 << 8
+    End Enum
+    <TestMethod()>
+    Public Sub EnumParseTest()
+        Assert.IsTrue("v1".EnumParse(Of EV)(ignoreCase:=False) = EV.v1)
+        Assert.IsTrue("v3".EnumParse(Of EV)(ignoreCase:=False) = EV.v3)
+        Assert.IsTrue("v10".EnumParse(Of EV)(ignoreCase:=False) = EV.v10)
+        Assert.IsTrue("V1".EnumParse(Of EV)(ignoreCase:=True) = EV.v1)
+        ExpectException(Of ArgumentException)(Sub() Call "V1".EnumParse(Of EV)(ignoreCase:=False))
+        ExpectException(Of ArgumentException)(Sub() Call "v2".EnumParse(Of EV)(ignoreCase:=True))
+
+        Assert.IsTrue("v1".EnumTryParse(Of EV)(ignoreCase:=False).Value = EV.v1)
+        Assert.IsTrue("v3".EnumTryParse(Of EV)(ignoreCase:=False).Value = EV.v3)
+        Assert.IsTrue("v10".EnumTryParse(Of EV)(ignoreCase:=False).Value = EV.v10)
+        Assert.IsTrue("V1".EnumTryParse(Of EV)(ignoreCase:=True).Value = EV.v1)
+        Assert.IsTrue(Not "V1".EnumTryParse(Of EV)(ignoreCase:=False).HasValue)
+        Assert.IsTrue(Not "v2".EnumTryParse(Of EV)(ignoreCase:=True).HasValue)
+    End Sub
+    <TestMethod()>
+    Public Sub EnumValuesTest()
+        Assert.IsTrue(EnumValues(Of EV)().SequenceEqual({EV.v1, EV.v3, EV.v10}))
+        Assert.IsTrue(EnumValues(Of FV)().SequenceEqual({FV.None, FV.f0, FV.f2, FV.f5, FV.f8}))
+    End Sub
+    <TestMethod()>
+    Public Sub EnumFlagsTest()
+        Assert.IsTrue(FV.f2.EnumFlags().SequenceEqual({FV.f2}))
+        Assert.IsTrue((FV.f2 Or FV.f5).EnumFlags().SequenceEqual({FV.f2, FV.f5}))
+        Assert.IsTrue(CType((1 << 2) Or (1 << 3), FV).EnumFlags().SequenceEqual({FV.f2, CType(1 << 3, FV)}))
+        Assert.IsTrue((FV.f2 Or FV.f5).EnumFlagsIndexed().SequenceEqual({Tuple.Create(FV.f2, 2), Tuple.Create(FV.f5, 5)}))
+    End Sub
+    <TestMethod()>
+    Public Sub EnumValueIsDefinedTest()
+        Assert.IsTrue(EV.v1.EnumValueIsDefined)
+        Assert.IsTrue(Not CType(255, EV).EnumValueIsDefined)
+        Assert.IsTrue(FV.f5.EnumValueIsDefined)
+        Assert.IsTrue(Not (FV.f5 Or FV.f2).EnumValueIsDefined)
+    End Sub
+    <TestMethod()>
+    Public Sub EnumFlagsAreDefinedTest()
+        Assert.IsTrue(FV.f5.EnumFlagsAreDefined())
+        Assert.IsTrue((FV.f2 Or FV.f5).EnumFlagsAreDefined())
+        Assert.IsTrue(Not CType(1 << 3, FV).EnumFlagsAreDefined())
+    End Sub
+    <TestMethod()>
+    Public Sub EnumFlagsToStringTest()
+        Assert.IsTrue((FV.f2 Or FV.f5).EnumFlagsToString = "f2, f5")
+    End Sub
 End Class
