@@ -4,7 +4,6 @@
     ''' </summary>
     <DebuggerDisplay("{ToString}")>
     Public Structure InvariantString
-        'verification off because code contracts 1.2.21023.14 silently crashes if this class is verified
         Implements IEquatable(Of String)
         Implements IComparable(Of String)
         Implements IEquatable(Of InvariantString)
@@ -12,7 +11,7 @@
 
         Private ReadOnly _value As String
 
-        'verification disabled due to stupid verifier (1.2.30118.5)
+        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub New(ByVal value As String)
             Contract.Requires(value IsNot Nothing)
@@ -21,7 +20,7 @@
         End Sub
 
         Public ReadOnly Property Value As String
-            'verification disabled due to stupid verifier (1.2.30118.5)
+            'verification disabled due to stupid verifier (1.2.30312.0)
             <ContractVerification(False)>
             Get
                 Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
@@ -88,7 +87,7 @@
             Contract.Ensures(Contract.Result(Of InvariantString)().Value = value)
             Return New InvariantString(value)
         End Operator
-        'verification disabled due to stupid verifier (1.2.30118.5)
+        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Shared Widening Operator CType(ByVal value As InvariantString) As String
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
@@ -96,21 +95,21 @@
             Return value.Value
         End Operator
 
-        'verification disabled due to stupid verifier (1.2.30118.5)
+        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         <Pure()>
         Public Function EndsWith(ByVal value As InvariantString) As Boolean
             Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.Length >= value.Length)
             Return Me.Value.EndsWith(value.Value, StringComparison.OrdinalIgnoreCase)
         End Function
-        'verification disabled due to stupid verifier (1.2.30118.5)
+        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         <Pure()>
         Function StartsWith(ByVal value As InvariantString) As Boolean
             Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.Length >= value.Length)
             Return Me.Value.StartsWith(value.Value, StringComparison.OrdinalIgnoreCase)
         End Function
-        'verification disabled due to stupid verifier (1.2.30118.5)
+        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         <Pure()>
         Public Function Substring(ByVal startIndex As Integer) As InvariantString

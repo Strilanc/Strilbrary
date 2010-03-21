@@ -19,7 +19,7 @@ Namespace Time
             Contract.Invariant(_timeOffset.Ticks >= _startTime.Ticks)
         End Sub
 
-        'verification disabled due to stupid verifier (1.2.30118.5)
+        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub New(ByVal parentClock As IClock, ByVal startingTime As TimeSpan)
             Contract.Requires(parentClock IsNot Nothing)
@@ -40,7 +40,7 @@ Namespace Time
         End Sub
 
         Public ReadOnly Property StartingTimeOnParentClock As TimeSpan
-            'verification disabled due to stupid verifier (1.2.30118.5)
+            'verification disabled due to stupid verifier (1.2.30312.0)
             <ContractVerification(False)>
             Get
                 Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks >= 0)

@@ -132,6 +132,7 @@
     <Compile Include="Exceptions\Exception Types.vb" />
     <Compile Include="Exceptions\Exception Extensions.vb" />
     <Compile Include="Misc\DelegatedDisposable.vb" />
+    <Compile Include="Streams\EnumeratorStream.vb" />
     <Compile Include="Streams\Stream Interface Converters.vb" />
     <Compile Include="Streams\Stream Interfaces.vb" />
     <Compile Include="Threading\TaskExtensions.vb" />
@@ -143,6 +144,7 @@
     <Compile Include="Values\BitBuffer.vb" />
     <Compile Include="Values\BitWord64.vb" />
     <Compile Include="Threading\Throttle.vb" />
+    <Compile Include="Values\NonNull.vb" />
     <Compile Include="Values\TextExtensions.vb" />
     <Compile Include="Values\EnumExtensions.vb" />
     <Compile Include="Values\InvariantString.vb" />

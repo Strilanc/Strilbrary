@@ -28,7 +28,6 @@ Namespace Collections
 
         '''<summary>Adds an item to the priority queue.</summary>
         Public Sub Enqueue(ByVal item As TValue)
-            Contract.Requires(item IsNot Nothing)
             Dim curIndex = _items.Count
             _items.Add(item)
             While curIndex > 0
@@ -46,8 +45,6 @@ Namespace Collections
         <Pure()>
         Public Function Peek() As TValue
             Contract.Requires(Count > 0)
-            Contract.Ensures(Contract.Result(Of TValue)() IsNot Nothing)
-            Contract.Assume(_items(0) IsNot Nothing)
             Return _items(0)
         End Function
 
@@ -55,9 +52,7 @@ Namespace Collections
         <ContractVerification(False)>
         Public Function Dequeue() As TValue
             Contract.Requires(Count > 0)
-            Contract.Ensures(Contract.Result(Of TValue)() IsNot Nothing)
             Dim result = _items(0)
-            Contract.Assume(result IsNot Nothing)
 
             Dim curIndex = 0
             Do

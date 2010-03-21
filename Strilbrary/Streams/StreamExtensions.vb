@@ -354,5 +354,20 @@ Namespace Streams
             Loop
             Return result.AsReadableList
         End Function
+
+        '''<summary>Exposes a sequence of bytes as an IReadableStream.</summary>
+        <Extension()> <Pure()>
+        Public Function AsReadableStream(ByVal sequence As IEnumerable(Of Byte)) As IReadableStream
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IReadableStream)() IsNot Nothing)
+            Return New EnumeratorStream(sequence.GetEnumerator)
+        End Function
+        '''<summary>Exposes a sequence of bytes as an IReadableStream.</summary>
+        <Extension()> <Pure()>
+        Public Function AsReadableStream(ByVal sequence As IEnumerator(Of Byte)) As IReadableStream
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IReadableStream)() IsNot Nothing)
+            Return New EnumeratorStream(sequence)
+        End Function
     End Module
 End Namespace

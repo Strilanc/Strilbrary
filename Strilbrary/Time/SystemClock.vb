@@ -17,7 +17,7 @@ Namespace Time
             Contract.Invariant(_elapsedTime.Ticks >= 0)
         End Sub
 
-        'verification disabled due to stupid verifier (1.2.30118.5)
+        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub New()
             Me._lastTick = Environment.TickCount
@@ -41,7 +41,7 @@ Namespace Time
         End Function
 
         Public ReadOnly Property ElapsedTime As TimeSpan Implements IClock.ElapsedTime
-            'verification disabled due to stupid verifier (1.2.30118.5)
+            'verification disabled due to stupid verifier (1.2.30312.0)
             <ContractVerification(False)>
             Get
                 SyncLock _lock
