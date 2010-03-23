@@ -69,8 +69,7 @@
             Return (_value.GetHashCode)
         End Function
         Public Overrides Function Equals(ByVal obj As Object) As Boolean
-            If Not TypeOf obj Is ModInt64 Then Return False
-            Return Me._value = CType(obj, ModInt64)._value
+            Return TypeOf obj Is ModInt64 AndAlso Me._value = DirectCast(obj, ModInt64)._value
         End Function
         Public Overloads Function Equals(ByVal other As ModInt64) As Boolean Implements IEquatable(Of ModInt64).Equals
             Return Me._value = other._value

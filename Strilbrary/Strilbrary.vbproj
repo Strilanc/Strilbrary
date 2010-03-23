@@ -18,7 +18,7 @@
     <OptionStrict>On</OptionStrict>
     <OptionInfer>On</OptionInfer>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>HostBot_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>StrilancWeak.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkProfile />
     <LangVersion>
     </LangVersion>
@@ -136,7 +136,7 @@
     <Compile Include="Streams\Stream Interface Converters.vb" />
     <Compile Include="Streams\Stream Interfaces.vb" />
     <Compile Include="Threading\TaskExtensions.vb" />
-    <Compile Include="Time\Clock Interfaces.vb" />
+    <Compile Include="Time\IClock.vb" />
     <Compile Include="Time\RelativeClock.vb" />
     <Compile Include="Time\SystemClock.vb" />
     <Compile Include="Time\ManualClock.vb" />
@@ -201,6 +201,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="StrilancWeak.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StrilbraryUnchecked\StrilbraryUnchecked.vbproj">

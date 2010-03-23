@@ -16,5 +16,11 @@ Namespace Values
             Contract.Ensures((Contract.Result(Of TResult)() IsNot Nothing) = (value IsNot Nothing))
             Return CType(DirectCast(value, Object), TResult)
         End Function
+
+        <Pure()> <Extension()>
+        Public Function AsNonNull(Of T)(ByVal value As T) As NonNull(Of T)
+            Contract.Requires(value IsNot Nothing)
+            Return New NonNull(Of T)(value)
+        End Function
     End Module
 End Namespace

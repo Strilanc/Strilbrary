@@ -61,7 +61,7 @@ Namespace Threading
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of IEnumerable(Of TValue)))() IsNot Nothing)
             Dim tasks = sequence.ToList
-            Return CType(tasks, IEnumerable(Of Task)).AsAggregateTask.ContinueWithFunc(Function() (From task In tasks Select task.Result).ToList.AsEnumerable)
+            Return DirectCast(tasks, IEnumerable(Of Task)).AsAggregateTask.ContinueWithFunc(Function() (From task In tasks Select task.Result).ToList.AsEnumerable)
         End Function
 
         '''<summary>Causes a task completion source to succeed with the result of a function, or to fault if the function throws an exception.</summary>

@@ -62,12 +62,12 @@ Namespace Streams
             Public Property Position As Long Implements ISeekableStream.Position
                 Get
                     Contract.Ensures(Contract.Result(Of Long)() >= 0)
-                    Contract.Ensures(Contract.Result(Of Long)() <= CType(Me, ISeekableStream).Length)
+                    Contract.Ensures(Contract.Result(Of Long)() <= DirectCast(Me, ISeekableStream).Length)
                     Throw New NotSupportedException
                 End Get
                 Set(ByVal value As Long)
                     Contract.Requires(value >= 0)
-                    Contract.Requires(value <= CType(Me, ISeekableStream).Length)
+                    Contract.Requires(value <= DirectCast(Me, ISeekableStream).Length)
                     Throw New NotSupportedException
                 End Set
             End Property
@@ -86,7 +86,7 @@ Namespace Streams
         NotInheritable Shadows Class ContractClass
             Implements IRandomReadableStream
             Public Function Read(ByVal maxCount As Integer) As IReadableList(Of Byte) Implements IReadableStream.Read
-                Contract.Ensures(Me.Position = Contract.OldValue(CType(Me, ISeekableStream).Position) + Contract.Result(Of IReadableList(Of Byte))().Count)
+                Contract.Ensures(Me.Position = Contract.OldValue(DirectCast(Me, ISeekableStream).Position) + Contract.Result(Of IReadableList(Of Byte))().Count)
                 Throw New NotSupportedException
             End Function
             Public ReadOnly Property Length As Long Implements ISeekableStream.Length
@@ -117,7 +117,7 @@ Namespace Streams
         NotInheritable Shadows Class ContractClass
             Implements IRandomWritableStream
             Public Sub Write(ByVal data As IReadableList(Of Byte)) Implements IWritableStream.Write
-                Contract.Ensures(Me.Position = Contract.OldValue(CType(Me, ISeekableStream).Position) + data.Count)
+                Contract.Ensures(Me.Position = Contract.OldValue(DirectCast(Me, ISeekableStream).Position) + data.Count)
                 Throw New NotSupportedException
             End Sub
             Public Sub Flush() Implements IWritableStream.Flush

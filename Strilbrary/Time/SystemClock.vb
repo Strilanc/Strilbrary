@@ -24,8 +24,9 @@ Namespace Time
         End Sub
 
         <ContractVerification(False)>
-        Public Function AsyncWait(ByVal dt As TimeSpan) As Task Implements IClock.AsyncWait
+        Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
             Dim result = New TaskCompletionSource(Of Boolean)
+            Dim dt = time - ElapsedTime
             If dt.Ticks <= 0 Then
                 result.SetResult(True)
             Else

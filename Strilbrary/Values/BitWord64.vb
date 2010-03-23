@@ -86,8 +86,7 @@
             Return Not word1 = word2
         End Operator
         Public Overloads Overrides Function Equals(ByVal obj As Object) As Boolean
-            If Not TypeOf obj Is BitWord64 Then Return False
-            Return Me = CType(obj, BitWord64)
+            Return TypeOf obj Is BitWord64 AndAlso Me = DirectCast(obj, BitWord64)
         End Function
         Public Overloads Function Equals(ByVal other As BitWord64) As Boolean Implements System.IEquatable(Of BitWord64).Equals
             Return Me = other

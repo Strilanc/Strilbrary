@@ -1,4 +1,6 @@
-﻿Namespace Threading
+﻿Imports Strilbrary.Time
+
+Namespace Threading
     '''<summary>Runs specified actions while respecting a minimum cooldown.</summary>
     Public NotInheritable Class Throttle
         Private ReadOnly _cooldown As TimeSpan

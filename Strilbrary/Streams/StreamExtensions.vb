@@ -234,7 +234,8 @@ Namespace Streams
         Public Function TryReadByte(ByVal stream As IReadableStream) As Byte?
             Contract.Requires(stream IsNot Nothing)
             Dim read = stream.Read(1)
-            Return If(read.Count = 1, read.Single, CType(Nothing, Byte?))
+            If read.Count <> 1 Then Return Nothing
+            Return read.Single
         End Function
 
         ''' <summary>

@@ -5,10 +5,10 @@ Namespace Time
     <ContractClass(GetType(IClock.ContractClass))>
     Public Interface IClock
         ''' <summary>
-        ''' Returns a future which becomes ready after the given amount of time has passed on the clock.
-        ''' The resulting future is instantly ready if the given time is non-positive.
+        ''' Returns a task which completes once the given time has been reached by the clock.
+        ''' The resulting task is instantly ready if the given time has already been reached.
         ''' </summary>
-        Function AsyncWait(ByVal dt As TimeSpan) As Task
+        Function AsyncWaitUntil(ByVal time As TimeSpan) As task
 
         ''' <summary>
         ''' Determines the time elapsed on the clock since it was started.
@@ -18,7 +18,7 @@ Namespace Time
         <ContractClassFor(GetType(IClock))>
         NotInheritable Class ContractClass
             Implements IClock
-            Public Function AsyncWait(ByVal dt As TimeSpan) As Task Implements IClock.AsyncWait
+            Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
                 Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
                 Throw New NotSupportedException
             End Function

@@ -67,4 +67,25 @@ Public Class CallQueueTest
         WaitForTaskToSucceed(result)
         Assert.IsTrue(flag)
     End Sub
+
+    Private Sub TestCallQueue(ByVal q As CallQueue)
+        Dim t = 0
+        Dim flag = True
+        For i = 0 To 1000 - 1
+            Dim i_ = i
+            q.QueueAction(Sub()
+                              If i_ <> t Then flag = False
+                              t += 1
+                          End Sub)
+        Next i
+        WaitForTaskToSucceed(q.QueueAction(Sub()
+                                           End Sub))
+        Assert.IsTrue(t = 1000)
+    End Sub
+    <TestMethod()>
+    Public Sub CallQueueTypeTests()
+        TestCallQueue(New ThreadPooledCallQueue(initiallyStarted:=True))
+        TestCallQueue(New TaskedCallQueue(initiallyStarted:=True))
+        TestCallQueue(New ThreadedCallQueue(initiallyStarted:=True))
+    End Sub
 End Class

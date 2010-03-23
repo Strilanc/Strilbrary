@@ -7,6 +7,13 @@ Imports Strilbrary.Collections
 <TestClass()>
 Public Class ValueExtensionTest
     <TestMethod()>
+    Public Sub ReversedByteOrderUInt16Test()
+        Assert.IsTrue(0US.ReversedByteOrder() = 0US)
+        Assert.IsTrue(UInt16.MaxValue.ReversedByteOrder() = UInt16.MaxValue)
+        Assert.IsTrue(&H5US.ReversedByteOrder() = &H500US)
+        Assert.IsTrue(&H1234US.ReversedByteOrder() = &H3412US)
+    End Sub
+    <TestMethod()>
     Public Sub ReversedByteOrderUInt32Test()
         Assert.IsTrue(0UI.ReversedByteOrder() = 0UI)
         Assert.IsTrue(UInt32.MaxValue.ReversedByteOrder() = UInt32.MaxValue)
@@ -452,12 +459,12 @@ Public Class ValueExtensionTest
         Assert.IsTrue(3.ClampAtOrAbove(3) = 3)
     End Sub
 
-    Private Enum EV
+    Private Enum EV As UInt64
         v1 = 1
         v3 = 3
         v10 = 10
     End Enum
-    Private Enum FV
+    Private Enum FV As Int32
         None = 0
         f0 = 1 << 0
         f2 = 1 << 2
@@ -508,5 +515,17 @@ Public Class ValueExtensionTest
     <TestMethod()>
     Public Sub EnumFlagsToStringTest()
         Assert.IsTrue((FV.f2 Or FV.f5).EnumFlagsToString = "f2, f5")
+        Assert.IsTrue((CType(1 << 1, FV) Or FV.f5).EnumFlagsToString = "1<<1, f5")
+    End Sub
+
+    <TestMethod()>
+    Public Sub NonNullTests()
+        Assert.IsTrue(New NonNull(Of Byte)(1).Value = 1)
+        Assert.IsTrue(CType(2, NonNull(Of Int32)).Value = 2)
+        Assert.IsTrue(CType(New NonNull(Of UInt32)(4), UInt32) = 4UI)
+        Assert.IsTrue(New NonNull(Of Byte)(1).ToString = CByte(1).ToString)
+        ExpectException(Of Exception)(Sub()
+                                          Dim r = New NonNull(Of Object)().Value
+                                      End Sub)
     End Sub
 End Class

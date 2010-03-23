@@ -57,10 +57,10 @@ Public Class ModInt64Test
 
     <TestMethod()>
     Public Sub op_NotTest()
-        Assert.IsTrue(Not New ModInt64(0) = &HFFFFFFFFFFFFFFFFUL)
-        Assert.IsTrue(Not New ModInt64(1) = &HFFFFFFFFFFFFFFFEUL)
-        Assert.IsTrue(Not New ModInt64(-1) = 0)
-        Assert.IsTrue(Not New ModInt64(UInt64.MaxValue) = 0)
+        Assert.IsTrue((Not New ModInt64(0)) = &HFFFFFFFFFFFFFFFFUL)
+        Assert.IsTrue((Not New ModInt64(1)) = &HFFFFFFFFFFFFFFFEUL)
+        Assert.IsTrue((Not New ModInt64(-1)) = 0)
+        Assert.IsTrue((Not New ModInt64(UInt64.MaxValue)) = 0)
     End Sub
 
     <TestMethod()>
@@ -80,6 +80,10 @@ Public Class ModInt64Test
         Assert.IsTrue(New ModInt64(2) <> 1)
         Assert.IsTrue(New ModInt64(2) <> -1)
         Assert.IsTrue(New ModInt64(UInt64.MaxValue).Equals(New ModInt64(-1)))
+
+        Assert.IsTrue(New ModInt64(1).Equals(CType(New ModInt64(1), Object)))
+        Assert.IsTrue(Not New ModInt64(1).Equals(CType(1UI, Object)))
+        Assert.IsTrue(New ModInt64(1).GetHashCode = New ModInt64(1).GetHashCode)
     End Sub
 
     <TestMethod()>
@@ -117,5 +121,10 @@ Public Class ModInt64Test
         Assert.IsTrue(New ModInt64(3).ShiftRotateRight(2) = &HC000000000000000UL)
         Assert.IsTrue(New ModInt64(3).ShiftRotateRight(1) = &H8000000000000001UL)
         Assert.IsTrue(New ModInt64(&HFFFFFFFFFFFFFFFFUL).ShiftRotateRight(2) = &HFFFFFFFFFFFFFFFFUL)
+    End Sub
+
+    <TestMethod()>
+    Public Sub ToStringTest()
+        Assert.IsTrue(New ModInt64(2).ToString = "2")
     End Sub
 End Class

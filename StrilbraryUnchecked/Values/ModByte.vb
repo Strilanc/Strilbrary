@@ -69,7 +69,7 @@
             Return _value.GetHashCode
         End Function
         Public Overrides Function Equals(ByVal obj As Object) As Boolean
-            Return TypeOf obj Is ModByte AndAlso Me._value = CType(obj, ModByte)._value
+            Return TypeOf obj Is ModByte AndAlso Me._value = DirectCast(obj, ModByte)._value
         End Function
         Public Overloads Function Equals(ByVal other As ModByte) As Boolean Implements IEquatable(Of ModByte).Equals
             Return Me._value = other._value

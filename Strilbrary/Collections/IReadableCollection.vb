@@ -17,7 +17,7 @@
             End Get
         End Property
         Public Function Contains(ByVal item As T) As Boolean Implements IReadableCollection(Of T).Contains
-            Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse CType(Me, IReadableCollection(Of T)).Count > 0)
+            Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse DirectCast(Me, IReadableCollection(Of T)).Count > 0)
             Throw New NotSupportedException
         End Function
 

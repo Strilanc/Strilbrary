@@ -57,10 +57,10 @@ Public Class ModByteTest
 
     <TestMethod()>
     Public Sub op_NotTest()
-        Assert.IsTrue(Not New ModByte(0) = CByte(&HFF))
-        Assert.IsTrue(Not New ModByte(1) = CByte(&HFE))
-        Assert.IsTrue(Not New ModByte(-1) = CByte(0))
-        Assert.IsTrue(Not New ModByte(Byte.MaxValue) = CByte(0))
+        Assert.IsTrue((Not New ModByte(0)) = CByte(&HFF))
+        Assert.IsTrue((Not New ModByte(1)) = CByte(&HFE))
+        Assert.IsTrue((Not New ModByte(-1)) = CByte(0))
+        Assert.IsTrue((Not New ModByte(Byte.MaxValue)) = CByte(0))
     End Sub
 
     <TestMethod()>
@@ -80,6 +80,10 @@ Public Class ModByteTest
         Assert.IsTrue(New ModByte(2) <> CByte(1))
         Assert.IsTrue(New ModByte(2) <> CSByte(-1))
         Assert.IsTrue(New ModByte(Byte.MaxValue).Equals(New ModByte(-1)))
+
+        Assert.IsTrue(New ModByte(1).Equals(CType(New ModByte(1), Object)))
+        Assert.IsTrue(Not New ModByte(1).Equals(CType(CByte(1), Object)))
+        Assert.IsTrue(New ModByte(1).GetHashCode = New ModByte(1).GetHashCode)
     End Sub
 
     <TestMethod()>
@@ -117,5 +121,10 @@ Public Class ModByteTest
         Assert.IsTrue(New ModByte(3).ShiftRotateRight(2) = CByte(&HC0))
         Assert.IsTrue(New ModByte(3).ShiftRotateRight(1) = CByte(&H81))
         Assert.IsTrue(New ModByte(Byte.MaxValue).ShiftRotateRight(2) = Byte.MaxValue)
+    End Sub
+
+    <TestMethod()>
+    Public Sub ToStringTest()
+        Assert.IsTrue(New ModByte(2).ToString = "2")
     End Sub
 End Class

@@ -46,15 +46,15 @@ Namespace Time
         End Property
 
         <ContractVerification(False)>
-        Public Function AsyncWait(ByVal dt As TimeSpan) As Task Implements IClock.AsyncWait
+        Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
             Dim result = New TaskCompletionSource(Of Boolean)
-            If dt.Ticks <= 0 Then
-                result.SetResult(True)
-            Else
-                SyncLock _lock
-                    _asyncWaits.Enqueue(Tuple.Create(ElapsedTime + dt, result))
-                End SyncLock
-            End If
+            SyncLock _lock
+                If time <= ElapsedTime Then
+                    result.SetResult(True)
+                Else
+                    _asyncWaits.Enqueue(Tuple.Create(time, result))
+                End If
+            End SyncLock
             Return result.Task
         End Function
     End Class

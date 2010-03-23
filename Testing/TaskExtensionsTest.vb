@@ -34,6 +34,25 @@ Public Class TaskExtensionsTest
         WaitForTaskToSucceed(result)
     End Sub
     <TestMethod()>
+    Public Sub AsAggregateTaskTest_Empty()
+        Dim tasks = New Task() {}
+        Dim result = tasks.AsAggregateTask
+        WaitForTaskToSucceed(result)
+    End Sub
+    <TestMethod()>
+    Public Sub AsAggregateTaskTest_Fault()
+        Dim taskSources = {New TaskCompletionSource(Of Boolean), New TaskCompletionSource(Of Boolean), New TaskCompletionSource(Of Boolean)}
+        Dim tasks = From t In taskSources Select CType(t.Task, Task)
+        Dim result = tasks.AsAggregateTask
+        taskSources(0).SetException(New ArgumentException())
+        taskSources(1).SetResult(True)
+        taskSources(2).SetException(New InvalidOperationException())
+        WaitForTaskToFault(result)
+        Assert.IsTrue(result.Exception.InnerExceptions.Count = 2)
+        Assert.IsTrue(TypeOf result.Exception.InnerExceptions(0) Is ArgumentException)
+        Assert.IsTrue(TypeOf result.Exception.InnerExceptions(1) Is InvalidOperationException)
+    End Sub
+    <TestMethod()>
     Public Sub AsAggregateTaskTest_Value()
         Dim taskSources = {New TaskCompletionSource(Of Int32), New TaskCompletionSource(Of Int32)}
         Dim tasks = From t In taskSources Select t.Task
@@ -309,20 +328,25 @@ Public Class TaskExtensionsTest
         Assert.IsTrue(TypeOf result.Exception.InnerExceptions.Single Is InvalidOperationException)
     End Sub
 
+    <TestMethod()>
     Public Sub LinqSelectTest()
         Dim task = New TaskCompletionSource(Of Int32)()
-        Dim result = From value In task.Task Select value + 1
+        Dim result = From value In task.Task
+                     Select value + 1
         ExpectTaskToIdle(result)
         task.SetResult(5)
         WaitForTaskToSucceed(result)
         Assert.IsTrue(result.Result = 6)
     End Sub
+    <TestMethod()>
     Public Sub LinqSelectManyTest()
-        Dim task1 = New TaskCompletionSource(Of Int32)()
         Dim task2 = New TaskCompletionSource(Of Int32)()
-        Dim result = From v1 In task1.Task From v2 In task2.Task Select v1 + v2
+        Dim task1 = New TaskCompletionSource(Of Task(Of Int32))()
+        Dim result = From task In task1.Task
+                     From value In task
+                     Select value + 5
         ExpectTaskToIdle(result)
-        task1.SetResult(5)
+        task1.SetResult(task2.Task)
         task2.SetResult(6)
         WaitForTaskToSucceed(result)
         Assert.IsTrue(result.Result = 11)

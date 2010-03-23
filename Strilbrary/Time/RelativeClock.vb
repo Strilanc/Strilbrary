@@ -48,8 +48,8 @@ Namespace Time
             End Get
         End Property
 
-        Public Function AsyncWait(ByVal dt As TimeSpan) As Task Implements IClock.AsyncWait
-            Return _parentClock.AsyncWait(dt)
+        Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
+            Return _parentClock.AsyncWaitUntil(time)
         End Function
 
         Public ReadOnly Property ElapsedTime As TimeSpan Implements IClock.ElapsedTime

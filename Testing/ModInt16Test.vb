@@ -57,10 +57,10 @@ Public Class ModInt16Test
 
     <TestMethod()>
     Public Sub op_NotTest()
-        Assert.IsTrue(Not New ModInt16(0) = &HFFFFS)
-        Assert.IsTrue(Not New ModInt16(1) = &HFFFES)
-        Assert.IsTrue(Not New ModInt16(-1) = 0S)
-        Assert.IsTrue(Not New ModInt16(UShort.MaxValue) = 0S)
+        Assert.IsTrue((Not New ModInt16(0)) = &HFFFFS)
+        Assert.IsTrue((Not New ModInt16(1)) = &HFFFES)
+        Assert.IsTrue((Not New ModInt16(-1)) = 0S)
+        Assert.IsTrue((Not New ModInt16(UShort.MaxValue)) = 0S)
     End Sub
 
     <TestMethod()>
@@ -80,6 +80,10 @@ Public Class ModInt16Test
         Assert.IsTrue(New ModInt16(2) <> 1S)
         Assert.IsTrue(New ModInt16(2) <> -1S)
         Assert.IsTrue(New ModInt16(UShort.MaxValue).Equals(New ModInt16(-1)))
+
+        Assert.IsTrue(New ModInt16(1).Equals(CType(New ModInt16(1), Object)))
+        Assert.IsTrue(Not New ModInt16(1).Equals(CType(1US, Object)))
+        Assert.IsTrue(New ModInt16(1).GetHashCode = New ModInt16(1).GetHashCode)
     End Sub
 
     <TestMethod()>
@@ -117,5 +121,10 @@ Public Class ModInt16Test
         Assert.IsTrue(New ModInt16(3).ShiftRotateRight(2) = &HC000US)
         Assert.IsTrue(New ModInt16(3).ShiftRotateRight(1) = &H8001US)
         Assert.IsTrue(New ModInt16(&HFFFFUS).ShiftRotateRight(2) = &HFFFFUS)
+    End Sub
+
+    <TestMethod()>
+    Public Sub ToStringTest()
+        Assert.IsTrue(New ModInt16(2).ToString = "2")
     End Sub
 End Class

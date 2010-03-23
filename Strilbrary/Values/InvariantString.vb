@@ -128,11 +128,12 @@
             Return Me.Value.Substring(startIndex, length)
         End Function
 
+        <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")>
         Public Overrides Function Equals(ByVal obj As Object) As Boolean
             If TypeOf obj Is InvariantString Then
-                Return Me = CType(obj, InvariantString)
+                Return Me = DirectCast(obj, InvariantString)
             ElseIf TypeOf obj Is String Then
-                Return Me = CStr(obj)
+                Return Me = DirectCast(obj, String)
             Else
                 Return False
             End If

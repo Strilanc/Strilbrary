@@ -2,7 +2,7 @@
 
 Namespace Values
     <DebuggerDisplay("{ToString}")>
-    Public Structure NonNull(Of T As Class)
+    Public Structure NonNull(Of T)
         Private ReadOnly _value As T
 
         Public Sub New(ByVal value As T)
@@ -31,12 +31,4 @@ Namespace Values
             Return _value.ToString
         End Function
     End Structure
-
-    Public Module NonNullExtensions
-        <Pure()> <Extension()>
-        Public Function AsNonNull(Of T As Class)(ByVal value As T) As NonNull(Of T)
-            Contract.Requires(value IsNot Nothing)
-            Return New NonNull(Of T)(value)
-        End Function
-    End Module
 End Namespace

@@ -12,6 +12,16 @@ Namespace Time
         End Function
 
         ''' <summary>
+        ''' Returns a task which completes after the given amount of time has passed on the clock.
+        ''' The resulting task is instantly ready if the given time is non-positive.
+        ''' </summary>
+        <Extension()>
+        Public Function AsyncWait(ByVal clock As IClock, ByVal dt As TimeSpan) As Task
+            Contract.Requires(clock IsNot Nothing)
+            Return clock.AsyncWaitUntil(clock.ElapsedTime + dt)
+        End Function
+
+        ''' <summary>
         ''' Begins periodically calling an action, and returns an IDisposable to end the repitition.
         ''' The first call happens after the period has elapsed (instead of immediately).
         ''' </summary>
@@ -25,12 +35,15 @@ Namespace Time
 
             Dim stopFlag As Boolean
             Dim callback As Action
+            Dim t = clock.ElapsedTime
             callback = Sub()
                            If stopFlag Then Return
                            Call action()
-                           clock.AsyncWait(period).ContinueWithAction(callback)
+                           t += period
+                           clock.AsyncWaitUntil(t).ContinueWithAction(callback)
                        End Sub
-            clock.AsyncWait(period).ContinueWithAction(callback)
+            t += period
+            clock.AsyncWaitUntil(t).ContinueWithAction(callback)
             Return New DelegatedDisposable(Sub() stopFlag = True)
         End Function
 
