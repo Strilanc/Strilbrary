@@ -8,29 +8,39 @@ Namespace Threading
 
         Private ReadOnly _consumerQueue As LockFreeConsumer(Of Task)
         Private ReadOnly _startedLock As New OnetimeLock
-        Private ReadOnly _runner As Action(Of Action)
+        Private ReadOnly _primedLock As New OnetimeLock
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(_consumerQueue IsNot Nothing)
             Contract.Invariant(_startedLock IsNot Nothing)
-            Contract.Invariant(_runner IsNot Nothing)
+            Contract.Invariant(_primedLock IsNot Nothing)
         End Sub
 
-        Public Sub New(ByVal runner As Action(Of Action), ByVal initiallyStarted As Boolean)
-            Contract.Requires(runner IsNot Nothing)
-            If initiallyStarted Then _startedLock.TryAcquire()
-            Me._runner = runner
-            Me._consumerQueue = New LockFreeConsumer(Of Task)(runner:=AddressOf Start,
+        Public Sub New(ByVal initiallyStarted As Boolean)
+            Me._consumerQueue = New LockFreeConsumer(Of Task)(runner:=AddressOf StartOrBeginConsuming,
                                                               consumer:=Sub(task)
                                                                             Dim executed = TryExecuteTask(task)
                                                                             Contract.Assume(executed)
                                                                         End Sub)
+            If initiallyStarted Then
+                _startedLock.TryAcquire()
+                _primedLock.TryAcquire()
+            End If
         End Sub
         Public Sub Start()
-            '[Ignores the first call, which is either consumption ready before user start or user start before consumption ready]
-            If _startedLock.TryAcquire Then Return
+            If _startedLock.TryAcquire Then StartOrBeginConsuming()
+        End Sub
 
-            Call _runner(AddressOf _consumerQueue.Run)
+        Private Sub StartOrBeginConsuming()
+            '[The first two calls will be from Start and from the LockFreeConsumer getting its first item.]
+            '[We have to wait for both to have occurred before continuing.]
+            If _primedLock.TryAcquire Then Return
+
+            BeginConsuming(AddressOf _consumerQueue.Run)
+        End Sub
+        Protected Overridable Sub BeginConsuming(ByVal action As Action)
+            Contract.Requires(action IsNot Nothing)
+            Call action()
         End Sub
 
         Protected NotOverridable Overrides Function GetScheduledTasks() As IEnumerable(Of Task)
@@ -59,7 +69,6 @@ Namespace Threading
             task.Start(Me)
             Return task
         End Function
-
         '''<summary>Enqueues a function to be run and exposes it as a task.</summary>
         Public Function QueueFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(func IsNot Nothing)
@@ -73,33 +82,53 @@ Namespace Threading
     '''<summary>Runs queued calls on a control's thread.</summary>
     Public NotInheritable Class InvokedCallQueue
         Inherits CallQueue
+        Private ReadOnly _control As Control
+
+        <ContractInvariantMethod()> Private Sub ObjectInvariant()
+            Contract.Invariant(_control IsNot Nothing)
+        End Sub
+
         Public Sub New(ByVal control As Control, ByVal initiallyStarted As Boolean)
-            MyBase.New(Sub(action) control.AsyncInvokedAction(action).Catch(
-                    Sub(ex) ex.RaiseAsUnexpected("Invalid Invoke from {0}.StartRunning() ({1}, {2})".Frmt(GetType(InvokedCallQueue).Name,
-                                                                                                          control.GetType.Name,
-                                                                                                          control.Name))), initiallyStarted)
+            MyBase.New(initiallyStarted)
             Contract.Requires(control IsNot Nothing)
+            Me._control = control
+        End Sub
+        Protected Overrides Sub BeginConsuming(ByVal action As Action)
+            _control.AsyncInvokedAction(action).Catch(
+                Sub(ex) ex.RaiseAsUnexpected(
+                    "Invalid Invoke from {0}.StartRunning() ({1}, {2})".Frmt(Me.GetType.Name,
+                                                                             _control.GetType.Name,
+                                                                             _control.Name)))
         End Sub
     End Class
     '''<summary>Runs queued calls on an independent thread.</summary>
     Public NotInheritable Class ThreadedCallQueue
         Inherits CallQueue
         Public Sub New(Optional ByVal initiallyStarted As Boolean = True)
-            MyBase.New(Sub(action) ThreadedAction(action), initiallyStarted)
+            MyBase.New(initiallyStarted)
+        End Sub
+        Protected Overrides Sub BeginConsuming(ByVal action As Action)
+            ThreadedAction(action)
         End Sub
     End Class
     '''<summary>Runs queued calls on the thread pool.</summary>
     Public NotInheritable Class ThreadPooledCallQueue
         Inherits CallQueue
         Public Sub New(Optional ByVal initiallyStarted As Boolean = True)
-            MyBase.New(Sub(action) ThreadPooledAction(action), initiallyStarted)
+            MyBase.New(initiallyStarted)
+        End Sub
+        Protected Overrides Sub BeginConsuming(ByVal action As Action)
+            ThreadPooledAction(action)
         End Sub
     End Class
     '''<summary>Runs queued calls as a task.</summary>
     Public NotInheritable Class TaskedCallQueue
         Inherits CallQueue
         Public Sub New(Optional ByVal initiallyStarted As Boolean = True)
-            MyBase.New(Sub(action) TaskedAction(action), initiallyStarted)
+            MyBase.New(initiallyStarted)
+        End Sub
+        Protected Overrides Sub BeginConsuming(ByVal action As Action)
+            TaskedAction(action)
         End Sub
     End Class
 End Namespace

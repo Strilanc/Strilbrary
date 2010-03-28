@@ -62,6 +62,28 @@ Namespace Values
             Return From pair In value.EnumFlagsIndexed() Select pair.Item1
         End Function
 
+        <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
+        <Pure()>
+        Public Function EnumAllFlags(Of TEnum)(ByVal onlyDefined As Boolean) As IEnumerable(Of TEnum)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of TEnum))() IsNot Nothing)
+            Dim allFlags As IEnumerable(Of TEnum)
+            Select Case [Enum].GetUnderlyingType(GetType(TEnum))
+                Case GetType(SByte) : allFlags = From i In 8.Range Select (CSByte(1) << i).DynamicDirectCastTo(Of TEnum)()
+                Case GetType(Int16) : allFlags = From i In 16.Range Select (1S << i).DynamicDirectCastTo(Of TEnum)()
+                Case GetType(Int32) : allFlags = From i In 32.Range Select (1 << i).DynamicDirectCastTo(Of TEnum)()
+                Case GetType(Int64) : allFlags = From i In 64.Range Select (1L << i).DynamicDirectCastTo(Of TEnum)()
+                Case GetType(Byte) : allFlags = From i In 8.Range Select (CByte(1) << i).DynamicDirectCastTo(Of TEnum)()
+                Case GetType(UInt16) : allFlags = From i In 16.Range Select (1US << i).DynamicDirectCastTo(Of TEnum)()
+                Case GetType(UInt32) : allFlags = From i In 32.Range Select (1UI << i).DynamicDirectCastTo(Of TEnum)()
+                Case GetType(UInt64) : allFlags = From i In 64.Range Select (1UL << i).DynamicDirectCastTo(Of TEnum)()
+                Case Else
+                    Throw New InvalidOperationException("{0} does not have a recognized underlying enum type.".Frmt(GetType(TEnum)))
+            End Select
+            Contract.Assert(allFlags IsNot Nothing)
+            If Not onlyDefined Then Return allFlags
+            Return From flag In allFlags Where flag.EnumValueIsDefined()
+        End Function
+
         '''<summary>Determines if an Enum value is defined or not.</summary>
         <Pure()> <Extension()>
         Public Function EnumValueIsDefined(Of TEnum)(ByVal value As TEnum) As Boolean
