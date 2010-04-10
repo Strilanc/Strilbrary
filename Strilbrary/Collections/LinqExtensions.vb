@@ -324,21 +324,26 @@
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(count >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
-            Dim buffer = New Queue(Of T)
-            '[Warning: Side effects in query. Done this way to enable lazy evaluation without using an entire class.]
-            '[Note the important () after End Function, causing the function to be evaluated.]
-            Return From item In sequence
-                   Where Function()
-                             buffer.Enqueue(item)
-                             Return buffer.Count > count
-                         End Function()
-                   Select buffer.Dequeue()
+            Return New Enumerable(Of T)(
+                Function()
+                    Dim buffer = New Queue(Of T)
+                    '[Warning: Side effects in query. Done this way to enable lazy evaluation without using an entire class.]
+                    '[Note the important () after End Function, causing the function to be evaluated.]
+                    Return (From item In sequence
+                            Where Function()
+                                      buffer.Enqueue(item)
+                                      Return buffer.Count > count
+                                  End Function()
+                            Select buffer.Dequeue()
+                            ).GetEnumerator
+                End Function)
         End Function
 
         ''' <summary>
         ''' Returns the intermediate results of applying an accumulator function over a sequence.
         ''' The specified seed is used as the initial accumulator value, and is not included in the results.
         ''' </summary>
+        <ContractVerification(False)>
         <Extension()> <Pure()>
         Public Function PartialAggregates(Of TValue, TAccumulate)(ByVal sequence As IEnumerable(Of TValue),
                                                                   ByVal seed As TAccumulate,
@@ -349,12 +354,16 @@
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TAccumulate))().Count = sequence.Count)
             '[Warning: Side effects in query. Done this way to enable lazy evaluation without using an entire class.]
             '[Note the important () after End Function, causing the function to be evaluated.]
-            Dim accumulator = seed
-            Return From item In sequence
-                   Select Function()
-                              accumulator = func(accumulator, item)
-                              Return accumulator
-                          End Function()
+            Return New Enumerable(Of TAccumulate)(
+                Function()
+                    Dim accumulator = seed
+                    Return (From item In sequence
+                            Select Function()
+                                       accumulator = func(accumulator, item)
+                                       Return accumulator
+                                   End Function()
+                            ).GetEnumerator
+                End Function)
         End Function
     End Module
 End Namespace
