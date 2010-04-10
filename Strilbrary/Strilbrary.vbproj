@@ -144,6 +144,7 @@
     <Compile Include="Values\BitBuffer.vb" />
     <Compile Include="Values\BitWord64.vb" />
     <Compile Include="Threading\Throttle.vb" />
+    <Compile Include="Collections\Tree.vb" />
     <Compile Include="Values\ValueExtensions.vb" />
     <Compile Include="Values\NonNull.vb" />
     <Compile Include="Values\TextExtensions.vb" />

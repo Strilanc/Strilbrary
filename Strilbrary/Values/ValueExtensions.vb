@@ -22,5 +22,11 @@ Namespace Values
             Contract.Requires(value IsNot Nothing)
             Return New NonNull(Of T)(value)
         End Function
+
+        <Pure()> <Extension()>
+        Public Function KeyValue(Of TKey, TValue)(ByVal key As TKey, ByVal value As TValue) As KeyValuePair(Of TKey, TValue)
+            Contract.Requires(key IsNot Nothing)
+            Return New KeyValuePair(Of TKey, TValue)(key, value)
+        End Function
     End Module
 End Namespace

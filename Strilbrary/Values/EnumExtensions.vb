@@ -100,6 +100,7 @@ Namespace Values
         <Pure()> <Extension()>
         <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
         Public Function EnumFlagsToString(Of TEnum)(ByVal value As TEnum) As String
+            Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
             Dim indexedFlags = value.EnumFlagsIndexed()
             If indexedFlags.None Then Return value.ToString
             Return (From pair In indexedFlags

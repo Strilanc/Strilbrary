@@ -18,6 +18,7 @@ Namespace Time
         <Extension()>
         Public Function AsyncWait(ByVal clock As IClock, ByVal dt As TimeSpan) As Task
             Contract.Requires(clock IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
             Return clock.AsyncWaitUntil(clock.ElapsedTime + dt)
         End Function
 
