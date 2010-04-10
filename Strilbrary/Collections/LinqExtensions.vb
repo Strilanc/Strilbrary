@@ -302,5 +302,59 @@
             Return sequence.ZipWithIndexes.GroupBy(keySelector:=Function(e) e.Item2 \ partitionSize,
                                                    elementSelector:=Function(e) e.Item1)
         End Function
+
+        '''<summary>Returns the last specified number of items in a sequence, or the entire sequence if there are fewer items than the specified number.</summary>
+        <Extension()>
+        Public Function TakeLast(Of T)(ByVal sequence As IEnumerable(Of T),
+                                       ByVal count As Integer) As IEnumerable(Of T)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(count >= 0)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
+            Dim result = New Queue(Of T)
+            For Each item In sequence
+                result.Enqueue(item)
+                If result.Count > count Then result.Dequeue()
+            Next item
+            Return result
+        End Function
+        '''<summary>Returns all but the last specified number of items in a sequence, or no items if there are fewer items than the specified number.</summary>
+        <Extension()>
+        Public Function SkipLast(Of T)(ByVal sequence As IEnumerable(Of T),
+                                       ByVal count As Integer) As IEnumerable(Of T)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(count >= 0)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
+            Dim buffer = New Queue(Of T)
+            '[Warning: Side effects in query. Done this way to enable lazy evaluation without using an entire class.]
+            '[Note the important () after End Function, causing the function to be evaluated.]
+            Return From item In sequence
+                   Where Function()
+                             buffer.Enqueue(item)
+                             Return buffer.Count > count
+                         End Function()
+                   Select buffer.Dequeue()
+        End Function
+
+        ''' <summary>
+        ''' Returns the intermediate results of applying an accumulator function over a sequence.
+        ''' The specified seed is used as the initial accumulator value, and is not included in the results.
+        ''' </summary>
+        <Extension()> <Pure()>
+        Public Function PartialAggregates(Of TValue, TAccumulate)(ByVal sequence As IEnumerable(Of TValue),
+                                                                  ByVal seed As TAccumulate,
+                                                                  ByVal func As Func(Of TAccumulate, TValue, TAccumulate)) As IEnumerable(Of TAccumulate)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(func IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of TAccumulate))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of TAccumulate))().Count = sequence.Count)
+            '[Warning: Side effects in query. Done this way to enable lazy evaluation without using an entire class.]
+            '[Note the important () after End Function, causing the function to be evaluated.]
+            Dim accumulator = seed
+            Return From item In sequence
+                   Select Function()
+                              accumulator = func(accumulator, item)
+                              Return accumulator
+                          End Function()
+        End Function
     End Module
 End Namespace

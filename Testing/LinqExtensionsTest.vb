@@ -234,4 +234,27 @@ Public Class LinqExtensionsTest
         Assert.IsTrue({1, 2, 3}.AsReadableList.SubView(1, 1).SequenceEqual({2}))
         Assert.IsTrue({1, 2, 3}.AsReadableList.SubView(1, 0).SequenceEqual({}))
     End Sub
+
+    <TestMethod()>
+    Public Sub PartialAggregatesTest()
+        Assert.IsTrue(New Int32() {}.PartialAggregates(0, Function(acc, e) acc + e).SequenceEqual({}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.PartialAggregates(0, Function(acc, e) acc + e).SequenceEqual({1, 3, 6, 10, 15}))
+        Assert.IsTrue({1, 2, 3, 4, 5, 0}.PartialAggregates(1, Function(acc, e) acc * e).SequenceEqual({1, 2, 6, 24, 120, 0}))
+    End Sub
+    <TestMethod()>
+    Public Sub SkipLastTest()
+        Assert.IsTrue({1, 2, 3, 4, 5}.SkipLast(0).SequenceEqual({1, 2, 3, 4, 5}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.SkipLast(1).SequenceEqual({1, 2, 3, 4}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.SkipLast(2).SequenceEqual({1, 2, 3}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.SkipLast(5).SequenceEqual({}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.SkipLast(6).SequenceEqual({}))
+    End Sub
+    <TestMethod()>
+    Public Sub TakeLastTest()
+        Assert.IsTrue({1, 2, 3, 4, 5}.TakeLast(0).SequenceEqual({}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.TakeLast(1).SequenceEqual({5}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.TakeLast(2).SequenceEqual({4, 5}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.TakeLast(5).SequenceEqual({1, 2, 3, 4, 5}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.TakeLast(6).SequenceEqual({1, 2, 3, 4, 5}))
+    End Sub
 End Class
