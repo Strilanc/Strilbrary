@@ -127,8 +127,7 @@
     <Compile Include="Collections\CompatibilityExtensions.vb" />
     <Compile Include="Collections\PriorityQueue.vb" />
     <Compile Include="Collections\LinqExtensions.vb" />
-    <Compile Include="Collections\IReadableList.vb" />
-    <Compile Include="Collections\IReadableCollection.vb" />
+    <Compile Include="Collections\Collection Interfaces.vb" />
     <Compile Include="Exceptions\Exception Types.vb" />
     <Compile Include="Exceptions\Exception Extensions.vb" />
     <Compile Include="Misc\DelegatedDisposable.vb" />

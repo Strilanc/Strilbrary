@@ -88,11 +88,10 @@ Namespace Collections
         End Function
 
         Public Overrides Function ToString() As String
-            If Me.Count > 10 Then
-                Return "[{0}, ...".Frmt(Me.Take(10).StringJoin(", "))
-            Else
-                Return "[{0}]".Frmt(Me.StringJoin(", "))
-            End If
+            Const MaxItems As Integer = 10
+            Return "Count: {0}, Items: [{0}{1}".Frmt(Me.Count,
+                                                     Me.Take(MaxItems).StringJoin(", "),
+                                                     If(Me.Count <= MaxItems, "]", ", ..."))
         End Function
 
         Private Class Enumerator
