@@ -27,20 +27,20 @@ Namespace Threading
             Dim tasks = sequence.ToList
             Dim result = New TaskCompletionSource(Of Boolean)
             Dim readyCount = 0
-            Dim faults = New List(Of Exception)
 
             'Become ready once all input futures are ready
             Dim notify = Sub(task As task)
-                             If task.Status = TaskStatus.Faulted Then
-                                 faults.AddRange(task.Exception.InnerExceptions)
-                             End If
+                             If Interlocked.Increment(readyCount) < tasks.Count Then Return
 
-                             If Interlocked.Increment(readyCount) >= tasks.Count Then
-                                 If faults.Count > 0 Then
-                                     result.SetException(faults)
-                                 Else
-                                     result.SetResult(True)
-                                 End If
+                             Dim faults = (From t In tasks
+                                           Where t.Status = TaskStatus.Faulted
+                                           From e In t.Exception.InnerExceptions
+                                           Select e
+                                           ).ToList
+                             If faults.Count > 0 Then
+                                 result.SetException(faults)
+                             Else
+                                 result.SetResult(True)
                              End If
                          End Sub
 

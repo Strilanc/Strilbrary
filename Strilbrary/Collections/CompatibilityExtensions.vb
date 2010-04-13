@@ -156,7 +156,7 @@ Namespace Collections
 
             Public Overrides Function ToString() As String
                 Const MaxItems As Integer = 10
-                Return "Count: {0}, Items: [{0}{1}".Frmt(Me.Count,
+                Return "Count: {0}, Items: [{1}{2}".Frmt(Me.Count,
                                                          Me.Take(MaxItems).StringJoin(", "),
                                                          If(Me.Count <= MaxItems, "]", ", ..."))
             End Function

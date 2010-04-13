@@ -9,14 +9,14 @@ Namespace Time
     Public Class RelativeClock
         Implements IClock
         Private ReadOnly _parentClock As IClock
-        Private ReadOnly _timeOffset As TimeSpan
-        Private ReadOnly _startTime As TimeSpan
+        Private ReadOnly _timeOffsetFromOriginal As TimeSpan
+        Private ReadOnly _timeOffsetFromParent As TimeSpan
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(_parentClock IsNot Nothing)
-            Contract.Invariant(_startTime.Ticks >= 0)
-            Contract.Invariant(_timeOffset.Ticks >= 0)
-            Contract.Invariant(_timeOffset.Ticks >= _startTime.Ticks)
+            Contract.Invariant(_timeOffsetFromParent.Ticks >= 0)
+            Contract.Invariant(_timeOffsetFromOriginal.Ticks >= 0)
+            Contract.Invariant(_timeOffsetFromOriginal.Ticks >= _timeOffsetFromParent.Ticks)
         End Sub
 
         'verification disabled due to stupid verifier (1.2.30312.0)
@@ -27,15 +27,15 @@ Namespace Time
             Contract.Ensures(Me.StartingTimeOnParentClock = startingTime)
             If startingTime > parentClock.ElapsedTime Then Throw New ArgumentException("The starting time must not be ahead of the clock's current time.", "startingTime")
 
-            Me._startTime = startingTime
-            Me._timeOffset = Me._startTime
+            Me._timeOffsetFromParent = startingTime
+            Me._timeOffsetFromOriginal = startingTime
             Me._parentClock = parentClock
 
             'Avoid creating doubly-relative clocks
             Dim relativeParentClock = TryCast(parentClock, RelativeClock)
             If relativeParentClock IsNot Nothing Then
                 Me._parentClock = relativeParentClock._parentClock
-                Me._timeOffset += relativeParentClock._timeOffset
+                Me._timeOffsetFromOriginal += relativeParentClock._timeOffsetFromOriginal
             End If
         End Sub
 
@@ -44,18 +44,18 @@ Namespace Time
             <ContractVerification(False)>
             Get
                 Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks >= 0)
-                Return _startTime
+                Return _timeOffsetFromParent
             End Get
         End Property
 
         Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
-            Return _parentClock.AsyncWaitUntil(time)
+            Return _parentClock.AsyncWaitUntil(time + _timeOffsetFromOriginal)
         End Function
 
         Public ReadOnly Property ElapsedTime As TimeSpan Implements IClock.ElapsedTime
             <ContractVerification(False)>
             Get
-                Return _parentClock.ElapsedTime - _timeOffset
+                Return _parentClock.ElapsedTime - _timeOffsetFromOriginal
             End Get
         End Property
     End Class

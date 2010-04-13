@@ -99,9 +99,16 @@ Public Class TimeTest
     <TestMethod()>
     Public Sub RelativeClockTest_AsyncWaitUntil()
         Dim c = New ManualClock()
+
         Dim r0 = c.Restarted()
         Dim t = r0.AsyncWaitUntil(1.Seconds)
         ExpectTaskToIdle(t)
+        c.Advance(2.Seconds)
+        WaitForTaskToSucceed(t)
+
+        Dim r1 = c.Restarted()
+        Dim t2 = r1.AsyncWaitUntil(1.Seconds)
+        ExpectTaskToIdle(t2)
         c.Advance(2.Seconds)
         WaitForTaskToSucceed(t)
     End Sub
@@ -112,6 +119,19 @@ Public Class TimeTest
         Dim r0 = c.Restarted().Restarted().Restarted().Restarted()
         c.Advance(5.Seconds)
         Assert.IsTrue(r0.ElapsedTime = 5.Seconds)
+    End Sub
+    <TestMethod()>
+    Public Sub RelativeClockTest_NestedAsyncWaitUntil()
+        Dim c = New ManualClock()
+        c.Advance(3.Seconds)
+        Dim r0 = c.Restarted()
+        c.Advance(3.Seconds)
+
+        Dim r1 = r0.Restarted()
+        Dim t = r1.AsyncWaitUntil(1.Seconds)
+        ExpectTaskToIdle(t)
+        c.Advance(2.Seconds)
+        WaitForTaskToSucceed(t)
     End Sub
 
     <TestMethod()>
@@ -139,7 +159,7 @@ Public Class TimeTest
     Public Sub AsyncRepeatTest_Partial()
         Dim c = New ManualClock()
         Dim lock = New Threading.AutoResetEvent(initialState:=False)
-        c.AsyncRepeat(period:=2.Seconds, action:=addressof lock.Set)
+        c.AsyncRepeat(period:=2.Seconds, action:=AddressOf lock.Set)
 
         c.Advance(1.Seconds)
         Assert.IsTrue(Not lock.WaitOne(millisecondsTimeout:=10))
@@ -151,9 +171,9 @@ Public Class TimeTest
     Public Sub AsyncRepeatTest_Multi()
         Dim c = New ManualClock()
         Dim t = 0
-        Dim locks = New list(Of Threading.AutoResetEvent)()
+        Dim locks = New List(Of Threading.AutoResetEvent)()
         For i = 0 To 5 - 1
-            locks.add(New Threading.AutoResetEvent(initialState:=False))
+            locks.Add(New Threading.AutoResetEvent(initialState:=False))
         Next i
         c.AsyncRepeat(period:=2.Seconds, action:=Sub()
                                                      locks(t).Set()
