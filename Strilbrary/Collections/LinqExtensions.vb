@@ -1,4 +1,6 @@
-﻿Namespace Collections
+﻿Imports Strilbrary.Values
+
+Namespace Collections
     Public Module LinqExtensions
 #Region "Count"
         '''<summary>Determines if a sequence has no elements.</summary>
@@ -226,7 +228,7 @@
             Return sequence.Zip(Int32.MaxValue.Range)
         End Function
 
-        '''<summary>Returns a sequence consisting of a repeated value.</summary>
+        '''<summary>Returns a sequence consisting of a value repeated a specified number of times.</summary>
         <Pure()> <Extension()>
         <ContractVerification(False)>
         Public Function Repeated(Of T)(ByVal value As T, ByVal count As Integer) As IEnumerable(Of T)
@@ -235,6 +237,48 @@
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))().Count = count)
             Return Enumerable.Repeat(value, count)
         End Function
+        '''<summary>Returns a never-ending sequence consisting of a repeated value.</summary>
+        <Pure()> <Extension()>
+        Public Function RepeatForever(Of TValue)(ByVal value As TValue) As IEnumerable(Of TValue)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of TValue))() IsNot Nothing)
+            Return New EnumeratorForever(Of TValue)(value)
+        End Function
+        Private Class EnumeratorForever(Of T)
+            Implements IEnumerable(Of T)
+            Implements IEnumerator(Of T)
+
+            Private ReadOnly _value As T
+            Public Sub New(ByVal value As T)
+                Me._value = value
+            End Sub
+
+            Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
+                Return New EnumeratorForever(Of T)(_value)
+            End Function
+            Public ReadOnly Property Current As T Implements IEnumerator(Of T).Current
+                Get
+                    Return _value
+                End Get
+            End Property
+            Public Function MoveNext() As Boolean Implements System.Collections.IEnumerator.MoveNext
+                Return True
+            End Function
+
+            Public Sub Dispose() Implements IDisposable.Dispose
+                GC.SuppressFinalize(Me)
+            End Sub
+
+            Public Sub Reset() Implements System.Collections.IEnumerator.Reset
+            End Sub
+            Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+                Return GetEnumerator()
+            End Function
+            Private ReadOnly Property CurrentObj As Object Implements System.Collections.IEnumerator.Current
+                Get
+                    Return _value
+                End Get
+            End Property
+        End Class
 
         '''<summary>Pads a sequence to a given minimum length.</summary>
         <Pure()> <Extension()>
@@ -364,6 +408,39 @@
                                    End Function()
                             ).GetEnumerator
                 End Function)
+        End Function
+        ''' <summary>
+        ''' Zips the sequence with the intermediate results of applying an accumulator function over the sequence.
+        ''' The specified seed is used as the initial accumulator value, and is not included in the results.
+        ''' </summary>
+        <Extension()> <Pure()>
+        Public Function ZipWithPartialAggregates(Of TValue, TAggregate)(ByVal sequence As IEnumerable(Of TValue),
+                                                                        ByVal seed As TAggregate,
+                                                                        ByVal func As Func(Of TAggregate, TValue, TAggregate)) As IEnumerable(Of Tuple(Of TValue, TAggregate))
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(func IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of TValue, TAggregate)))() IsNot Nothing)
+            Return sequence.PartialAggregates(seed:=Tuple.Create([Default](Of TValue), seed),
+                                              func:=Function(acc, e) Tuple.Create(e, func(acc.Item2, e)))
+        End Function
+
+        ''' <summary>
+        ''' Iteratively generates the values of a sequence.
+        ''' The sequence ends once the state function returns null.
+        ''' </summary>
+        <Pure()> <Extension()>
+        Public Function Iterate(Of TState, TResult)(ByVal seed As TState,
+                                                    ByVal func As Func(Of TState, Tuple(Of TState, TResult))) As IEnumerable(Of TResult)
+            Contract.Requires(func IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of TResult))() IsNot Nothing)
+            Return True.RepeatForever().
+                   PartialAggregates(seed:=Tuple.Create(seed, [Default](Of TResult)),
+                                     func:=Function(acc, e)
+                                               If acc Is Nothing Then Return acc
+                                               Return func(acc.Item1)
+                                           End Function).
+                   TakeWhile(Function(e) e IsNot Nothing).
+                   Select(Function(e) e.Item2)
         End Function
     End Module
 End Namespace

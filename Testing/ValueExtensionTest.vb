@@ -528,4 +528,10 @@ Public Class ValueExtensionTest
                                           Dim r = New NonNull(Of Object)().Value
                                       End Sub)
     End Sub
+
+    <TestMethod()>
+    Public Sub DefaultTest()
+        Assert.IsTrue([Default](Of Byte)() = 0)
+        Assert.IsTrue([Default](Of Action(Of Byte))() Is Nothing)
+    End Sub
 End Class
