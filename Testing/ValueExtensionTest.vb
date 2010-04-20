@@ -534,4 +534,35 @@ Public Class ValueExtensionTest
         Assert.IsTrue([Default](Of Byte)() = 0)
         Assert.IsTrue([Default](Of Action(Of Byte))() Is Nothing)
     End Sub
+
+    <TestMethod()>
+    Public Sub IndentTest()
+        Assert.IsTrue("test".Indent("   ") = "   test")
+        Assert.IsTrue({"test", "2"}.StringJoin(Environment.NewLine).Indent("abc") = {"abctest", "abc2"}.StringJoin(Environment.NewLine))
+    End Sub
+    <TestMethod()>
+    Public Sub PaddedTest()
+        Assert.IsTrue("test".Padded(3, "X"c) = "test")
+        Assert.IsTrue("test".Padded(4, "X"c) = "test")
+        Assert.IsTrue("test".Padded(5, "X"c) = "testX")
+        Assert.IsTrue("test".Padded(6, "X"c) = "testXX")
+        Assert.IsTrue("".Padded(6, " "c) = "      ")
+    End Sub
+
+    <TestMethod()>
+    Public Sub DynamicCastToTest()
+        Assert.IsTrue("5".DynamicCastTo(Of UShort)() = 5)
+        ExpectException(Of InvalidCastException)(Sub() Call "a".DynamicCastTo(Of UInt32)())
+    End Sub
+
+    <TestMethod()>
+    Public Sub AsNonNullTest()
+        Assert.IsTrue(5.AsNonNull.Value = 5)
+    End Sub
+
+    <TestMethod()>
+    Public Sub KeyValueTest()
+        Assert.IsTrue(5.KeyValue(4US).Equals(New Collections.Generic.KeyValuePair(Of Int32, UInt16)(5, 4)))
+        Assert.IsTrue(6.KeyValue(3US).Equals(New Collections.Generic.KeyValuePair(Of Int32, UInt16)(6, 3)))
+    End Sub
 End Class

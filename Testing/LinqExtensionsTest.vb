@@ -273,4 +273,18 @@ Public Class LinqExtensionsTest
         Assert.IsTrue({1, 2, 3, 4, 5}.ZipWithPartialAggregates(0, Function(acc, e) acc + e).SequenceEqual({1, 2, 3, 4, 5}.Zip({1, 3, 6, 10, 15})))
         Assert.IsTrue(New Int32() {}.ZipWithPartialAggregates(0, Function(acc, e) acc + e).SequenceEqual({}))
     End Sub
+
+    <TestMethod()>
+    Public Sub FirstOrNullableDefaultTest()
+        Assert.IsTrue({2}.FirstOrNullableDefault.Value = 2)
+        Assert.IsTrue({1, 2, 3}.FirstOrNullableDefault.Value = 1)
+        Assert.IsTrue(Not New Int32() {}.FirstOrNullableDefault.HasValue)
+    End Sub
+    <TestMethod()>
+    Public Sub FirstOrDefaultTest()
+        Assert.IsTrue({2}.FirstOrDefault([default]:=3) = 2)
+        Assert.IsTrue({1, 2, 3}.FirstOrDefault([default]:=4) = 1)
+        Assert.IsTrue(New Int32() {}.FirstOrDefault([default]:=5) = 5)
+        Assert.IsTrue(New Int32() {}.FirstOrDefault([default]:=6) = 6)
+    End Sub
 End Class

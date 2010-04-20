@@ -8,7 +8,7 @@ Namespace Time
         Public Function Restarted(ByVal this As IClock) As RelativeClock
             Contract.Requires(this IsNot Nothing)
             Contract.Ensures(Contract.Result(Of RelativeClock)() IsNot Nothing)
-            Return New RelativeClock(parentClock:=this, startingTime:=this.ElapsedTime)
+            Return New RelativeClock(parentClock:=this, timeOffsetFromParent:=-this.ElapsedTime)
         End Function
 
         ''' <summary>

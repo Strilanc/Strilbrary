@@ -143,7 +143,7 @@ Public Class TimeTest
     End Sub
     <TestMethod()>
     Public Sub SystemAsyncWaitUntilTest_Instant()
-        Dim c = New ManualClock()
+        Dim c = New SystemClock()
         Dim f = c.AsyncWaitUntil(-1.Seconds)
         Assert.IsTrue(f.Status = TaskStatus.RanToCompletion)
     End Sub
@@ -176,8 +176,8 @@ Public Class TimeTest
             locks.Add(New Threading.AutoResetEvent(initialState:=False))
         Next i
         c.AsyncRepeat(period:=2.Seconds, action:=Sub()
-                                                     locks(t).Set()
                                                      t += 1
+                                                     locks(t - 1).Set()
                                                  End Sub)
         c.Advance(10.Seconds)
         For Each e In locks

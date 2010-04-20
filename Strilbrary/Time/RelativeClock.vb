@@ -8,34 +8,30 @@ Namespace Time
     ''' </summary>
     Public Class RelativeClock
         Implements IClock
-        Private ReadOnly _parentClock As IClock
-        Private ReadOnly _timeOffsetFromOriginal As TimeSpan
+        Private ReadOnly _baseClock As IClock
+        Private ReadOnly _timeOffsetFromBase As TimeSpan
         Private ReadOnly _timeOffsetFromParent As TimeSpan
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
-            Contract.Invariant(_parentClock IsNot Nothing)
-            Contract.Invariant(_timeOffsetFromParent.Ticks >= 0)
-            Contract.Invariant(_timeOffsetFromOriginal.Ticks >= 0)
-            Contract.Invariant(_timeOffsetFromOriginal.Ticks >= _timeOffsetFromParent.Ticks)
+            Contract.Invariant(_baseClock IsNot Nothing)
         End Sub
 
         'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
-        Public Sub New(ByVal parentClock As IClock, ByVal startingTime As TimeSpan)
+        Public Sub New(ByVal parentClock As IClock,
+                       ByVal timeOffsetFromParent As TimeSpan)
             Contract.Requires(parentClock IsNot Nothing)
-            Contract.Requires(startingTime.Ticks >= 0)
-            Contract.Ensures(Me.StartingTimeOnParentClock = startingTime)
-            If startingTime > parentClock.ElapsedTime Then Throw New ArgumentException("The starting time must not be ahead of the clock's current time.", "startingTime")
+            Contract.Ensures(Me.StartingTimeOnParentClock = -timeOffsetFromParent)
 
-            Me._timeOffsetFromParent = startingTime
-            Me._timeOffsetFromOriginal = startingTime
-            Me._parentClock = parentClock
+            Me._timeOffsetFromParent = timeOffsetFromParent
+            Me._timeOffsetFromBase = timeOffsetFromParent
+            Me._baseClock = parentClock
 
             'Avoid creating doubly-relative clocks
             Dim relativeParentClock = TryCast(parentClock, RelativeClock)
             If relativeParentClock IsNot Nothing Then
-                Me._parentClock = relativeParentClock._parentClock
-                Me._timeOffsetFromOriginal += relativeParentClock._timeOffsetFromOriginal
+                Me._baseClock = relativeParentClock._baseClock
+                Me._timeOffsetFromBase += relativeParentClock._timeOffsetFromBase
             End If
         End Sub
 
@@ -43,19 +39,18 @@ Namespace Time
             'verification disabled due to stupid verifier (1.2.30312.0)
             <ContractVerification(False)>
             Get
-                Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks >= 0)
-                Return _timeOffsetFromParent
+                Return -_timeOffsetFromParent
             End Get
         End Property
 
         Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
-            Return _parentClock.AsyncWaitUntil(time + _timeOffsetFromOriginal)
+            Return _baseClock.AsyncWaitUntil(time - _timeOffsetFromBase)
         End Function
 
         Public ReadOnly Property ElapsedTime As TimeSpan Implements IClock.ElapsedTime
             <ContractVerification(False)>
             Get
-                Return _parentClock.ElapsedTime - _timeOffsetFromOriginal
+                Return _baseClock.ElapsedTime + _timeOffsetFromBase
             End Get
         End Property
     End Class

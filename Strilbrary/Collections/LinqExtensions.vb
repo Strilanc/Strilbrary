@@ -442,5 +442,21 @@ Namespace Collections
                    TakeWhile(Function(e) e IsNot Nothing).
                    Select(Function(e) e.Item2)
         End Function
+
+        '''<summary>Returns the first element of a sequence, or a specified default value if the sequence contains no elements.</summary>
+        <Pure()> <Extension()>
+        Public Function FirstOrDefault(Of T)(ByVal sequence As IEnumerable(Of T),
+                                             ByVal [default] As T) As T
+            Contract.Requires(sequence IsNot Nothing)
+            Dim e = sequence.GetEnumerator
+            Return If(e.MoveNext, e.Current, [default])
+        End Function
+        '''<summary>Returns a nullable containing the first element of a sequence, or an empty nullable if the sequence contains no elements.</summary>
+        <Pure()> <Extension()>
+        Public Function FirstOrNullableDefault(Of T As Structure)(ByVal sequence As IEnumerable(Of T)) As T?
+            Contract.Requires(sequence IsNot Nothing)
+            Dim e = sequence.GetEnumerator()
+            Return If(e.MoveNext, e.Current, [Default](Of T?))
+        End Function
     End Module
 End Namespace

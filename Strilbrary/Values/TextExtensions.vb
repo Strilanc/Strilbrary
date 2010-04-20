@@ -55,6 +55,12 @@ Namespace Values
             Return result
         End Function
 
+        <Extension()> <Pure()>
+        Public Function ToInvariant(ByVal value As String) As InvariantString
+            Contract.Requires(value IsNot Nothing)
+            Return value
+        End Function
+
 #Region "String <-> Number"
         <Extension()> <Pure()>
         Public Function ToAscBytes(ByVal data As String,
