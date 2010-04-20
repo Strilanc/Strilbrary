@@ -235,17 +235,15 @@ Public Class ValueExtensionTest
 
     <TestMethod()>
     Public Sub ToAscBytesTest()
-        Assert.IsTrue(" 0a".ToAscBytes.SequenceEqual({&H20, &H30, &H61}))
-        Assert.IsTrue("".ToAscBytes.SequenceEqual({}))
-        Assert.IsTrue("A".ToAscBytes.SequenceEqual({&H41}))
-        Assert.IsTrue(("B" + Chr(0) + "C").ToAscBytes(nullTerminate:=True).SequenceEqual({&H42, 0, &H43, 0}))
+        Assert.IsTrue(" 0a".ToAsciiBytes.SequenceEqual({&H20, &H30, &H61}))
+        Assert.IsTrue("".ToAsciiBytes.SequenceEqual({}))
+        Assert.IsTrue("A".ToAsciiBytes.SequenceEqual({&H41}))
     End Sub
     <TestMethod()>
     Public Sub ParseChrStringTest()
-        Assert.IsTrue(New Byte() {&H20, &H30, &H61}.ParseChrString(nullTerminated:=False) = " 0a")
-        Assert.IsTrue(New Byte() {}.ParseChrString(nullTerminated:=False) = "")
-        Assert.IsTrue(New Byte() {&H41}.ParseChrString(nullTerminated:=False) = "A")
-        Assert.IsTrue(New Byte() {&H42, 0, &H43, 0}.ParseChrString(nullTerminated:=True) = "B")
+        Assert.IsTrue(New Byte() {&H20, &H30, &H61}.ToAsciiChars.SequenceEqual(" 0a"))
+        Assert.IsTrue(New Byte() {}.ToAsciiChars.SequenceEqual(""))
+        Assert.IsTrue(New Byte() {&H41}.ToAsciiChars.SequenceEqual("A"))
     End Sub
 
     <TestMethod()>
@@ -564,5 +562,11 @@ Public Class ValueExtensionTest
     Public Sub KeyValueTest()
         Assert.IsTrue(5.KeyValue(4US).Equals(New Collections.Generic.KeyValuePair(Of Int32, UInt16)(5, 4)))
         Assert.IsTrue(6.KeyValue(3US).Equals(New Collections.Generic.KeyValuePair(Of Int32, UInt16)(6, 3)))
+    End Sub
+
+    <TestMethod()>
+    Public Sub AsStringTest()
+        Assert.IsTrue(New Char() {}.AsString = "")
+        Assert.IsTrue({"5"c, "4"c}.AsString = "54")
     End Sub
 End Class

@@ -36,5 +36,12 @@ Namespace Values
         Public Function [Default](Of T)() As T
             Return Nothing
         End Function
+
+        <Pure()> <Extension()>
+        Public Function AsString(ByVal chars As IEnumerable(Of Char)) As String
+            Contract.Requires(chars IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
+            Return New String(chars.ToArray)
+        End Function
     End Module
 End Namespace

@@ -23,7 +23,7 @@ Namespace Values
         ''' </summary>
         <Pure()> <Extension()>
         Public Function Indent(ByVal paragraph As String,
-                               Optional ByVal prefix As String = vbTab) As String
+                               ByVal prefix As String) As String
             Contract.Requires(paragraph IsNot Nothing)
             Contract.Requires(prefix IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
@@ -63,30 +63,18 @@ Namespace Values
 
 #Region "String <-> Number"
         <Extension()> <Pure()>
-        Public Function ToAscBytes(ByVal data As String,
-                                   Optional ByVal nullTerminate As Boolean = False) As Byte()
-            Contract.Requires(data IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Byte())().Length = data.Length + If(nullTerminate, 1, 0))
-            Dim result(0 To data.Length + If(nullTerminate, 1, 0) - 1) As Byte
-            For i = 0 To data.Length - 1
-                result(i) = CByte(Asc(data(i)))
-            Next i
-            Return result
+        Public Function ToAsciiBytes(ByVal chars As IEnumerable(Of Char)) As IEnumerable(Of Byte)
+            Contract.Requires(chars IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of Byte))() IsNot Nothing)
+            Return From c In chars
+                   Select CByte(Microsoft.VisualBasic.Asc(c))
         End Function
         <Extension()> <Pure()>
-        Public Function ParseChrString(ByVal data As IEnumerable(Of Byte),
-                                       ByVal nullTerminated As Boolean) As String
+        Public Function ToAsciiChars(ByVal data As IEnumerable(Of Byte)) As IEnumerable(Of Char)
             Contract.Requires(data IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of String)().Length <= data.Count)
-            Contract.Ensures(nullTerminated OrElse Contract.Result(Of String)().Length = data.Count)
-
-            Dim textData = If(nullTerminated, data.TakeWhile(Function(b) b <> 0), data)
-            Dim result = (From b In textData Select Chr(b)).ToArray
-            Contract.Assume(result.Length <= data.Count)
-            Contract.Assume(nullTerminated OrElse result.Length = data.Count)
-            Return result
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of Char))() IsNot Nothing)
+            Return From b In data
+                   Select Microsoft.VisualBasic.Chr(b)
         End Function
 
         <Extension()> <Pure()>
@@ -96,18 +84,9 @@ Namespace Values
             Contract.Requires(data IsNot Nothing)
             Contract.Requires(separator IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
-
-            Dim result = New System.Text.StringBuilder()
-            For Each b In data
-                If result.Length > 0 Then result.Append(separator)
-                Dim h = Hex(b)
-                Contract.Assume(h IsNot Nothing)
-                For i = 1 To minWordLength - h.Length
-                    result.Append("0"c)
-                Next i
-                result.Append(h)
-            Next b
-            Return result.ToString()
+            Return (From b In data
+                    Select b.ToString("X{0}".Frmt(minWordLength), Globalization.CultureInfo.InvariantCulture)
+                    ).StringJoin(separator)
         End Function
         <Extension()> <Pure()>
         Public Function FromHexStringToBytes(ByVal data As String) As Byte()
@@ -166,7 +145,7 @@ Namespace Values
             Dim val = 0UL
             For Each c In chars
                 If Not HexDictionary.ContainsKey(c) Then
-                    Throw New ArgumentException("Invalid hex character: {0}.".frmt(c), "chars")
+                    Throw New ArgumentException("Invalid hex character: {0}.".Frmt(c), "chars")
                 End If
                 val <<= 4
                 val += HexDictionary(c)
