@@ -165,6 +165,29 @@ Namespace Streams
 
     Public Module StreamInterfaceExtensions
         ''' <summary>
+        ''' Reads bytes from the stream.
+        ''' If less than the given maxCount is read, then the stream has ended.
+        ''' </summary>
+        <Extension()>
+        Public Function ReadBestEffort(ByVal stream As IReadableStream,
+                                       ByVal maxCount As Integer) As IReadableList(Of Byte)
+            Contract.Requires(stream IsNot Nothing)
+            Contract.Requires(maxCount > 0)
+            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))().Count <= maxCount)
+            Dim result = New List(Of Byte)(capacity:=maxCount)
+            While result.Count < maxCount
+                Dim readData = stream.Read(maxCount - result.Count)
+                Select Case readData.Count
+                    Case 0 : Exit While
+                    Case maxCount : Return readData
+                    Case Else : result.AddRange(readData)
+                End Select
+            End While
+            Contract.Assume(result.Count = maxCount)
+            Return result.AsReadableList
+        End Function
+        ''' <summary>
         ''' Reads an exact amount of bytes from the stream (as opposed to the default Read which may return fewer bytes).
         ''' Throws an IOException if the stream ends prematurely.
         ''' </summary>
@@ -175,20 +198,11 @@ Namespace Streams
             Contract.Requires(exactCount > 0)
             Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))().Count = exactCount)
-            Dim result = New List(Of Byte)(capacity:=exactCount)
-            While result.Count < exactCount
-                Dim readData = stream.Read(exactCount - result.Count)
-                Select Case readData.Count
-                    Case 0
-                        Throw New IO.IOException("Stream ended before enough data could be read.")
-                    Case exactCount
-                        Return readData
-                    Case Else
-                        result.AddRange(readData)
-                End Select
-            End While
-            Contract.Assume(result.Count = exactCount)
-            Return result.AsReadableList
+            Dim result = ReadBestEffort(stream, maxCount:=exactCount)
+            If result.Count < exactCount Then
+                 Throw New IO.IOException("Stream ended before enough data could be read.")
+            End If
+            Return result
         End Function
         ''' <summary>
         ''' Writes bytes to the stream, starting at the given position.
