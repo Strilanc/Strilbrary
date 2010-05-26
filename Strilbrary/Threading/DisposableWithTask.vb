@@ -7,7 +7,7 @@
 
         <ContractClassFor(GetType(IDisposableWithTask))>
         <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
-        Class ContractClass
+        MustInherit Class ContractClass
             Implements IDisposableWithTask
             Public ReadOnly Property DisposalTask As Task Implements IDisposableWithTask.DisposalTask
                 Get

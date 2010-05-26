@@ -16,7 +16,7 @@ Namespace Collections
     End Interface
 
     <ContractClassFor(GetType(IEnumeratorController(Of )))>
-    Public Class IEnumeratorControllerContractClass(Of T)
+    Public MustInherit Class IEnumeratorControllerContractClass(Of T)
         Implements IEnumeratorController(Of T)
         Public Function Break() As T Implements IEnumeratorController(Of T).Break
             Throw New NotSupportedException

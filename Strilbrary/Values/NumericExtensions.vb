@@ -99,7 +99,6 @@ Namespace Values
             Dim result = value Mod divisor
             If result < 0 Then result += divisor
             Contract.Assume(result < divisor)
-            Contract.Assume((value - result) Mod divisor = 0)
             Return result
         End Function
 
@@ -152,7 +151,6 @@ Namespace Values
             Contract.Ensures((value - Contract.Result(Of Int16)()) Mod divisor = 0)
             Dim result = value Mod divisor
             If result <= 0 Then result += divisor
-            Contract.Assume(result <= divisor)
             Contract.Assume((value - result) Mod divisor = 0)
             Return result
         End Function

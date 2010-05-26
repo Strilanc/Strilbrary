@@ -31,7 +31,6 @@ Namespace Values
             _words.AddLast(tail)
             _bitCount += word.BitCount
         End Sub
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub Stack(ByVal word As BitWord64)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + word.BitCount)
@@ -69,6 +68,7 @@ Namespace Values
 
             _bitCount -= skippedBitCount
         End Sub
+        <ContractVerification(False)>
         Public Function Take(ByVal resultBitCount As Integer) As BitWord64
             Contract.Requires(resultBitCount >= 0)
             Contract.Requires(resultBitCount <= Me.BitCount)
@@ -81,7 +81,6 @@ Namespace Values
             Skip(resultBitCount)
             Return result
         End Function
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         <Pure()>
         Public Function Peek(ByVal resultBitCount As Integer) As BitWord64
@@ -113,54 +112,47 @@ Namespace Values
 #End Region
 
 #Region "Derived Operations"
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub StackBit(ByVal value As Boolean)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 1)
             Stack(New BitWord64(If(value, 1UL, 0UL), 1))
         End Sub
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub StackByte(ByVal value As Byte)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 8)
             Stack(New BitWord64(value, 8))
         End Sub
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub StackUInt16(ByVal value As UShort)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 16)
             Stack(New BitWord64(value, 16))
         End Sub
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub StackUInt32(ByVal value As UInteger)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 32)
             Stack(New BitWord64(value, 32))
         End Sub
+        <ContractVerification(False)>
         Public Sub StackUInt64(ByVal value As UInt64)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 64)
             Stack(New BitWord64(value, 64))
         End Sub
 
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub QueueBit(ByVal value As Boolean)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 1)
             Queue(New BitWord64(If(value, 1UL, 0UL), 1))
         End Sub
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub QueueByte(ByVal value As Byte)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 8)
             Queue(New BitWord64(value, 8))
         End Sub
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub QueueUInt16(ByVal value As UInt16)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 16)
             Queue(New BitWord64(value, 16))
         End Sub
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub QueueUInt32(ByVal value As UInt32)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 32)
@@ -171,7 +163,6 @@ Namespace Values
             Queue(New BitWord64(value, 64))
         End Sub
 
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Function TakeBit() As Boolean
             Contract.Requires(Me.BitCount >= 1)
@@ -179,7 +170,6 @@ Namespace Values
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 1)
             Return Take(1).Bits <> 0
         End Function
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Function TakeByte() As Byte
             Contract.Requires(Me.BitCount >= 8)
@@ -187,7 +177,6 @@ Namespace Values
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 8)
             Return CByte(Take(8).Bits)
         End Function
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Function TakeUInt16() As UInt16
             Contract.Requires(Me.BitCount >= 16)
@@ -195,7 +184,6 @@ Namespace Values
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 16)
             Return CUShort(Take(16).Bits)
         End Function
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Function TakeUInt32() As UInt32
             Contract.Requires(Me.BitCount >= 32)
@@ -203,7 +191,6 @@ Namespace Values
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 32)
             Return CUInt(Take(32).Bits)
         End Function
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Function TakeUInt64() As UInt64
             Contract.Requires(Me.BitCount >= 64)

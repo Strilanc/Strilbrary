@@ -14,7 +14,6 @@
             Contract.Invariant(_bitCount = MaxSize OrElse _bits >> _bitCount = 0)
         End Sub
 
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub New(ByVal bits As UInt64, ByVal bitCount As Integer)
             Contract.Requires(bitCount >= 0)
@@ -27,7 +26,6 @@
         End Sub
 
         Public ReadOnly Property Bits As UInt64
-            'verification disabled due to stupid verifier (1.2.30312.0)
             <ContractVerification(False)>
             Get
                 Contract.Ensures(BitCount = MaxSize OrElse Contract.Result(Of UInt64)() >> BitCount = 0)
@@ -45,7 +43,6 @@
         End Property
 
         Public ReadOnly Property LowPart(ByVal splitIndex As Integer) As BitWord64
-            'verification disabled due to stupid verifier (1.2.30312.0)
             <ContractVerification(False)>
             Get
                 Contract.Requires(splitIndex >= 0)
@@ -57,7 +54,6 @@
             End Get
         End Property
         Public ReadOnly Property HighPart(ByVal splitIndex As Integer) As BitWord64
-            'verification disabled due to stupid verifier (1.2.30312.0)
             <ContractVerification(False)>
             Get
                 Contract.Requires(splitIndex >= 0)
@@ -69,7 +65,6 @@
             End Get
         End Property
 
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Shared Operator +(ByVal word1 As BitWord64, ByVal word2 As BitWord64) As BitWord64
             Contract.Requires(word1.BitCount + word2.BitCount <= MaxSize)

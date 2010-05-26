@@ -8,7 +8,7 @@ Namespace Streams
         Function Read(ByVal maxCount As Integer) As IReadableList(Of Byte)
 
         <ContractClassFor(GetType(IReadableStream))>
-        NotInheritable Class ContractClass
+        MustInherit Class ContractClass
             Implements IReadableStream
             Public Function Read(ByVal maxCount As Integer) As Collections.IReadableList(Of Byte) Implements IReadableStream.Read
                 Contract.Requires(maxCount > 0)
@@ -29,7 +29,7 @@ Namespace Streams
         Sub Flush()
 
         <ContractClassFor(GetType(IWritableStream))>
-        NotInheritable Class ContractClass
+        MustInherit Class ContractClass
             Implements IWritableStream
             Public Sub Write(ByVal data As IReadableList(Of Byte)) Implements IWritableStream.Write
                 Contract.Requires(data IsNot Nothing)
@@ -51,7 +51,7 @@ Namespace Streams
         Property Position As Long
 
         <ContractClassFor(GetType(ISeekableStream))>
-        NotInheritable Class ContractClass
+        MustInherit Class ContractClass
             Implements ISeekableStream
             Public ReadOnly Property Length As Long Implements ISeekableStream.Length
                 Get
@@ -83,7 +83,7 @@ Namespace Streams
         Inherits ISeekableStream
 
         <ContractClassFor(GetType(IRandomReadableStream))>
-        NotInheritable Shadows Class ContractClass
+        MustInherit Shadows Class ContractClass
             Implements IRandomReadableStream
             Public Function Read(ByVal maxCount As Integer) As IReadableList(Of Byte) Implements IReadableStream.Read
                 Contract.Ensures(Me.Position = Contract.OldValue(DirectCast(Me, ISeekableStream).Position) + Contract.Result(Of IReadableList(Of Byte))().Count)
@@ -114,7 +114,7 @@ Namespace Streams
         Inherits ISeekableStream
 
         <ContractClassFor(GetType(IRandomWritableStream))>
-        NotInheritable Shadows Class ContractClass
+        MustInherit Shadows Class ContractClass
             Implements IRandomWritableStream
             Public Sub Write(ByVal data As IReadableList(Of Byte)) Implements IWritableStream.Write
                 Contract.Ensures(Me.Position = Contract.OldValue(DirectCast(Me, ISeekableStream).Position) + data.Count)

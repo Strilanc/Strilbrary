@@ -16,7 +16,7 @@ Namespace Time
         ReadOnly Property ElapsedTime() As TimeSpan
 
         <ContractClassFor(GetType(IClock))>
-        NotInheritable Class ContractClass
+        MustInherit Class ContractClass
             Implements IClock
             Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
                 Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)

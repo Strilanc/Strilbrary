@@ -296,6 +296,7 @@ Namespace Streams
         ''' Throws an IOException if the stream ends prematurely.
         ''' </summary>
         <Extension()>
+        <ContractVerification(False)>
         Public Function ReadSingle(ByVal stream As IReadableStream) As Single
             Contract.Requires(stream IsNot Nothing)
             Return BitConverter.ToSingle(stream.ReadExact(4).ToArray, 0)
@@ -305,6 +306,7 @@ Namespace Streams
         ''' Throws an IOException if the stream ends prematurely.
         ''' </summary>
         <Extension()>
+        <ContractVerification(False)>
         Public Function ReadDouble(ByVal stream As IReadableStream) As Double
             Contract.Requires(stream IsNot Nothing)
             Return BitConverter.ToDouble(stream.ReadExact(8).ToArray, 0)

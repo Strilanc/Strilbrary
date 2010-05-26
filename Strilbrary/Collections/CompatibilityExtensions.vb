@@ -2,7 +2,6 @@
 
 Namespace Collections
     Public Module CompatibilityExtensions
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         <Extension()> <Pure()>
         Public Function AsList(Of T)(ByVal this As IReadableList(Of T)) As IList(Of T)
@@ -44,7 +43,6 @@ Namespace Collections
                 Me._subList = subList
             End Sub
 
-            'verification disabled due to stupid verifier (1.2.30312.0)
             <ContractVerification(False)>
             Public Sub CopyTo(ByVal array() As T, ByVal arrayIndex As Integer) Implements ICollection(Of T).CopyTo
                 For i = 0 To _subList.Count - 1
@@ -58,8 +56,6 @@ Namespace Collections
                 End Get
             End Property
 
-            'verification disabled due to stupid verifier (1.2.30312.0)
-            <ContractVerification(False)>
             Public Function Contains(ByVal item As T) As Boolean Implements ICollection(Of T).Contains
                 Return _subList.Contains(item)
             End Function
@@ -75,13 +71,11 @@ Namespace Collections
             Public Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
                 Return _subList.GetEnumerator()
             End Function
-            'verification disabled due to stupid verifier (1.2.30312.0)
             <ContractVerification(False)>
             Public Function IndexOf(ByVal item As T) As Integer Implements IList(Of T).IndexOf
                 Return _subList.IndexOf(item)
             End Function
             Default Public Property Item(ByVal index As Integer) As T Implements IList(Of T).Item
-                'verification disabled due to stupid verifier (1.2.30312.0)
                 <ContractVerification(False)>
                 Get
                     Return _subList.Item(index)
@@ -126,8 +120,6 @@ Namespace Collections
                 Me._subList = subList
             End Sub
 
-            'verification disabled due to stupid verifier (1.2.30312.0)
-            <ContractVerification(False)>
             Public Function Contains(ByVal item As T) As Boolean Implements IReadableCollection(Of T).Contains
                 Return _subList.Contains(item)
             End Function
@@ -141,7 +133,6 @@ Namespace Collections
                 Return _subList.IndexOf(item)
             End Function
             Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
-                'verification disabled due to stupid verifier (1.2.30312.0)
                 <ContractVerification(False)>
                 Get
                     Return _subList.Item(index)

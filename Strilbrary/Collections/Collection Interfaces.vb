@@ -46,7 +46,6 @@
     End Class
     <ContractClassFor(GetType(IIndexedEnumerable(Of )))>
     Public MustInherit Class IIndexedEnumerableContractClass(Of T)
-        Inherits ISizedEnumerableContractClass(Of T)
         Implements IIndexedEnumerable(Of T)
         Default Public ReadOnly Property Item(ByVal index As Integer) As T Implements IIndexedEnumerable(Of T).Item
             Get
@@ -55,19 +54,41 @@
                 Throw New NotSupportedException
             End Get
         End Property
+
+        Public ReadOnly Property Count As Integer Implements ISizedEnumerable(Of T).Count
+            Get
+                Throw New NotSupportedException
+            End Get
+        End Property
+        Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
+            Throw New NotSupportedException
+        End Function
+        Public Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+            Throw New NotSupportedException
+        End Function
     End Class
     <ContractClassFor(GetType(IReadableCollection(Of )))>
     Public MustInherit Class IReadableCollectionContractClass(Of T)
-        Inherits ISizedEnumerableContractClass(Of T)
         Implements IReadableCollection(Of T)
         Public Function Contains(ByVal item As T) As Boolean Implements IReadableCollection(Of T).Contains
             Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse DirectCast(Me, IReadableCollection(Of T)).Count > 0)
             Throw New NotSupportedException
         End Function
+
+        Public ReadOnly Property Count As Integer Implements ISizedEnumerable(Of T).Count
+            Get
+                Throw New NotSupportedException
+            End Get
+        End Property
+        Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
+            Throw New NotSupportedException
+        End Function
+        Public Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+            Throw New NotSupportedException
+        End Function
     End Class
     <ContractClassFor(GetType(IReadableList(Of )))>
     Public MustInherit Class IReadableListContractClass(Of T)
-        Inherits IIndexedEnumerableContractClass(Of T)
         Implements IReadableList(Of T)
         Public Function IndexOf(ByVal item As T) As Integer Implements IReadableList(Of T).IndexOf
             Contract.Ensures(Contract.Result(Of Integer)() < DirectCast(Me, IReadableList(Of T)).Count)
@@ -75,6 +96,23 @@
             Throw New NotSupportedException
         End Function
         Public Function Contains(ByVal item As T) As Boolean Implements IReadableCollection(Of T).Contains
+            Throw New NotSupportedException
+        End Function
+
+        Default Public ReadOnly Property Item(ByVal index As Integer) As T Implements IIndexedEnumerable(Of T).Item
+            Get
+                Throw New NotSupportedException
+            End Get
+        End Property
+        Public ReadOnly Property Count As Integer Implements ISizedEnumerable(Of T).Count
+            Get
+                Throw New NotSupportedException
+            End Get
+        End Property
+        Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
+            Throw New NotSupportedException
+        End Function
+        Public Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
             Throw New NotSupportedException
         End Function
     End Class

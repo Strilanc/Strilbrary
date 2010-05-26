@@ -16,7 +16,6 @@ Namespace Time
             Contract.Invariant(_baseClock IsNot Nothing)
         End Sub
 
-        'verification disabled due to stupid verifier (1.2.30312.0)
         <ContractVerification(False)>
         Public Sub New(ByVal parentClock As IClock,
                        ByVal timeOffsetFromParent As TimeSpan)
@@ -36,8 +35,6 @@ Namespace Time
         End Sub
 
         Public ReadOnly Property StartingTimeOnParentClock As TimeSpan
-            'verification disabled due to stupid verifier (1.2.30312.0)
-            <ContractVerification(False)>
             Get
                 Return -_timeOffsetFromParent
             End Get
