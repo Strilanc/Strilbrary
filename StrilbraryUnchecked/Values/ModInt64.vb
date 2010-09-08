@@ -3,6 +3,7 @@
     <DebuggerDisplay("{ToString} (mod 2^64)")>
     Public Structure ModInt64
         Implements IEquatable(Of ModInt64)
+        Private Const BitCount As Int32 = 64
         Private ReadOnly _value As UInt64
 
         Public Sub New(ByVal value As UInt64)
@@ -57,16 +58,16 @@
             Return value1._value <> value2._value
         End Operator
         Public Function ShiftRotateLeft(ByVal offset As Integer) As ModInt64
-            offset = offset And (64 - 1)
-            Return (_value << offset) Or (_value >> (64 - offset))
+            offset = offset And (BitCount - 1)
+            Return (_value << offset) Or (_value >> (BitCount - offset))
         End Function
         Public Function ShiftRotateRight(ByVal offset As Integer) As ModInt64
-            offset = offset And (64 - 1)
-            Return (_value >> offset) Or (_value << (64 - offset))
+            offset = offset And (BitCount - 1)
+            Return (_value >> offset) Or (_value << (BitCount - offset))
         End Function
 
         Public Overrides Function GetHashCode() As Integer
-            Return (_value.GetHashCode)
+            Return _value.GetHashCode
         End Function
         Public Overrides Function Equals(ByVal obj As Object) As Boolean
             Return TypeOf obj Is ModInt64 AndAlso Me._value = DirectCast(obj, ModInt64)._value

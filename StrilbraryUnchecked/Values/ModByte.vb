@@ -3,6 +3,7 @@
     <DebuggerDisplay("{ToString} (mod 2^8)")>
     Public Structure ModByte
         Implements IEquatable(Of ModByte)
+        Private Const BitCount As Int32 = 8
         Private ReadOnly _value As Byte
 
         Public Sub New(ByVal value As Byte)
@@ -57,12 +58,12 @@
             Return value1._value <> value2._value
         End Operator
         Public Function ShiftRotateLeft(ByVal offset As Integer) As ModByte
-            offset = offset And (8 - 1)
-            Return (_value << offset) Or (_value >> (8 - offset))
+            offset = offset And (BitCount - 1)
+            Return (_value << offset) Or (_value >> (BitCount - offset))
         End Function
         Public Function ShiftRotateRight(ByVal offset As Integer) As ModByte
-            offset = offset And (8 - 1)
-            Return (_value >> offset) Or (_value << (8 - offset))
+            offset = offset And (BitCount - 1)
+            Return (_value >> offset) Or (_value << (BitCount - offset))
         End Function
 
         Public Overrides Function GetHashCode() As Integer

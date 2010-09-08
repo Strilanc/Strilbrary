@@ -3,6 +3,7 @@
     <DebuggerDisplay("{ToString} (mod 2^16)")>
     Public Structure ModInt16
         Implements IEquatable(Of ModInt16)
+        Private Const BitCount As Int32 = 16
         Private ReadOnly _value As UInt16
 
         Public Sub New(ByVal value As UInt16)
@@ -57,16 +58,16 @@
             Return value1._value <> value2._value
         End Operator
         Public Function ShiftRotateLeft(ByVal offset As Integer) As ModInt16
-            offset = offset And (16 - 1)
-            Return (_value << offset) Or (_value >> (16 - offset))
+            offset = offset And (BitCount - 1)
+            Return (_value << offset) Or (_value >> (BitCount - offset))
         End Function
         Public Function ShiftRotateRight(ByVal offset As Integer) As ModInt16
-            offset = offset And (16 - 1)
-            Return (_value >> offset) Or (_value << (16 - offset))
+            offset = offset And (BitCount - 1)
+            Return (_value >> offset) Or (_value << (BitCount - offset))
         End Function
 
         Public Overrides Function GetHashCode() As Integer
-            Return (_value.GetHashCode)
+            Return _value.GetHashCode
         End Function
         Public Overrides Function Equals(ByVal obj As Object) As Boolean
             Return TypeOf obj Is ModInt16 AndAlso Me._value = DirectCast(obj, ModInt16)._value
