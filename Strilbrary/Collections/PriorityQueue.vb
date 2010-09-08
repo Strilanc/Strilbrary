@@ -35,7 +35,6 @@ Namespace Collections
                 Dim parentItem = _items(parentIndex)
                 If _comparer(item, parentItem) <= 0 Then Exit While
 
-                Contract.Assume(curIndex < _items.Count)
                 _items(curIndex) = parentItem
                 _items(parentIndex) = item
                 curIndex = parentIndex

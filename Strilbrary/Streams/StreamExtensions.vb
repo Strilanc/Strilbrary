@@ -29,7 +29,6 @@ Namespace Streams
                 numRead += n
                 If n = 0 Then Exit Do
             Loop
-            Contract.Assume(numRead <= length)
             Return numRead
         End Function
 
@@ -208,7 +207,6 @@ Namespace Streams
         ''' Writes bytes to the stream, starting at the given position.
         ''' </summary>
         <Extension()>
-        <ContractVerification(False)>
         Public Sub WriteAt(ByVal stream As IRandomWritableStream,
                            ByVal position As Long,
                            ByVal data As IReadableList(Of Byte))
@@ -225,7 +223,6 @@ Namespace Streams
         ''' Throws an IOException if the stream ends prematurely.
         ''' </summary>
         <Extension()>
-        <ContractVerification(False)>
         Public Function ReadExactAt(ByVal stream As IRandomReadableStream,
                                     ByVal position As Long,
                                     ByVal exactCount As Integer) As IReadableList(Of Byte)

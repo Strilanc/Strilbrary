@@ -20,6 +20,7 @@ Namespace Time
         <ContractVerification(False)>
         Public Sub New()
             Me._lastTick = Environment.TickCount
+            Me._elapsedTime = New TimeSpan(0)
         End Sub
 
         <ContractVerification(False)>

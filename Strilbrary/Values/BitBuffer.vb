@@ -68,7 +68,6 @@ Namespace Values
 
             _bitCount -= skippedBitCount
         End Sub
-        <ContractVerification(False)>
         Public Function Take(ByVal resultBitCount As Integer) As BitWord64
             Contract.Requires(resultBitCount >= 0)
             Contract.Requires(resultBitCount <= Me.BitCount)

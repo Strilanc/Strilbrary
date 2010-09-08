@@ -72,8 +72,6 @@ Namespace Values
             Contract.Ensures((value - Contract.Result(Of Int64)()) Mod divisor = 0)
             Dim result = value Mod divisor
             If result < 0 Then result += divisor
-            Contract.Assume(result >= 0)
-            Contract.Assume((value - result) Mod divisor = 0)
             Return result
         End Function
         '''<summary>Determines the smallest non-negative remainder of the division of the value by the given divisor.</summary>
@@ -98,6 +96,7 @@ Namespace Values
             Contract.Ensures((value - Contract.Result(Of Int16)()) Mod divisor = 0)
             Dim result = value Mod divisor
             If result < 0 Then result += divisor
+            Contract.Assume((value - result) Mod divisor = 0)
             Contract.Assume(result < divisor)
             Return result
         End Function
@@ -125,7 +124,6 @@ Namespace Values
             Contract.Ensures((value - Contract.Result(Of Int64)()) Mod divisor = 0)
             Dim result = value Mod divisor
             If result <= 0 Then result += divisor
-            Contract.Assume(result > 0)
             Contract.Assume((value - result) Mod divisor = 0)
             Return result
         End Function
@@ -152,6 +150,7 @@ Namespace Values
             Dim result = value Mod divisor
             If result <= 0 Then result += divisor
             Contract.Assume((value - result) Mod divisor = 0)
+            Contract.Assume(result <= divisor)
             Return result
         End Function
         '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
@@ -321,7 +320,6 @@ Namespace Values
         End Function
         '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
         Public Function FloorMultiple(ByVal value As UInt32, ByVal divisor As UInt32) As UInt32
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of UInt32)() Mod divisor = 0)

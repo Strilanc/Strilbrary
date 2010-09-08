@@ -104,6 +104,7 @@
             Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.Length >= value.Length)
             Return Me.Value.StartsWith(value.Value, StringComparison.OrdinalIgnoreCase)
         End Function
+        <ContractVerification(False)>
         <Pure()>
         Public Function Substring(ByVal startIndex As Integer) As InvariantString
             Contract.Requires(startIndex >= 0)
@@ -111,6 +112,7 @@
             Contract.Ensures(Contract.Result(Of InvariantString)().Length = Me.Length - startIndex)
             Return Me.Value.Substring(startIndex)
         End Function
+        <ContractVerification(False)>
         <Pure()>
         Public Function Substring(ByVal startIndex As Integer, ByVal length As Integer) As InvariantString
             Contract.Requires(startIndex >= 0)

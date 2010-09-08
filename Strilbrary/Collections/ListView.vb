@@ -34,7 +34,6 @@ Namespace Collections
         End Sub
 
         Default Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
-            <ContractVerification(False)>
             Get
                 Return _items(_offset + index)
             End Get

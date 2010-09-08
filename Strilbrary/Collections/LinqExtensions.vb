@@ -225,7 +225,7 @@ Namespace Collections
         Public Function ZipWithIndexes(Of T)(ByVal sequence As IEnumerable(Of T)) As IEnumerable(Of Tuple(Of T, Integer))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of T, Integer)))() IsNot Nothing)
-            Return sequence.Zip(Int32.MaxValue.Range)
+            Return sequence.Select(Function(item, index) Tuple.Create(item, index))
         End Function
 
         '''<summary>Returns a sequence consisting of a value repeated a specified number of times.</summary>

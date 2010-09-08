@@ -43,7 +43,6 @@ Namespace Collections
                 Me._subList = subList
             End Sub
 
-            <ContractVerification(False)>
             Public Sub CopyTo(ByVal array() As T, ByVal arrayIndex As Integer) Implements ICollection(Of T).CopyTo
                 For i = 0 To _subList.Count - 1
                     array(i + arrayIndex) = _subList(i)
@@ -133,7 +132,6 @@ Namespace Collections
                 Return _subList.IndexOf(item)
             End Function
             Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
-                <ContractVerification(False)>
                 Get
                     Return _subList.Item(index)
                 End Get

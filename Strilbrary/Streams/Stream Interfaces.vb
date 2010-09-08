@@ -86,7 +86,7 @@ Namespace Streams
         MustInherit Shadows Class ContractClass
             Implements IRandomReadableStream
             Public Function Read(ByVal maxCount As Integer) As IReadableList(Of Byte) Implements IReadableStream.Read
-                Contract.Ensures(Me.Position = Contract.OldValue(DirectCast(Me, ISeekableStream).Position) + Contract.Result(Of IReadableList(Of Byte))().Count)
+                'Contract.Ensures(Me.Position = Contract.OldValue(DirectCast(Me, ISeekableStream).Position) + Contract.Result(Of IReadableList(Of Byte))().Count)
                 Throw New NotSupportedException
             End Function
             Public ReadOnly Property Length As Long Implements ISeekableStream.Length
@@ -117,7 +117,7 @@ Namespace Streams
         MustInherit Shadows Class ContractClass
             Implements IRandomWritableStream
             Public Sub Write(ByVal data As IReadableList(Of Byte)) Implements IWritableStream.Write
-                Contract.Ensures(Me.Position = Contract.OldValue(DirectCast(Me, ISeekableStream).Position) + data.Count)
+                'Contract.Ensures(Me.Position = Contract.OldValue(DirectCast(Me, ISeekableStream).Position) + data.Count)
                 Throw New NotSupportedException
             End Sub
             Public Sub Flush() Implements IWritableStream.Flush

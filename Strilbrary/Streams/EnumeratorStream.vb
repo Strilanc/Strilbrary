@@ -19,7 +19,6 @@ Namespace Streams
             While result.Count < maxCount AndAlso _enumerator.MoveNext
                 result.Add(_enumerator.Current)
             End While
-            Contract.Assume(result.Count <= maxCount)
             Return result.AsReadableList
         End Function
 
