@@ -1,4 +1,6 @@
-﻿Namespace Threading
+﻿Imports Strilbrary.Values
+
+Namespace Threading
     '''<summary>Represents an object which makes its future thread-safe disposal available as a future.</summary>
     <ContractClass(GetType(IDisposableWithTask.ContractClass))>
     Public Interface IDisposableWithTask
@@ -28,7 +30,7 @@
         Implements IDisposableWithTask
 
         Private ReadOnly _disposeLock As New OnetimeLock
-        Private ReadOnly _disposalTask As New TaskCompletionSource(Of Boolean)
+        Private ReadOnly _disposalTask As New TaskCompletionSource(Of NoValue)
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(_disposeLock IsNot Nothing)
@@ -58,9 +60,9 @@
 
             Dim result = PerformDispose(finalizing)
             If result Is Nothing Then
-                _disposalTask.SetResult(True)
+                _disposalTask.SetResult(Nothing)
             Else
-                result.ContinueWithAction(Sub() _disposalTask.SetResult(True))
+                result.ContinueWithAction(Sub() _disposalTask.SetResult(Nothing))
             End If
         End Sub
         Public Sub Dispose() Implements IDisposable.Dispose

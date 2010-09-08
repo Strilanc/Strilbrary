@@ -25,7 +25,7 @@ Namespace Threading
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
 
             Dim tasks = sequence.ToList
-            Dim result = New TaskCompletionSource(Of Boolean)
+            Dim result = New TaskCompletionSource(Of NoValue)
             Dim readyCount = 0
 
             'Become ready once all input futures are ready
@@ -40,7 +40,7 @@ Namespace Threading
                              If faults.Count > 0 Then
                                  result.SetException(faults)
                              Else
-                                 result.SetResult(True)
+                                 result.SetResult(Nothing)
                              End If
                          End Sub
 
@@ -48,7 +48,7 @@ Namespace Threading
                 Contract.Assume(task IsNot Nothing)
                 task.ContinueWith(notify)
             Next task
-            If tasks.Count = 0 Then result.SetResult(True)
+            If tasks.Count = 0 Then result.SetResult(Nothing)
 
             Return result.Task
         End Function
@@ -73,12 +73,12 @@ Namespace Threading
         End Sub
         '''<summary>Causes a task completion source to succeed if an action runs, or to fault if the action throws an exception.</summary>
         <Extension()>
-        Public Sub SetByCalling(ByVal taskSource As TaskCompletionSource(Of Boolean), ByVal action As action)
+        Public Sub SetByCalling(ByVal taskSource As TaskCompletionSource(Of NoValue), ByVal action As action)
             Contract.Requires(taskSource IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             taskSource.DependentCall(Sub()
                                          Call action()
-                                         taskSource.SetResult(True)
+                                         taskSource.SetResult(Nothing)
                                      End Sub)
         End Sub
         '''<summary>Causes a task completion source to fault if running an action throws an exception.</summary>
@@ -120,7 +120,7 @@ Namespace Threading
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of task)() IsNot Nothing)
-            Dim result = New TaskCompletionSource(Of Boolean)
+            Dim result = New TaskCompletionSource(Of NoValue)
             task.ContinueWith(Sub(t) If Not result.PropagateFaultsFrom(t) Then result.SetByCalling(action))
             Return result.Task
         End Function

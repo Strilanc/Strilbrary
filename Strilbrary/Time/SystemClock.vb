@@ -5,7 +5,6 @@ Namespace Time
     ''' <summary>
     ''' A clock which advances relative to the system tick count.
     ''' </summary>
-    <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")>
     Public Class SystemClock
         Implements IClock
         Private _elapsedTime As TimeSpan
@@ -25,15 +24,15 @@ Namespace Time
 
         <ContractVerification(False)>
         Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
-            Dim result = New TaskCompletionSource(Of Boolean)
+            Dim result = New TaskCompletionSource(Of NoValue)
             Dim dt = time - ElapsedTime
             If dt.Ticks <= 0 Then
-                result.SetResult(True)
+                result.SetResult(Nothing)
             Else
                 Dim timer = New Timers.Timer(dt.TotalMilliseconds)
                 AddHandler timer.Elapsed, Sub()
                                               timer.Dispose()
-                                              result.SetResult(True)
+                                              result.SetResult(Nothing)
                                           End Sub
                 timer.AutoReset = False
                 timer.Start()

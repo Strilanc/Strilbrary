@@ -1,4 +1,5 @@
 ﻿Imports System.Threading
+Imports Strilbrary.Values
 
 Namespace Threading
     'Verification disabled due to missing task contracts
@@ -8,7 +9,7 @@ Namespace Threading
         Public Function ThreadedAction(ByVal action As Action) As Task
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Dim result = New TaskCompletionSource(Of Boolean)
+            Dim result = New TaskCompletionSource(Of NoValue)
             Call New Thread(Sub() result.SetByCalling(action)).Start()
             Return result.Task
         End Function
@@ -41,7 +42,7 @@ Namespace Threading
         Public Function ThreadPooledAction(ByVal action As Action) As Task
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Dim result = New TaskCompletionSource(Of Boolean)
+            Dim result = New TaskCompletionSource(Of NoValue)
             ThreadPool.QueueUserWorkItem(Sub() result.SetByCalling(action))
             Return result.Task
         End Function
@@ -60,7 +61,7 @@ Namespace Threading
             Contract.Requires(control IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Dim result = New TaskCompletionSource(Of Boolean)
+            Dim result = New TaskCompletionSource(Of NoValue)
             result.DependentCall(Sub() control.BeginInvoke(Sub() result.SetByCalling(action)))
             Return result.Task
         End Function
