@@ -11,14 +11,13 @@
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(_bitCount >= 0)
             Contract.Invariant(_bitCount <= MaxSize)
-            Contract.Invariant(_bitCount = MaxSize OrElse _bits >> _bitCount = 0)
+            Contract.Invariant(_bits.HasNoBitsSetAbovePosition(_bitCount))
         End Sub
 
-        <ContractVerification(False)>
         Public Sub New(ByVal bits As UInt64, ByVal bitCount As Integer)
             Contract.Requires(bitCount >= 0)
             Contract.Requires(bitCount <= MaxSize)
-            Contract.Requires(bitCount = MaxSize OrElse bits >> bitCount = 0)
+            Contract.Requires(bits.HasNoBitsSetAbovePosition(bitCount))
             Contract.Ensures(Me.Bits = bits)
             Contract.Ensures(Me.BitCount = bitCount)
             Me._bits = bits
@@ -28,7 +27,7 @@
         Public ReadOnly Property Bits As UInt64
             <ContractVerification(False)>
             Get
-                Contract.Ensures(BitCount = MaxSize OrElse Contract.Result(Of UInt64)() >> BitCount = 0)
+                Contract.Ensures(Contract.Result(Of UInt64)().HasNoBitsSetAbovePosition(BitCount))
                 Contract.Ensures(Contract.Result(Of UInt64)() = _bits)
                 Return _bits
             End Get
@@ -83,7 +82,7 @@
         Public Overloads Overrides Function Equals(ByVal obj As Object) As Boolean
             Return TypeOf obj Is BitWord64 AndAlso Me = DirectCast(obj, BitWord64)
         End Function
-        Public Overloads Function Equals(ByVal other As BitWord64) As Boolean Implements System.IEquatable(Of BitWord64).Equals
+        Public Overloads Function Equals(ByVal other As BitWord64) As Boolean Implements IEquatable(Of BitWord64).Equals
             Return Me = other
         End Function
         Public Overrides Function GetHashCode() As Integer

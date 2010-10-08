@@ -314,6 +314,7 @@ Namespace Collections
             Dim enumerators = (From sequence In sequences Select sequence.GetEnumerator).ToList
             Dim index = 0
             Do
+                Contract.Assume(enumerators(index) IsNot Nothing)
                 While Not enumerators(index).MoveNext
                     enumerators.RemoveAt(index)
                     If enumerators.Count = 0 Then Exit Do

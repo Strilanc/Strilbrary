@@ -25,7 +25,7 @@ Namespace Values
         End Function
 
         '''<summary>Determines the binary flags included in the enum value (including flags which may not be defined), including the power of each flag.</summary>
-        <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
+        <SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
         <Extension()> <Pure()>
         Public Function EnumFlagsIndexed(Of TEnum)(ByVal value As TEnum) As IEnumerable(Of Tuple(Of TEnum, Int32))
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of TEnum, Int32)))() IsNot Nothing)
@@ -55,14 +55,14 @@ Namespace Values
                    Select Tuple.Create(pair.Item1.DynamicDirectCastTo(Of TEnum)(), pair.Item2)
         End Function
         '''<summary>Determines the binary flags included in the enum value (including flags which may not be defined).</summary>
-        <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
+        <SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
         <Extension()> <Pure()>
         Public Function EnumFlags(Of TEnum)(ByVal value As TEnum) As IEnumerable(Of TEnum)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TEnum))() IsNot Nothing)
             Return From pair In value.EnumFlagsIndexed() Select pair.Item1
         End Function
 
-        <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
+        <SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
         <Pure()>
         Public Function EnumAllFlags(Of TEnum)(ByVal onlyDefined As Boolean) As IEnumerable(Of TEnum)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TEnum))() IsNot Nothing)
@@ -91,14 +91,14 @@ Namespace Values
         End Function
         '''<summary>Determines if all the binary flags included in the Enum value are defined.</summary>
         <Pure()> <Extension()>
-        <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
+        <SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
         Public Function EnumFlagsAreDefined(Of TEnum)(ByVal value As TEnum) As Boolean
             Return value.EnumFlags().All(Function(flag) flag.EnumValueIsDefined())
         End Function
 
         '''<summary>Returns a string representation of the binary flags included in the enum value.</summary>
         <Pure()> <Extension()>
-        <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
+        <SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
         Public Function EnumFlagsToString(Of TEnum)(ByVal value As TEnum) As String
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
             Dim indexedFlags = value.EnumFlagsIndexed()

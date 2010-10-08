@@ -11,7 +11,7 @@ Namespace Threading
     '''<summary>A thread-safe lock which can be acquired once, and never released.</summary>
     <DebuggerDisplay("{ToString}")>
     Public NotInheritable Class OnetimeLock
-        Private _acquired As Integer
+        Private _acquired As Int32
 
         '''<summary>Tries to permanently acquire the lock. Returns true exactly once, then always returns false.</summary>
         Public Function TryAcquire() As Boolean

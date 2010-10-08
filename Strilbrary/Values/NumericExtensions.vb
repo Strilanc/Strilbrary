@@ -167,7 +167,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-(value - Contract.Result(Of UInt32)()) Mod divisor = 0")>
         Public Function PositiveMod(ByVal value As UInt32, ByVal divisor As UInt32) As UInt32
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of UInt32)() > 0)
@@ -273,7 +273,9 @@ Namespace Values
 
         '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of BigInteger)() Mod divisor = 0")>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of BigInteger)() <= value")>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of BigInteger)() > value - divisor")>
         Public Function FloorMultiple(ByVal value As BigInteger, ByVal divisor As BigInteger) As BigInteger
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of BigInteger)() Mod divisor = 0)
@@ -675,7 +677,8 @@ Namespace Values
 #End Region
 
         <Pure()> <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of T)().CompareTo(value1) >= 0")>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of T)().CompareTo(value2) >= 0")>
         Public Function ClampAtOrAbove(Of T As IComparable(Of T))(ByVal value1 As T, ByVal value2 As T) As T
             Contract.Requires(value1 IsNot Nothing)
             Contract.Requires(value2 IsNot Nothing)
@@ -685,7 +688,8 @@ Namespace Values
             Return If(value1.CompareTo(value2) >= 0, value1, value2)
         End Function
         <Pure()> <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of T)().CompareTo(value1) <= 0")>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of T)().CompareTo(value2) <= 0")>
         Public Function ClampAtOrBelow(Of T As IComparable(Of T))(ByVal value1 As T, ByVal value2 As T) As T
             Contract.Requires(value1 IsNot Nothing)
             Contract.Requires(value2 IsNot Nothing)

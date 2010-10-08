@@ -104,7 +104,9 @@ Namespace Streams
             Private ReadOnly _seekStream As ISeekableStream
             Private ReadOnly _writeStream As IWritableStream
 
-            <ContractVerification(False)>
+            <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Me.CanRead = (readStream IsNot Nothing)")>
+            <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Me.CanSeek = (seekStream IsNot Nothing)")>
+            <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Me.CanWrite = (writeStream IsNot Nothing)")>
             Public Sub New(ByVal readStream As IReadableStream, ByVal seekStream As ISeekableStream, ByVal writeStream As IWritableStream)
                 Contract.Ensures(Me.CanRead = (readStream IsNot Nothing))
                 Contract.Ensures(Me.CanSeek = (seekStream IsNot Nothing))

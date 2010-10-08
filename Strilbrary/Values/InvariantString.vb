@@ -11,7 +11,7 @@
 
         Private ReadOnly _value As String
 
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Me.Value = value")>
         Public Sub New(ByVal value As String)
             Contract.Requires(value IsNot Nothing)
             Contract.Ensures(Me.Value = value)
@@ -19,7 +19,7 @@
         End Sub
 
         Public ReadOnly Property Value As String
-            <ContractVerification(False)>
+            <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of String)() = If(_value, """")")>
             Get
                 Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
                 Contract.Ensures(Contract.Result(Of String)() = If(_value, ""))
@@ -85,35 +85,35 @@
             Contract.Ensures(Contract.Result(Of InvariantString)().Value = value)
             Return New InvariantString(value)
         End Operator
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of String)() = value.Value")>
         Public Shared Widening Operator CType(ByVal value As InvariantString) As String
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)() = value.Value)
             Return value.Value
         End Operator
 
-        <ContractVerification(False)>
         <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Not Contract.Result(Of Boolean)() OrElse Me.Length >= value.Length")>
         Public Function EndsWith(ByVal value As InvariantString) As Boolean
             Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.Length >= value.Length)
             Return Me.Value.EndsWith(value.Value, StringComparison.OrdinalIgnoreCase)
         End Function
-        <ContractVerification(False)>
         <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Not Contract.Result(Of Boolean)() OrElse Me.Length >= value.Length")>
         Function StartsWith(ByVal value As InvariantString) As Boolean
             Contract.Ensures(Not Contract.Result(Of Boolean)() OrElse Me.Length >= value.Length)
             Return Me.Value.StartsWith(value.Value, StringComparison.OrdinalIgnoreCase)
         End Function
-        <ContractVerification(False)>
         <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of InvariantString)().Length = Me.Length - startIndex")>
         Public Function Substring(ByVal startIndex As Integer) As InvariantString
             Contract.Requires(startIndex >= 0)
             Contract.Requires(startIndex <= Me.Length)
             Contract.Ensures(Contract.Result(Of InvariantString)().Length = Me.Length - startIndex)
             Return Me.Value.Substring(startIndex)
         End Function
-        <ContractVerification(False)>
         <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of InvariantString)().Length = length")>
         Public Function Substring(ByVal startIndex As Integer, ByVal length As Integer) As InvariantString
             Contract.Requires(startIndex >= 0)
             Contract.Requires(length >= 0)
@@ -122,7 +122,7 @@
             Return Me.Value.Substring(startIndex, length)
         End Function
 
-        <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")>
+        <SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")>
         Public Overrides Function Equals(ByVal obj As Object) As Boolean
             If TypeOf obj Is InvariantString Then
                 Return Me = DirectCast(obj, InvariantString)

@@ -21,7 +21,6 @@ Namespace Streams
             _emptied = Not Me._streams.MoveNext()
         End Sub
 
-        <ContractVerification(False)>
         Public Function Read(ByVal maxCount As Integer) As IReadableList(Of Byte) Implements IReadableStream.Read
             Dim result = New List(Of Byte)
             While result.Count < maxCount AndAlso Not _emptied
@@ -41,7 +40,6 @@ Namespace Streams
             Return result.AsReadableList
         End Function
 
-        <ContractVerification(False)>
         Public Sub Dispose() Implements IDisposable.Dispose
             Do Until _emptied
                 Contract.Assume(_streams.Current IsNot Nothing)

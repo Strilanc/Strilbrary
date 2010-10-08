@@ -157,6 +157,7 @@ Namespace Values
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 32)
             Queue(New BitWord64(value, 32))
         End Sub
+        <ContractVerification(False)>
         Public Sub QueueUInt64(ByVal value As UInt64)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 64)
             Queue(New BitWord64(value, 64))
@@ -169,28 +170,28 @@ Namespace Values
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 1)
             Return Take(1).Bits <> 0
         End Function
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Byte)() = Contract.OldValue(Me.PeekByte)")>
         Public Function TakeByte() As Byte
             Contract.Requires(Me.BitCount >= 8)
             Contract.Ensures(Contract.Result(Of Byte)() = Contract.OldValue(Me.PeekByte))
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 8)
             Return CByte(Take(8).Bits)
         End Function
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of UInt16)() = Contract.OldValue(Me.PeekUInt16)")>
         Public Function TakeUInt16() As UInt16
             Contract.Requires(Me.BitCount >= 16)
             Contract.Ensures(Contract.Result(Of UInt16)() = Contract.OldValue(Me.PeekUInt16))
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 16)
             Return CUShort(Take(16).Bits)
         End Function
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of UInt32)() = Contract.OldValue(Me.PeekUInt32)")>
         Public Function TakeUInt32() As UInt32
             Contract.Requires(Me.BitCount >= 32)
             Contract.Ensures(Contract.Result(Of UInt32)() = Contract.OldValue(Me.PeekUInt32))
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) - 32)
             Return CUInt(Take(32).Bits)
         End Function
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of UInt64)() = Contract.OldValue(Me.PeekUInt64)")>
         Public Function TakeUInt64() As UInt64
             Contract.Requires(Me.BitCount >= 64)
             Contract.Ensures(Contract.Result(Of UInt64)() = Contract.OldValue(Me.PeekUInt64))

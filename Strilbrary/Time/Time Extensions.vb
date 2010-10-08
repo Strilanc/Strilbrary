@@ -23,7 +23,7 @@ Namespace Time
         End Function
 
         ''' <summary>
-        ''' Begins periodically calling an action, and returns an IDisposable to end the repitition.
+        ''' Begins periodically calling an action, and returns an IDisposable to end the repetition.
         ''' The first call happens after the period has elapsed (instead of immediately).
         ''' </summary>
         <Extension()>
@@ -34,7 +34,7 @@ Namespace Time
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IDisposable)() IsNot Nothing)
 
-            Dim stopFlag As Boolean
+            Dim stopFlag = False
             Dim callback As Action
             Dim t = clock.ElapsedTime
             callback = Sub()
@@ -50,22 +50,22 @@ Namespace Time
 
 #Region "Time Spans"
         'verification disabled due to lack of TimeSpan contracts
-        <ContractVerification(False)>
         <Extension()> <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of TimeSpan)().Ticks = quantity * TimeSpan.TicksPerMinute")>
         Public Function Minutes(ByVal quantity As Long) As TimeSpan
             Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks = quantity * TimeSpan.TicksPerMinute)
             Return New TimeSpan(ticks:=quantity * TimeSpan.TicksPerMinute)
         End Function
         'verification disabled due to lack of TimeSpan contracts
-        <ContractVerification(False)>
         <Extension()> <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of TimeSpan)().Ticks = quantity * TimeSpan.TicksPerSecond")>
         Public Function Seconds(ByVal quantity As Long) As TimeSpan
             Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks = quantity * TimeSpan.TicksPerSecond)
             Return New TimeSpan(ticks:=quantity * TimeSpan.TicksPerSecond)
         End Function
         'verification disabled due to lack of TimeSpan contracts
-        <ContractVerification(False)>
         <Extension()> <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of TimeSpan)().Ticks = quantity * TimeSpan.TicksPerMillisecond")>
         Public Function Milliseconds(ByVal quantity As Long) As TimeSpan
             Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks = quantity * TimeSpan.TicksPerMillisecond)
             Return New TimeSpan(ticks:=quantity * TimeSpan.TicksPerMillisecond)

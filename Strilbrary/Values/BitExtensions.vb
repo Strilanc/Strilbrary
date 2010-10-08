@@ -67,7 +67,7 @@ Namespace Values
 
         '''<summary>Enumerates the bits in a value, in little-endian order.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of Boolean))().Count = 64")>
         Public Function Bits(ByVal value As UInt64) As IEnumerable(Of Boolean)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))().Count = 64)
@@ -75,7 +75,7 @@ Namespace Values
         End Function
         '''<summary>Enumerates the bits in a value, in little-endian order.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of Boolean))().Count = 32")>
         Public Function Bits(ByVal value As UInt32) As IEnumerable(Of Boolean)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))().Count = 32)
@@ -83,7 +83,7 @@ Namespace Values
         End Function
         '''<summary>Enumerates the bits in a value, in little-endian order.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of Boolean))().Count = 16")>
         Public Function Bits(ByVal value As UInt16) As IEnumerable(Of Boolean)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))().Count = 16)
@@ -91,7 +91,7 @@ Namespace Values
         End Function
         '''<summary>Enumerates the bits in a value, in little-endian order.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of Boolean))().Count = 8")>
         Public Function Bits(ByVal value As Byte) As IEnumerable(Of Boolean)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))().Count = 8)
@@ -162,6 +162,13 @@ Namespace Values
             Contract.Requires(bitsKept >= 0)
             Contract.Requires(bitsKept <= 64)
             Return Not LowMasked(value, 64 - bitsKept)
+        End Function
+
+        <Extension()> <Pure()>
+        Public Function HasNoBitsSetAbovePosition(ByVal value As UInt64, ByVal position As Integer) As Boolean
+            Contract.Requires(position >= 0)
+            Contract.Requires(position <= 64)
+            Return position = 64 OrElse value >> position = 0
         End Function
     End Module
 End Namespace

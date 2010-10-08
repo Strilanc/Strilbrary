@@ -2,8 +2,8 @@
 
 Namespace Collections
     Public Module CompatibilityExtensions
-        <ContractVerification(False)>
         <Extension()> <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IList(Of T))().IsReadOnly")>
         Public Function AsList(Of T)(ByVal this As IReadableList(Of T)) As IList(Of T)
             Contract.Requires(this IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IList(Of T))() IsNot Nothing)
@@ -70,12 +70,12 @@ Namespace Collections
             Public Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
                 Return _subList.GetEnumerator()
             End Function
-            <ContractVerification(False)>
+            <SuppressMessage("Microsoft.Contracts", "Ensures-43-12")>
             Public Function IndexOf(ByVal item As T) As Integer Implements IList(Of T).IndexOf
                 Return _subList.IndexOf(item)
             End Function
             Default Public Property Item(ByVal index As Integer) As T Implements IList(Of T).Item
-                <ContractVerification(False)>
+                <SuppressMessage("Microsoft.Contracts", "Requires-21-7")>
                 Get
                     Return _subList.Item(index)
                 End Get

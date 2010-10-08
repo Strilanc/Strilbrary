@@ -29,6 +29,7 @@ Namespace Time
             'Avoid creating doubly-relative clocks
             Dim relativeParentClock = TryCast(parentClock, RelativeClock)
             If relativeParentClock IsNot Nothing Then
+                Contract.Assume(relativeParentClock._baseClock IsNot Nothing)
                 Me._baseClock = relativeParentClock._baseClock
                 Me._timeOffsetFromBase += relativeParentClock._timeOffsetFromBase
             End If

@@ -3,7 +3,7 @@
         Public Event UnexpectedException(ByVal exception As Exception, ByVal context As String)
 
         <Extension()>
-        <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate")>
+        <SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate")>
         Public Sub RaiseAsUnexpected(ByVal exception As Exception,
                                      ByVal context As String)
             Contract.Requires(context IsNot Nothing)

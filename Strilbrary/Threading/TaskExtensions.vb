@@ -83,7 +83,7 @@ Namespace Threading
         End Sub
         '''<summary>Causes a task completion source to fault if running an action throws an exception.</summary>
         <Extension()>
-        <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
+        <SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
         Public Sub DependentCall(Of T)(ByVal taskSource As TaskCompletionSource(Of T), ByVal action As action)
             Contract.Requires(taskSource IsNot Nothing)
             Contract.Requires(action IsNot Nothing)

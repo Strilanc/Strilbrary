@@ -8,7 +8,7 @@ Namespace Threading
         ReadOnly Property DisposalTask As Task
 
         <ContractClassFor(GetType(IDisposableWithTask))>
-        <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
+        <SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
         MustInherit Class ContractClass
             Implements IDisposableWithTask
             Public ReadOnly Property DisposalTask As Task Implements IDisposableWithTask.DisposalTask
@@ -17,15 +17,15 @@ Namespace Threading
                     Throw New NotSupportedException
                 End Get
             End Property
-            <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
-            <CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")>
+            <SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
+            <SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")>
             Public Sub Dispose() Implements IDisposable.Dispose
             End Sub
         End Class
     End Interface
 
     '''<summary>A class which makes its future disposal available as a future.</summary>
-    <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
+    <SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
     Public Class DisposableWithTask
         Implements IDisposableWithTask
 
@@ -70,7 +70,7 @@ Namespace Threading
             GC.SuppressFinalize(Me)
         End Sub
         '''<remarks>It is possible for outside references to still exist to _disposalTask.Task when finalization occurs.</remarks>
-        <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
+        <SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")>
         Protected NotOverridable Overrides Sub Finalize()
             Dispose(finalizing:=True)
         End Sub

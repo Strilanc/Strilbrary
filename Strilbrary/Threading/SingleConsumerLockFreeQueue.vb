@@ -4,9 +4,8 @@ Namespace Threading
     ''' <summary>
     ''' A multiple-producer, single-consumer lock-free queue.
     ''' Does NOT guarantee an item has been queued when BeginEnqueue finishes.
-    ''' Does guarantee an item will eventually be queued after BeginEnqueue finishes.
-    ''' Does guarantee that, for calls simultaneously in BeginEnqueue, at least one will finish with its item having been enqueued.
-    ''' Does guarantee that, if BeginEnqueue(Y) is called after BeginEnqueue(X) finishes, Y will follow X in the queue.
+    ''' Guarantees an item will eventually be queued after BeginEnqueue finishes.
+    ''' Guarantees linearizability of enqueues w.r.t. calls to BeginEnqueue.
     ''' </summary>
     ''' <remarks>
     ''' Performance characteristics:
@@ -145,6 +144,7 @@ Namespace Threading
         ''' <summary>
         ''' Iterates over items in the queue.
         ''' Might include items added after enumeration has started.
+        ''' Might include items dequeued after enumeration has started.
         ''' Might not include items BeginEnqueued before enumeration started.
         ''' </summary>
         Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
