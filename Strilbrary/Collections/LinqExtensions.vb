@@ -352,24 +352,17 @@ Namespace Collections
         End Function
         '''<summary>Returns all but the last specified number of items in a sequence, or no items if there are fewer items than the specified number.</summary>
         <Extension()>
-        Public Function SkipLast(Of T)(ByVal sequence As IEnumerable(Of T),
-                                       ByVal count As Integer) As IEnumerable(Of T)
+        Public Iterator Function SkipLast(Of T)(ByVal sequence As IEnumerable(Of T),
+                                                ByVal count As Integer) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(count >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
-            Return New Enumerable(Of T)(
-                Function()
-                    Dim buffer = New Queue(Of T)
-                    '[Warning: Side effects in query. Done this way to enable lazy evaluation without using an entire class.]
-                    '[Note the important () after End Function, causing the function to be evaluated.]
-                    Return (From item In sequence
-                            Where Function()
-                                      buffer.Enqueue(item)
-                                      Return buffer.Count > count
-                                  End Function()
-                            Select buffer.Dequeue()
-                            ).GetEnumerator
-                End Function)
+            Dim tail = New Queue(Of T)(capacity:=count + 1)
+            For Each item In sequence
+                tail.Enqueue(item)
+                If tail.Count <= count Then Continue For
+                Yield tail.Dequeue()
+            Next item
         End Function
 
         ''' <summary>
