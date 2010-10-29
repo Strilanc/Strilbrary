@@ -371,25 +371,18 @@ Namespace Collections
         ''' </summary>
         <ContractVerification(False)>
         <Extension()> <Pure()>
-        Public Function PartialAggregates(Of TValue, TAccumulate)(ByVal sequence As IEnumerable(Of TValue),
-                                                                  ByVal seed As TAccumulate,
-                                                                  ByVal func As Func(Of TAccumulate, TValue, TAccumulate)) As IEnumerable(Of TAccumulate)
+        Public Iterator Function PartialAggregates(Of TValue, TAccumulate)(ByVal sequence As IEnumerable(Of TValue),
+                                                                           ByVal seed As TAccumulate,
+                                                                           ByVal func As Func(Of TAccumulate, TValue, TAccumulate)) As IEnumerable(Of TAccumulate)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TAccumulate))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TAccumulate))().Count = sequence.Count)
-            '[Warning: Side effects in query. Done this way to enable lazy evaluation without using an entire class.]
-            '[Note the important () after End Function, causing the function to be evaluated.]
-            Return New Enumerable(Of TAccumulate)(
-                Function()
-                    Dim accumulator = seed
-                    Return (From item In sequence
-                            Select Function()
-                                       accumulator = func(accumulator, item)
-                                       Return accumulator
-                                   End Function()
-                            ).GetEnumerator
-                End Function)
+            Dim accumulator = seed
+            For Each item In sequence
+                accumulator = func(accumulator, item)
+                Yield accumulator
+            Next item
         End Function
         ''' <summary>
         ''' Zips the sequence with the intermediate results of applying an accumulator function over the sequence.
