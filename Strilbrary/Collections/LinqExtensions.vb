@@ -319,13 +319,21 @@ Namespace Collections
 
         '''<summary>Splits a sequence into continuous segments of a given size (with the last partition possibly being smaller).</summary>
         <Pure()> <Extension()>
-        Public Function Partitioned(Of T)(ByVal sequence As IEnumerable(Of T),
-                                          ByVal partitionSize As Integer) As IEnumerable(Of IEnumerable(Of T))
+        Public Iterator Function Partitioned(Of T)(ByVal sequence As IEnumerable(Of T),
+                                                   ByVal partitionSize As Integer) As IEnumerable(Of IEnumerable(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(partitionSize > 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of IEnumerable(Of T)))() IsNot Nothing)
-            Return sequence.ZipWithIndexes.GroupBy(keySelector:=Function(e) e.Item2 \ partitionSize,
-                                                   elementSelector:=Function(e) e.Item1)
+
+            Dim r = New List(Of T)(capacity:=partitionSize)
+            For Each item In sequence
+                r.Add(item)
+                If r.Count = partitionSize Then
+                    Yield r
+                    r = New List(Of T)(capacity:=partitionSize)
+                End If
+            Next item
+            If r.Count > 0 Then Yield r
         End Function
 
         '''<summary>Returns the last specified number of items in a sequence, or the entire sequence if there are fewer items than the specified number.</summary>
