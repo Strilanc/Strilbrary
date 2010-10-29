@@ -239,46 +239,12 @@ Namespace Collections
         End Function
         '''<summary>Returns a never-ending sequence consisting of a repeated value.</summary>
         <Pure()> <Extension()>
-        Public Function RepeatForever(Of TValue)(ByVal value As TValue) As IEnumerable(Of TValue)
+        Public Iterator Function RepeatForever(Of TValue)(ByVal value As TValue) As IEnumerable(Of TValue)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TValue))() IsNot Nothing)
-            Return New EnumeratorForever(Of TValue)(value)
+            Do
+                Yield value
+            Loop
         End Function
-        Private Class EnumeratorForever(Of T)
-            Implements IEnumerable(Of T)
-            Implements IEnumerator(Of T)
-
-            Private ReadOnly _value As T
-            Public Sub New(ByVal value As T)
-                Me._value = value
-            End Sub
-
-            Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
-                Return New EnumeratorForever(Of T)(_value)
-            End Function
-            Public ReadOnly Property Current As T Implements IEnumerator(Of T).Current
-                Get
-                    Return _value
-                End Get
-            End Property
-            Public Function MoveNext() As Boolean Implements System.Collections.IEnumerator.MoveNext
-                Return True
-            End Function
-
-            Public Sub Dispose() Implements IDisposable.Dispose
-                GC.SuppressFinalize(Me)
-            End Sub
-
-            Public Sub Reset() Implements System.Collections.IEnumerator.Reset
-            End Sub
-            Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
-                Return GetEnumerator()
-            End Function
-            Private ReadOnly Property CurrentObj As Object Implements System.Collections.IEnumerator.Current
-                Get
-                    Return _value
-                End Get
-            End Property
-        End Class
 
         '''<summary>Pads a sequence to a given minimum length.</summary>
         <Pure()> <Extension()>
