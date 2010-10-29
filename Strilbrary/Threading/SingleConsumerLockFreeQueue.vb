@@ -147,13 +147,12 @@ Namespace Threading
         ''' Might include items dequeued after enumeration has started.
         ''' Might not include items BeginEnqueued before enumeration started.
         ''' </summary>
-        Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
+        Public Iterator Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
             Dim cur = head
-            Return New Collections.Enumerator(Of T)(Function(controller)
-                                                        If cur.next Is Nothing Then Return controller.Break
-                                                        cur = cur.next
-                                                        Return cur.value
-                                                    End Function)
+            While cur.next IsNot Nothing
+                Yield cur.value
+                cur = cur.next
+            End While
         End Function
         Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
             Return GetEnumerator()
