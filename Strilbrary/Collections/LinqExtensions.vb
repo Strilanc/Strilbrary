@@ -51,6 +51,13 @@ Namespace Collections
             Contract.Requires(maxCount >= 0)
             Contract.Ensures(Contract.Result(Of Integer)() >= 0)
             Contract.Ensures(Contract.Result(Of Integer)() <= maxCount)
+
+            If TypeOf sequence Is IList(Of T) Then
+                Return Math.Min(maxCount, DirectCast(sequence, IList(Of T)).Count)
+            ElseIf TypeOf sequence Is ISizedEnumerable(Of T) Then
+                Return Math.Min(maxCount, DirectCast(sequence, ISizedEnumerable(Of T)).Count)
+            End If
+
             Dim count = 0
             Dim enumerator = sequence.GetEnumerator()
             While count < maxCount AndAlso enumerator.MoveNext
