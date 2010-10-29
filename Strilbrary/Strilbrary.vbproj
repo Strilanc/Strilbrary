@@ -159,7 +159,6 @@
     <Compile Include="Threading\SingleConsumerLockFreeQueue.vb" />
     <Compile Include="Threading\OneTimeLock.vb" />
     <Compile Include="Collections\ListView.vb" />
-    <Compile Include="Collections\Enumeration.vb" />
     <Compile Include="Streams\ReadOnlyStream.vb" />
     <Compile Include="Streams\WrappedReadOnlyStream.vb" />
     <Compile Include="Threading\ThreadingExtensions.vb" />
