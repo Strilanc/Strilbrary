@@ -301,6 +301,21 @@ Namespace Collections
                                                    elementSelector:=Function(pair) pair.Item1).PaddedTo(sequenceCount)
         End Function
 
+        '''<summary>Selects every nth item in a sequence, starting with the first item.</summary>
+        <Pure()> <Extension()>
+        Public Iterator Function [Step](Of T)(ByVal sequence As IEnumerable(Of T), ByVal stepSize As Integer) As IEnumerable(Of T)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(stepSize > 0)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
+            Dim left = 1
+            For Each item In sequence
+                left -= 1
+                If left > 0 Then Continue For
+                left = stepSize
+                Yield item
+            Next item
+        End Function
+
         '''<summary>Splits a sequence into continuous segments of a given size (with the last partition possibly being smaller).</summary>
         <Pure()> <Extension()>
         Public Function Partitioned(Of T)(ByVal sequence As IEnumerable(Of T),

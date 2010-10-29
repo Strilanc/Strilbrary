@@ -287,4 +287,15 @@ Public Class LinqExtensionsTest
         Assert.IsTrue(New Int32() {}.FirstOrDefault([default]:=5) = 5)
         Assert.IsTrue(New Int32() {}.FirstOrDefault([default]:=6) = 6)
     End Sub
+
+    <TestMethod()>
+    Public Sub StepTest()
+        Assert.IsTrue(5.Range().Step(2).SequenceEqual({0, 2, 4}))
+        Assert.IsTrue(6.Range().Step(2).SequenceEqual({0, 2, 4}))
+        Assert.IsTrue(10.Range().Step(1).SequenceEqual(10.Range()))
+        Assert.IsTrue(New Int32() {}.Step(2).SequenceEqual({}))
+        Assert.IsTrue(New Int32() {}.Step(1).SequenceEqual({}))
+        Assert.IsTrue(5.Range().Step(3).SequenceEqual({0, 3}))
+        Assert.IsTrue(5.Range().Step(4).SequenceEqual({0, 4}))
+    End Sub
 End Class
