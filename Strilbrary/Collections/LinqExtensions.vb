@@ -293,12 +293,13 @@ Namespace Collections
 
         '''<summary>Groups a sequence based on the position of items (modulo the given sequence count).</summary>
         <Pure()> <Extension()>
-        Public Function Deinterleaved(Of T)(ByVal sequence As IEnumerable(Of T), ByVal sequenceCount As Integer) As IEnumerable(Of IEnumerable(Of T))
+        Public Iterator Function Deinterleaved(Of T)(ByVal sequence As IEnumerable(Of T), ByVal sequenceCount As Integer) As IEnumerable(Of IEnumerable(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(sequenceCount > 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of IEnumerable(Of T)))() IsNot Nothing)
-            Return sequence.ZipWithIndexes.GroupBy(keySelector:=Function(pair) pair.Item2 Mod sequenceCount,
-                                                   elementSelector:=Function(pair) pair.Item1).PaddedTo(sequenceCount)
+            For i = 0 To sequenceCount - 1
+                Yield sequence.Skip(i).Step(sequenceCount)
+            Next i
         End Function
 
         '''<summary>Selects every nth item in a sequence, starting with the first item.</summary>
