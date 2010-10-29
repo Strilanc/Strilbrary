@@ -273,24 +273,22 @@ Namespace Collections
         '''<summary>Interleaves the items of multiple sequences into a single sequence.</summary>
         <Pure()> <Extension()>
         <ContractVerification(False)>
-        Public Function Interleaved(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
+        Public Iterator Function Interleaved(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
             Contract.Requires(sequences IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
-            Dim result = New List(Of T)
-            Dim enumerators = (From sequence In sequences Select sequence.GetEnumerator).ToList
-            Dim index = 0
-            Do
-                Contract.Assume(enumerators(index) IsNot Nothing)
-                While Not enumerators(index).MoveNext
-                    enumerators.RemoveAt(index)
-                    If enumerators.Count = 0 Then Exit Do
-                    index = index Mod enumerators.Count
-                End While
 
-                result.Add(enumerators(index).Current)
-                index = (index + 1) Mod enumerators.Count
+            Dim enumerators = (From sequence In sequences
+                               Select sequence.GetEnumerator
+                               ).ToArray
+            Do
+                Dim used = False
+                For Each enumerator In enumerators
+                    If Not enumerator.MoveNext() Then Continue For
+                    used = True
+                    Yield enumerator.Current
+                Next enumerator
+                If Not used Then Exit Do
             Loop
-            Return result
         End Function
 
         '''<summary>Groups a sequence based on the position of items (modulo the given sequence count).</summary>
