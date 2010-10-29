@@ -363,17 +363,20 @@ Namespace Collections
 
         '''<summary>Returns the last specified number of items in a sequence, or the entire sequence if there are fewer items than the specified number.</summary>
         <Extension()>
-        Public Function TakeLast(Of T)(ByVal sequence As IEnumerable(Of T),
-                                       ByVal count As Integer) As IEnumerable(Of T)
+        Public Iterator Function TakeLast(Of T)(ByVal sequence As IEnumerable(Of T),
+                                                ByVal count As Integer) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(count >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
-            Dim result = New Queue(Of T)
+
+            Dim tail = New Queue(Of T)
             For Each item In sequence
-                result.Enqueue(item)
-                If result.Count > count Then result.Dequeue()
+                tail.Enqueue(item)
+                If tail.Count > count Then tail.Dequeue()
             Next item
-            Return result
+            For Each item In tail
+                Yield item
+            Next item
         End Function
         '''<summary>Returns all but the last specified number of items in a sequence, or no items if there are fewer items than the specified number.</summary>
         <Extension()>
