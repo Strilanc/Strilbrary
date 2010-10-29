@@ -246,6 +246,23 @@ Namespace Collections
             Loop
         End Function
 
+        '''<summary>Enumerates all contiguous subsequences of the given size from the given sequence.</summary>
+        <Pure()> <Extension()>
+        Public Iterator Function Roll(Of T)(ByVal sequence As IEnumerable(Of T), ByVal windowSize As Integer) As IEnumerable(Of IReadableList(Of T))
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(windowSize > 0)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of IReadableList(Of T)))() IsNot Nothing)
+
+            Dim window = New Queue(Of T)(capacity:=windowSize)
+            For Each item In sequence
+                window.Enqueue(item)
+                If window.Count >= windowSize Then
+                    Yield window.ToReadableList()
+                    window.Dequeue()
+                End If
+            Next item
+        End Function
+
         '''<summary>Pads a sequence to a given minimum length.</summary>
         <Pure()> <Extension()>
         Public Function PaddedTo(Of T)(ByVal sequence As IEnumerable(Of T),

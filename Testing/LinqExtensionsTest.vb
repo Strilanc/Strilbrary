@@ -13,6 +13,9 @@ Public Class LinqExtensionsTest
     Private Function SequenceSequenceEqual(Of T)(ByVal s1 As IEnumerable(Of IEnumerable(Of T)), ByVal s2 As IEnumerable(Of IEnumerable(Of T))) As Boolean
         Return Enumerable.Zip(s1, s2, Function(e1, e2) e1.SequenceEqual(e2)).All(Function(x) x)
     End Function
+    Private Function Array(Of T)(ByVal ParamArray vals() As T) As T()
+        Return vals
+    End Function
 
     <TestMethod()>
     Public Sub NoneTest()
@@ -297,5 +300,13 @@ Public Class LinqExtensionsTest
         Assert.IsTrue(New Int32() {}.Step(1).SequenceEqual({}))
         Assert.IsTrue(5.Range().Step(3).SequenceEqual({0, 3}))
         Assert.IsTrue(5.Range().Step(4).SequenceEqual({0, 4}))
+    End Sub
+
+    <TestMethod()>
+    Public Sub RollTest()
+        Assert.IsTrue(SequenceSequenceEqual(Of Int32)(5.Range().Roll(2), Array({0, 1}, {1, 2}, {2, 3}, {3, 4})))
+        Assert.IsTrue(SequenceSequenceEqual(Of Int32)(5.Range().Roll(1), Array({0}, {1}, {2}, {3}, {4})))
+        Assert.IsTrue(SequenceSequenceEqual(Of Int32)(5.Range().Roll(6), Array(Of Int32())()))
+        Assert.IsTrue(SequenceSequenceEqual(Of Int32)(5.Range().Roll(5), Array(5.Range())))
     End Sub
 End Class
