@@ -265,13 +265,21 @@ Namespace Collections
 
         '''<summary>Pads a sequence to a given minimum length.</summary>
         <Pure()> <Extension()>
-        Public Function PaddedTo(Of T)(ByVal sequence As IEnumerable(Of T),
-                                       ByVal minimumCount As Integer,
-                                       Optional ByVal paddingValue As T = Nothing) As IEnumerable(Of T)
+        Public Iterator Function PaddedTo(Of T)(ByVal sequence As IEnumerable(Of T),
+                                                ByVal minimumCount As Integer,
+                                                Optional ByVal paddingValue As T = Nothing) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(minimumCount >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
-            Return sequence.Concat(paddingValue.Repeated(Math.Max(0, minimumCount - sequence.Count)))
+            Dim count = 0
+            For Each item In sequence
+                count += 1
+                Yield item
+            Next item
+            While count < minimumCount
+                count += 1
+                Yield paddingValue
+            End While
         End Function
 
         '''<summary>Determines the positions of items in the sequence equivalent to the given value.</summary>
