@@ -52,11 +52,10 @@ Namespace Collections
             Contract.Ensures(Contract.Result(Of Integer)() >= 0)
             Contract.Ensures(Contract.Result(Of Integer)() <= maxCount)
 
-            If TypeOf sequence Is IList(Of T) Then
-                Return Math.Min(maxCount, DirectCast(sequence, IList(Of T)).Count)
-            ElseIf TypeOf sequence Is ISizedEnumerable(Of T) Then
-                Return Math.Min(maxCount, DirectCast(sequence, ISizedEnumerable(Of T)).Count)
-            End If
+            Dim list = TryCast(sequence, IList(Of T))
+            If list IsNot Nothing Then Return Math.Min(maxCount, list.Count)
+            Dim sized = TryCast(sequence, ISizedEnumerable(Of T))
+            If sized IsNot Nothing Then Return Math.Min(maxCount, sized.Count)
 
             Dim count = 0
             Dim enumerator = sequence.GetEnumerator()
@@ -246,47 +245,57 @@ Namespace Collections
         End Function
         '''<summary>Returns a never-ending sequence consisting of a repeated value.</summary>
         <Pure()> <Extension()>
-        Public Iterator Function RepeatForever(Of TValue)(ByVal value As TValue) As IEnumerable(Of TValue)
+        <ContractVerification(False)>
+        Public Function RepeatForever(Of TValue)(ByVal value As TValue) As IEnumerable(Of TValue)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TValue))() IsNot Nothing)
-            Do
-                Yield value
-            Loop
+            Return Iterator Function()
+                       Do
+                           Yield value
+                       Loop
+                   End Function()
         End Function
 
         '''<summary>Enumerates all contiguous subsequences of the given size from the given sequence.</summary>
         <Pure()> <Extension()>
-        Public Iterator Function Roll(Of T)(ByVal sequence As IEnumerable(Of T), ByVal windowSize As Integer) As IEnumerable(Of IReadableList(Of T))
+        <ContractVerification(False)>
+        Public Function Roll(Of T)(ByVal sequence As IEnumerable(Of T), ByVal windowSize As Integer) As IEnumerable(Of IReadableList(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(windowSize > 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of IReadableList(Of T)))() IsNot Nothing)
 
-            Dim window = New Queue(Of T)(capacity:=windowSize)
-            For Each item In sequence
-                window.Enqueue(item)
-                If window.Count >= windowSize Then
-                    Yield window.ToReadableList()
-                    window.Dequeue()
-                End If
-            Next item
+            Return Iterator Function()
+                       Dim rollingWindow = New Queue(Of T)(capacity:=windowSize)
+                       For Each item In sequence
+                           rollingWindow.Enqueue(item)
+                           If rollingWindow.Count >= windowSize Then
+                               Yield rollingWindow.ToReadableList()
+                               rollingWindow.Dequeue()
+                           End If
+                       Next item
+                   End Function()
         End Function
 
         '''<summary>Pads a sequence to a given minimum length.</summary>
         <Pure()> <Extension()>
-        Public Iterator Function PaddedTo(Of T)(ByVal sequence As IEnumerable(Of T),
-                                                ByVal minimumCount As Integer,
-                                                Optional ByVal paddingValue As T = Nothing) As IEnumerable(Of T)
+        <ContractVerification(False)>
+        Public Function PaddedTo(Of T)(ByVal sequence As IEnumerable(Of T),
+                                       ByVal minimumCount As Integer,
+                                       Optional ByVal paddingValue As T = Nothing) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(minimumCount >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
-            Dim count = 0
-            For Each item In sequence
-                count += 1
-                Yield item
-            Next item
-            While count < minimumCount
-                count += 1
-                Yield paddingValue
-            End While
+
+            Return Iterator Function()
+                       Dim count = 0
+                       For Each item In sequence
+                           count += 1
+                           Yield item
+                       Next item
+                       While count < minimumCount
+                           count += 1
+                           Yield paddingValue
+                       End While
+                   End Function()
         End Function
 
         '''<summary>Determines the positions of items in the sequence equivalent to the given value.</summary>
@@ -305,73 +314,86 @@ Namespace Collections
         '''<summary>Interleaves the items of multiple sequences into a single sequence.</summary>
         <Pure()> <Extension()>
         <ContractVerification(False)>
-        Public Iterator Function Interleaved(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
+        Public Function Interleaved(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
             Contract.Requires(sequences IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
 
-            Dim enumerators = (From sequence In sequences
-                               Select sequence.GetEnumerator
-                               ).ToArray
-            Do
-                Dim used = False
-                For Each enumerator In enumerators
-                    If Not enumerator.MoveNext() Then Continue For
-                    used = True
-                    Yield enumerator.Current
-                Next enumerator
-                If Not used Then Exit Do
-            Loop
+            Return Iterator Function()
+                       Dim enumerators = (From sequence In sequences
+                                          Select sequence.GetEnumerator
+                                          ).ToArray
+                       Do
+                           Dim used = False
+                           For Each enumerator In enumerators
+                               If Not enumerator.MoveNext() Then Continue For
+                               used = True
+                               Yield enumerator.Current
+                           Next enumerator
+                           If Not used Then Exit Do
+                       Loop
+                   End Function()
         End Function
 
         '''<summary>Groups a sequence based on the position of items (modulo the given sequence count).</summary>
         <Pure()> <Extension()>
-        Public Iterator Function Deinterleaved(Of T)(ByVal sequence As IEnumerable(Of T), ByVal sequenceCount As Integer) As IEnumerable(Of IEnumerable(Of T))
+        <ContractVerification(False)>
+        Public Function Deinterleaved(Of T)(ByVal sequence As IEnumerable(Of T), ByVal sequenceCount As Integer) As IEnumerable(Of IEnumerable(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(sequenceCount > 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of IEnumerable(Of T)))() IsNot Nothing)
-            For i = 0 To sequenceCount - 1
-                Yield sequence.Skip(i).Step(sequenceCount)
-            Next i
+
+            Return Iterator Function()
+                       For i = 0 To sequenceCount - 1
+                           Yield sequence.Skip(i).Step(sequenceCount)
+                       Next i
+                   End Function()
         End Function
 
         '''<summary>Selects every nth item in a sequence, starting with the first item.</summary>
         <Pure()> <Extension()>
-        Public Iterator Function [Step](Of T)(ByVal sequence As IEnumerable(Of T), ByVal stepSize As Integer) As IEnumerable(Of T)
+        <ContractVerification(False)>
+        Public Function [Step](Of T)(ByVal sequence As IEnumerable(Of T), ByVal stepSize As Integer) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(stepSize > 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
-            Dim left = 1
-            For Each item In sequence
-                left -= 1
-                If left > 0 Then Continue For
-                left = stepSize
-                Yield item
-            Next item
+
+            Return Iterator Function()
+                       Dim left = 1
+                       For Each item In sequence
+                           left -= 1
+                           If left > 0 Then Continue For
+                           left = stepSize
+                           Yield item
+                       Next item
+                   End Function()
         End Function
 
         '''<summary>Splits a sequence into continuous segments of a given size (with the last partition possibly being smaller).</summary>
         <Pure()> <Extension()>
-        Public Iterator Function Partitioned(Of T)(ByVal sequence As IEnumerable(Of T),
-                                                   ByVal partitionSize As Integer) As IEnumerable(Of IEnumerable(Of T))
+        <ContractVerification(False)>
+        Public Function Partitioned(Of T)(ByVal sequence As IEnumerable(Of T),
+                                          ByVal partitionSize As Integer) As IEnumerable(Of IEnumerable(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(partitionSize > 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of IEnumerable(Of T)))() IsNot Nothing)
 
-            Dim r = New List(Of T)(capacity:=partitionSize)
-            For Each item In sequence
-                r.Add(item)
-                If r.Count = partitionSize Then
-                    Yield r
-                    r = New List(Of T)(capacity:=partitionSize)
-                End If
-            Next item
-            If r.Count > 0 Then Yield r
+            Return Iterator Function()
+                       Dim r = New List(Of T)(capacity:=partitionSize)
+                       For Each item In sequence
+                           r.Add(item)
+                           If r.Count = partitionSize Then
+                               Yield r
+                               r = New List(Of T)(capacity:=partitionSize)
+                           End If
+                       Next item
+                       If r.Count > 0 Then Yield r
+                   End Function()
         End Function
 
         '''<summary>Returns the last specified number of items in a sequence, or the entire sequence if there are fewer items than the specified number.</summary>
         <Extension()>
-        Public Iterator Function TakeLast(Of T)(ByVal sequence As IEnumerable(Of T),
-                                                ByVal count As Integer) As IEnumerable(Of T)
+        Public Function TakeLast(Of T)(ByVal sequence As IEnumerable(Of T),
+                                       ByVal count As Integer) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(count >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
@@ -381,23 +403,25 @@ Namespace Collections
                 tail.Enqueue(item)
                 If tail.Count > count Then tail.Dequeue()
             Next item
-            For Each item In tail
-                Yield item
-            Next item
+            Return tail
         End Function
         '''<summary>Returns all but the last specified number of items in a sequence, or no items if there are fewer items than the specified number.</summary>
         <Extension()>
-        Public Iterator Function SkipLast(Of T)(ByVal sequence As IEnumerable(Of T),
-                                                ByVal count As Integer) As IEnumerable(Of T)
+        <ContractVerification(False)>
+        Public Function SkipLast(Of T)(ByVal sequence As IEnumerable(Of T),
+                                       ByVal count As Integer) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(count >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
-            Dim tail = New Queue(Of T)(capacity:=count + 1)
-            For Each item In sequence
-                tail.Enqueue(item)
-                If tail.Count <= count Then Continue For
-                Yield tail.Dequeue()
-            Next item
+
+            Return Iterator Function()
+                       Dim tail = New Queue(Of T)(capacity:=count + 1)
+                       For Each item In sequence
+                           tail.Enqueue(item)
+                           If tail.Count <= count Then Continue For
+                           Yield tail.Dequeue()
+                       Next item
+                   End Function()
         End Function
 
         ''' <summary>
@@ -406,18 +430,21 @@ Namespace Collections
         ''' </summary>
         <ContractVerification(False)>
         <Extension()> <Pure()>
-        Public Iterator Function PartialAggregates(Of TValue, TAccumulate)(ByVal sequence As IEnumerable(Of TValue),
-                                                                           ByVal seed As TAccumulate,
-                                                                           ByVal func As Func(Of TAccumulate, TValue, TAccumulate)) As IEnumerable(Of TAccumulate)
+        Public Function PartialAggregates(Of TValue, TAccumulate)(ByVal sequence As IEnumerable(Of TValue),
+                                                                  ByVal seed As TAccumulate,
+                                                                  ByVal func As Func(Of TAccumulate, TValue, TAccumulate)) As IEnumerable(Of TAccumulate)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TAccumulate))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TAccumulate))().Count = sequence.Count)
-            Dim accumulator = seed
-            For Each item In sequence
-                accumulator = func(accumulator, item)
-                Yield accumulator
-            Next item
+
+            Return Iterator Function()
+                       Dim accumulator = seed
+                       For Each item In sequence
+                           accumulator = func(accumulator, item)
+                           Yield accumulator
+                       Next item
+                   End Function()
         End Function
         ''' <summary>
         ''' Zips the sequence with the intermediate results of applying an accumulator function over the sequence.

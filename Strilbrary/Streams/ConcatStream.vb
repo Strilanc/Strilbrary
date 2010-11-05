@@ -2,6 +2,9 @@ Imports Strilbrary.Collections
 
 Namespace Streams
     '''<summary>A read-only stream which reads through the contents of multiple readable streams.</summary>
+    ''' 
+    '''<remarks>Enabling verification causes weird notices to appear (without any associated location, making it hard to track down).</remarks>
+    <ContractVerification(False)>
     Public NotInheritable Class ConcatStream
         Implements IReadableStream
         Private ReadOnly _streams As IEnumerator(Of IReadableStream)
@@ -40,6 +43,7 @@ Namespace Streams
             Return result.AsReadableList
         End Function
 
+        <ContractVerification(False)>
         Public Sub Dispose() Implements IDisposable.Dispose
             Do Until _emptied
                 Contract.Assume(_streams.Current IsNot Nothing)
