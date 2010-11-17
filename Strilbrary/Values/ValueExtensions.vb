@@ -22,6 +22,15 @@ Namespace Values
             Contract.Requires(value IsNot Nothing)
             Return New NonNull(Of T)(value)
         End Function
+        '''<summary>Exposes a sequence's underlying non-null values as a sequence.</summary>
+        <Pure()> <Extension()>
+        <ContractVerification(False)>
+        Public Function Values(Of T)(ByVal sequence As IEnumerable(Of NonNull(Of T))) As IEnumerable(Of T)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.ForAll(Contract.Result(Of IEnumerable(Of T))(), Function(e) e IsNot Nothing))
+            Return From e In sequence Select e.Value
+        End Function
 
         '''<summary>Combines a key and value into a KeyValuePair.</summary>
         <Pure()> <Extension()>
