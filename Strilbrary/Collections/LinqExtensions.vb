@@ -2,7 +2,6 @@
 
 Namespace Collections
     Public Module LinqExtensions
-#Region "Count"
         '''<summary>Determines if a sequence has no elements.</summary>
         <Extension()> <Pure()>
         Public Function None(Of T)(ByVal sequence As IEnumerable(Of T)) As Boolean
@@ -10,61 +9,13 @@ Namespace Collections
             Return Not sequence.Any()
         End Function
 
-        '''<summary>Determines if there are at least as many elements in the sequence as the specified minimum.</summary>
+        '''<summary>Returns a <see cref="LazyCounter" /> for the number of elements in the given sequence.</summary>
         <Extension()> <Pure()>
-        Public Function CountIsAtLeast(Of T)(ByVal sequence As IEnumerable(Of T), ByVal min As Integer) As Boolean
+        Public Function LazyCount(ByVal sequence As IEnumerable) As LazyCounter
             Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(min >= 0)
-            Return sequence.CountUpTo(min) >= min
+            Contract.Ensures(Contract.Result(Of LazyCounter)() IsNot Nothing)
+            Return New LazyCounter(sequence.GetEnumerator())
         End Function
-
-        '''<summary>Determines if there are less elements in the sequence than the specified maximum.</summary>
-        <Extension()> <Pure()>
-        Public Function CountIsLessThan(Of T)(ByVal sequence As IEnumerable(Of T), ByVal max As Integer) As Boolean
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(max >= 0)
-            Return sequence.CountUpTo(max) < max
-        End Function
-
-        '''<summary>Determines if there are at most as many elements in the sequence as the specified maximum.</summary>
-        <Extension()> <Pure()>
-        Public Function CountIsAtMost(Of T)(ByVal sequence As IEnumerable(Of T), ByVal max As Integer) As Boolean
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(max >= 0)
-            Contract.Requires(max < Int32.MaxValue)
-            Return sequence.CountUpTo(max + 1) <= max
-        End Function
-
-        '''<summary>Determines if there are more elements in the sequence than the specified minimum.</summary>
-        <Extension()> <Pure()>
-        Public Function CountIsGreaterThan(Of T)(ByVal sequence As IEnumerable(Of T), ByVal min As Integer) As Boolean
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(min >= 0)
-            Contract.Requires(min < Int32.MaxValue)
-            Return sequence.CountUpTo(min + 1) > min
-        End Function
-
-        '''<summary>Counts the number of elements in a sequence, but stops once the specified maximum is reached.</summary>
-        <Extension()> <Pure()>
-        Public Function CountUpTo(Of T)(ByVal sequence As IEnumerable(Of T), ByVal maxCount As Integer) As Integer
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Requires(maxCount >= 0)
-            Contract.Ensures(Contract.Result(Of Integer)() >= 0)
-            Contract.Ensures(Contract.Result(Of Integer)() <= maxCount)
-
-            Dim list = TryCast(sequence, IList(Of T))
-            If list IsNot Nothing Then Return Math.Min(maxCount, list.Count)
-            Dim sized = TryCast(sequence, ISizedEnumerable(Of T))
-            If sized IsNot Nothing Then Return Math.Min(maxCount, sized.Count)
-
-            Dim count = 0
-            Dim enumerator = sequence.GetEnumerator()
-            While count < maxCount AndAlso enumerator.MoveNext
-                count += 1
-            End While
-            Return count
-        End Function
-#End Region
 
 #Region "Min/Max"
         '''<summary>Determines the maximum element in a sequence based on the given comparison function.</summary>

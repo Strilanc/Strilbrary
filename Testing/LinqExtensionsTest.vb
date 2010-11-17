@@ -10,6 +10,8 @@ Public Class LinqExtensionsTest
     Private Shared ReadOnly L0() As Int32 = {}
     Private Shared ReadOnly L1() As Int32 = {1}
     Private Shared ReadOnly L2() As Int32 = {1, 2}
+    Private Shared ReadOnly LInf As IEnumerable(Of Int32) = Strilbrary.Collections.RepeatForever(0)
+
     Private Function SequenceSequenceEqual(Of T)(ByVal s1 As IEnumerable(Of IEnumerable(Of T)), ByVal s2 As IEnumerable(Of IEnumerable(Of T))) As Boolean
         Return Enumerable.Zip(s1, s2, Function(e1, e2) e1.SequenceEqual(e2)).All(Function(x) x)
     End Function
@@ -25,64 +27,69 @@ Public Class LinqExtensionsTest
     End Sub
 
     <TestMethod()>
-    Public Sub CountIsAtLeastTest()
-        Assert.IsTrue(L0.CountIsAtLeast(0))
-        Assert.IsTrue(Not L0.CountIsAtLeast(1))
-        Assert.IsTrue(Not L0.CountIsAtLeast(2))
-        Assert.IsTrue(L1.CountIsAtLeast(0))
-        Assert.IsTrue(L1.CountIsAtLeast(1))
-        Assert.IsTrue(Not L1.CountIsAtLeast(2))
-        Assert.IsTrue(L2.CountIsAtLeast(0))
-        Assert.IsTrue(L2.CountIsAtLeast(1))
-        Assert.IsTrue(L2.CountIsAtLeast(2))
-    End Sub
-    <TestMethod()>
-    Public Sub CountIsAtLessThanTest()
-        Assert.IsTrue(Not L0.CountIsLessThan(0))
-        Assert.IsTrue(L0.CountIsLessThan(1))
-        Assert.IsTrue(L0.CountIsLessThan(2))
-        Assert.IsTrue(Not L1.CountIsLessThan(0))
-        Assert.IsTrue(Not L1.CountIsLessThan(1))
-        Assert.IsTrue(L1.CountIsLessThan(2))
-        Assert.IsTrue(Not L2.CountIsLessThan(0))
-        Assert.IsTrue(Not L2.CountIsLessThan(1))
-        Assert.IsTrue(Not L2.CountIsLessThan(2))
-    End Sub
-    <TestMethod()>
-    Public Sub CountIsAtMostTest()
-        Assert.IsTrue(L0.CountIsAtMost(0))
-        Assert.IsTrue(L0.CountIsAtMost(1))
-        Assert.IsTrue(L0.CountIsAtMost(2))
-        Assert.IsTrue(Not L1.CountIsAtMost(0))
-        Assert.IsTrue(L1.CountIsAtMost(1))
-        Assert.IsTrue(L1.CountIsAtMost(2))
-        Assert.IsTrue(Not L2.CountIsAtMost(0))
-        Assert.IsTrue(Not L2.CountIsAtMost(1))
-        Assert.IsTrue(L2.CountIsAtMost(2))
-    End Sub
-    <TestMethod()>
-    Public Sub CountIsGreaterThanTest()
-        Assert.IsTrue(Not L0.CountIsGreaterThan(0))
-        Assert.IsTrue(Not L0.CountIsGreaterThan(1))
-        Assert.IsTrue(Not L0.CountIsGreaterThan(2))
-        Assert.IsTrue(L1.CountIsGreaterThan(0))
-        Assert.IsTrue(Not L1.CountIsGreaterThan(1))
-        Assert.IsTrue(Not L1.CountIsGreaterThan(2))
-        Assert.IsTrue(L2.CountIsGreaterThan(0))
-        Assert.IsTrue(L2.CountIsGreaterThan(1))
-        Assert.IsTrue(Not L2.CountIsGreaterThan(2))
-    End Sub
-    <TestMethod()>
-    Public Sub CountUpToTest()
-        Assert.IsTrue(L0.CountUpTo(0) = 0)
-        Assert.IsTrue(L0.CountUpTo(1) = 0)
-        Assert.IsTrue(L0.CountUpTo(2) = 0)
-        Assert.IsTrue(L1.CountUpTo(0) = 0)
-        Assert.IsTrue(L1.CountUpTo(1) = 1)
-        Assert.IsTrue(L1.CountUpTo(2) = 1)
-        Assert.IsTrue(L2.CountUpTo(0) = 0)
-        Assert.IsTrue(L2.CountUpTo(1) = 1)
-        Assert.IsTrue(L2.CountUpTo(2) = 2)
+    Public Sub LazyCountTest()
+        Assert.IsTrue(LInf.LazyCount() >= 5)
+        Assert.IsTrue(Not LInf.LazyCount() < 52)
+
+        Assert.IsTrue(L0.LazyCount() >= 0)
+        Assert.IsTrue(Not L0.LazyCount() >= 1)
+        Assert.IsTrue(Not L0.LazyCount() >= 2)
+        Assert.IsTrue(L1.LazyCount() >= 0)
+        Assert.IsTrue(L1.LazyCount() >= 1)
+        Assert.IsTrue(Not L1.LazyCount() >= 2)
+        Assert.IsTrue(L2.LazyCount() >= 0)
+        Assert.IsTrue(L2.LazyCount() >= 1)
+        Assert.IsTrue(L2.LazyCount() >= 2)
+
+        Assert.IsTrue(Not L0.LazyCount() < 0)
+        Assert.IsTrue(L0.LazyCount() < 1)
+        Assert.IsTrue(L0.LazyCount() < 2)
+        Assert.IsTrue(Not L1.LazyCount() < 0)
+        Assert.IsTrue(Not L1.LazyCount() < 1)
+        Assert.IsTrue(L1.LazyCount() < 2)
+        Assert.IsTrue(Not L2.LazyCount() < 0)
+        Assert.IsTrue(Not L2.LazyCount() < 1)
+        Assert.IsTrue(Not L2.LazyCount() < 2)
+
+        Assert.IsTrue(L0.LazyCount() <= 0)
+        Assert.IsTrue(L0.LazyCount() <= 1)
+        Assert.IsTrue(L0.LazyCount() <= 2)
+        Assert.IsTrue(Not L1.LazyCount() <= 0)
+        Assert.IsTrue(L1.LazyCount() <= 1)
+        Assert.IsTrue(L1.LazyCount() <= 2)
+        Assert.IsTrue(Not L2.LazyCount() <= 0)
+        Assert.IsTrue(Not L2.LazyCount() <= 1)
+        Assert.IsTrue(L2.LazyCount() <= 2)
+
+        Assert.IsTrue(Not L0.LazyCount() > 0)
+        Assert.IsTrue(Not L0.LazyCount() > 1)
+        Assert.IsTrue(Not L0.LazyCount() > 2)
+        Assert.IsTrue(L1.LazyCount() > 0)
+        Assert.IsTrue(Not L1.LazyCount() > 1)
+        Assert.IsTrue(Not L1.LazyCount() > 2)
+        Assert.IsTrue(L2.LazyCount() > 0)
+        Assert.IsTrue(L2.LazyCount() > 1)
+        Assert.IsTrue(Not L2.LazyCount() > 2)
+
+        Assert.IsTrue(L0.LazyCount().CountTo(0) = 0)
+        Assert.IsTrue(L0.LazyCount().CountTo(1) = 0)
+        Assert.IsTrue(L0.LazyCount().CountTo(2) = 0)
+        Assert.IsTrue(L1.LazyCount().CountTo(0) = 0)
+        Assert.IsTrue(L1.LazyCount().CountTo(1) = 1)
+        Assert.IsTrue(L1.LazyCount().CountTo(2) = 1)
+        Assert.IsTrue(L2.LazyCount().CountTo(0) = 0)
+        Assert.IsTrue(L2.LazyCount().CountTo(1) = 1)
+        Assert.IsTrue(L2.LazyCount().CountTo(2) = 2)
+
+        Assert.IsTrue(L0.LazyCount().CountPast(0) = 0)
+        Assert.IsTrue(L0.LazyCount().CountPast(1) = 0)
+        Assert.IsTrue(L0.LazyCount().CountPast(2) = 0)
+        Assert.IsTrue(L1.LazyCount().CountPast(0) = 1)
+        Assert.IsTrue(L1.LazyCount().CountPast(1) = 1)
+        Assert.IsTrue(L1.LazyCount().CountPast(2) = 1)
+        Assert.IsTrue(L2.LazyCount().CountPast(0) = 1)
+        Assert.IsTrue(L2.LazyCount().CountPast(1) = 2)
+        Assert.IsTrue(L2.LazyCount().CountPast(2) = 2)
     End Sub
 
     <TestMethod()>
