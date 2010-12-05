@@ -386,5 +386,26 @@ Namespace Streams
             Contract.Ensures(Contract.Result(Of IReadableStream)() IsNot Nothing)
             Return New EnumeratorStream(sequence)
         End Function
+
+        '''<summary>A ZLibStream is a DeflateStream with two magic bytes preceding the compressed data.</summary>
+        Public Function MakeZLibStream(ByVal stream As IO.Stream,
+                                       ByVal mode As IO.Compression.CompressionMode,
+                                       Optional ByVal leaveOpen As Boolean = False) As IO.Stream
+            Contract.Requires(stream IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
+
+            Select Case mode
+                Case IO.Compression.CompressionMode.Decompress
+                    stream.ReadByte()
+                    stream.ReadByte()
+                Case IO.Compression.CompressionMode.Compress
+                    stream.WriteByte(120)
+                    stream.WriteByte(156)
+                Case Else
+                    Throw mode.MakeArgumentValueException("mode")
+            End Select
+
+            Return New IO.Compression.DeflateStream(stream, mode, leaveOpen)
+        End Function
     End Module
 End Namespace

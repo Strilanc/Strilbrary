@@ -160,8 +160,6 @@
     <Compile Include="Threading\SingleConsumerLockFreeQueue.vb" />
     <Compile Include="Threading\OneTimeLock.vb" />
     <Compile Include="Collections\ListView.vb" />
-    <Compile Include="Streams\ReadOnlyStream.vb" />
-    <Compile Include="Streams\WrappedReadOnlyStream.vb" />
     <Compile Include="Threading\ThreadingExtensions.vb" />
     <Compile Include="Threading\CallQueue.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -181,8 +179,6 @@
     </Compile>
     <Compile Include="Values\NumericExtensions.vb" />
     <Compile Include="Streams\ConcatStream.vb" />
-    <Compile Include="Streams\WrappedStream.vb" />
-    <Compile Include="Streams\ZLibStream.vb" />
     <Compile Include="Threading\DisposableWithTask.vb" />
     <Compile Include="Collections\LinqListExtensions.vb" />
   </ItemGroup>
