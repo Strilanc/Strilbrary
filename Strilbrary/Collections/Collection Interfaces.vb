@@ -1,9 +1,14 @@
 ﻿Namespace Collections
-    '''<summary>An IEnumerable with a specified size.</summary>
-    <ContractClass(GetType(ISizedEnumerableContractClass(Of )))>
+    '''<summary>An object with a specified count.</summary>
+    <ContractClass(GetType(ICountedContractClass))>
+    Public Interface ICounted
+        ReadOnly Property Count As Integer
+    End Interface
+
+    '''<summary>An IEnumerable with a known finite count.</summary>
     Public Interface ISizedEnumerable(Of Out T)
         Inherits IEnumerable(Of T)
-        ReadOnly Property Count As Integer
+        Inherits ICounted
     End Interface
 
     '''<summary>An IEnumerable with a specified method to get items at given offsets.</summary>
@@ -28,21 +33,15 @@
         Function IndexOf(ByVal item As T) As Integer
     End Interface
 
-    <ContractClassFor(GetType(ISizedEnumerable(Of )))>
-    Public MustInherit Class ISizedEnumerableContractClass(Of T)
-        Implements ISizedEnumerable(Of T)
-        Public ReadOnly Property Count As Integer Implements ISizedEnumerable(Of T).Count
+    <ContractClassFor(GetType(ICounted))>
+    Public MustInherit Class ICountedContractClass
+        Implements ICounted
+        Public ReadOnly Property Count As Integer Implements ICounted.Count
             Get
                 Contract.Ensures(Contract.Result(Of Integer)() >= 0)
                 Throw New NotSupportedException
             End Get
         End Property
-        Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
-            Throw New NotSupportedException
-        End Function
-        Public Function GetEnumeratorObj() As System.Collections.IEnumerator Implements IEnumerable.GetEnumerator
-            Throw New NotSupportedException
-        End Function
     End Class
     <ContractClassFor(GetType(IIndexedEnumerable(Of )))>
     Public MustInherit Class IIndexedEnumerableContractClass(Of T)

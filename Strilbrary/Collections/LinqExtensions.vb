@@ -11,9 +11,15 @@ Namespace Collections
 
         '''<summary>Returns a <see cref="LazyCounter" /> for the number of elements in the given sequence.</summary>
         <Extension()> <Pure()>
-        Public Function LazyCount(ByVal sequence As IEnumerable) As LazyCounter
+        Public Function LazyCount(Of T)(ByVal sequence As IEnumerable(Of T)) As LazyCounter
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of LazyCounter)() IsNot Nothing)
+
+            Dim list = TryCast(sequence, IList(Of T))
+            If list IsNot Nothing Then Return list.Count
+            Dim counted = TryCast(sequence, ICounted)
+            If counted IsNot Nothing Then Return counted.Count
+
             Return New LazyCounter(sequence.GetEnumerator())
         End Function
 
@@ -211,7 +217,7 @@ Namespace Collections
 
         '''<summary>Enumerates all contiguous subsequences of the given size from the given sequence.</summary>
         <Pure()> <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of IReadableList(Of T)))() IsNot Nothing")>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of IRist(Of T)))() IsNot Nothing")>
         Public Function Roll(Of T)(ByVal sequence As IEnumerable(Of T), ByVal windowSize As Integer) As IEnumerable(Of IRist(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(windowSize > 0)
