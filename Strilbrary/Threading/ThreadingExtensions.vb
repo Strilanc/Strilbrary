@@ -2,7 +2,7 @@
 Imports Strilbrary.Values
 
 Namespace Threading
-    'Verification disabled due to missing task contracts
+    '''<remarks>Verification disabled due to missing task contracts</remarks>
     <ContractVerification(False)>
     Public Module ThreadingExtensions
         '''<summary>Determines a task for running an action in a new thread.</summary>

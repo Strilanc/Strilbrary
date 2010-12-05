@@ -25,10 +25,10 @@
         End Sub
 
         Public ReadOnly Property Bits As UInt64
-            <ContractVerification(False)>
             Get
                 Contract.Ensures(Contract.Result(Of UInt64)().HasNoBitsSetAbovePosition(BitCount))
                 Contract.Ensures(Contract.Result(Of UInt64)() = _bits)
+                Contract.Assume(_bits.HasNoBitsSetAbovePosition(BitCount))
                 Return _bits
             End Get
         End Property
@@ -42,25 +42,27 @@
         End Property
 
         Public ReadOnly Property LowPart(ByVal splitIndex As Integer) As BitWord64
-            <ContractVerification(False)>
             Get
                 Contract.Requires(splitIndex >= 0)
                 Contract.Requires(splitIndex <= MaxSize)
                 Contract.Requires(splitIndex <= Me.BitCount)
                 Contract.Ensures(Contract.Result(Of BitWord64)().BitCount = splitIndex)
                 If splitIndex = Me.BitCount Then Return Me
-                Return New BitWord64(_bits And (1UL << splitIndex) - 1UL, splitIndex)
+                Dim bits = _bits And (1UL << splitIndex) - 1UL
+                Contract.Assume(bits.HasNoBitsSetAbovePosition(splitIndex))
+                Return New BitWord64(Bits, splitIndex)
             End Get
         End Property
         Public ReadOnly Property HighPart(ByVal splitIndex As Integer) As BitWord64
-            <ContractVerification(False)>
             Get
                 Contract.Requires(splitIndex >= 0)
                 Contract.Requires(splitIndex <= MaxSize)
                 Contract.Requires(splitIndex <= Me.BitCount)
                 Contract.Ensures(Contract.Result(Of BitWord64)().BitCount = Me.BitCount - splitIndex)
-                If splitIndex = Me.BitCount Then Return New BitWord64(0, 0)
-                Return New BitWord64(_bits >> splitIndex, Me.BitCount - splitIndex)
+                If splitIndex = Me.BitCount Then Return New BitWord64()
+                Dim bits = _bits >> splitIndex
+                Contract.Assume(bits.HasNoBitsSetAbovePosition(Me.BitCount - splitIndex))
+                Return New BitWord64(bits, Me.BitCount - splitIndex)
             End Get
         End Property
 
