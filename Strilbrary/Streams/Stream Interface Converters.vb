@@ -22,7 +22,7 @@ Namespace Streams
                 End Get
             End Property
 
-            <ContractVerification(False)>
+            <SuppressMessage("Microsoft.Contracts", "Requires-56-34")>
             Public Function Read(ByVal maxLength As Integer) As IRist(Of Byte) Implements IReadableStream.Read
                 Dim buffer(0 To maxLength - 1) As Byte
                 Dim n = _stream.Read(buffer, 0, maxLength)
@@ -132,7 +132,7 @@ Namespace Streams
                 End Get
             End Property
 
-            <ContractVerification(False)>
+            <SuppressMessage("Microsoft.Contracts", "Unsafe-1-0")>
             Public Overrides Function Read(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer) As Integer
                 If _readStream Is Nothing Then Throw New NotSupportedException()
                 If count = 0 Then Return 0
@@ -143,7 +143,7 @@ Namespace Streams
                 Return data.Count
             End Function
 
-            <ContractVerification(False)>
+            <SuppressMessage("Microsoft.Contracts", "Unsafe-1-0")>
             Public Overrides Sub Write(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer)
                 If _writeStream Is Nothing Then Throw New NotSupportedException()
                 _writeStream.Write(buffer.AsReadableList.SubView(offset, count))

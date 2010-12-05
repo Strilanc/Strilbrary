@@ -64,11 +64,13 @@
             End Get
         End Property
 
-        <ContractVerification(False)>
         Public Shared Operator +(ByVal word1 As BitWord64, ByVal word2 As BitWord64) As BitWord64
             Contract.Requires(word1.BitCount + word2.BitCount <= MaxSize)
             Contract.Ensures(Contract.Result(Of BitWord64)().BitCount = word1.BitCount + word2.BitCount)
-            Return New BitWord64(word1.Bits Or (word2.Bits << word1.BitCount), word1.BitCount + word2.BitCount)
+            Dim bits = word1.Bits Or (word2.Bits << word1.BitCount)
+            Dim bitCount = word1.BitCount + word2.BitCount
+            Contract.Assume(bits.HasNoBitsSetAbovePosition(bitCount))
+            Return New BitWord64(bits, bitCount)
         End Operator
 
         Public Shared Operator =(ByVal word1 As BitWord64, ByVal word2 As BitWord64) As Boolean

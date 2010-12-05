@@ -153,6 +153,7 @@ Namespace Values
             Return result
         End Function
         '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
+        '''<remarks>Verification is disabled because the verifier is really bad with UInt64.</remarks>
         <Extension()> <Pure()>
         <ContractVerification(False)>
         Public Function PositiveMod(ByVal value As UInt64, ByVal divisor As UInt64) As UInt64
@@ -238,7 +239,9 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of UInt64)() Mod divisor = 0")>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of UInt64)() < value + divisor")>
+        <SuppressMessage("Microsoft.Contracts", "Requires-19-90")>
         Public Function CeilingMultiple(ByVal value As UInt64, ByVal divisor As UInt64) As UInt64
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of UInt64)() Mod divisor = 0)
@@ -308,6 +311,7 @@ Namespace Values
             Return value - value.ProperMod(divisor)
         End Function
         '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
+        '''<remarks>Verification is disabled because the verifier is really bad with UInt64.</remarks>
         <Extension()> <Pure()>
         <ContractVerification(False)>
         Public Function FloorMultiple(ByVal value As UInt64, ByVal divisor As UInt64) As UInt64
@@ -327,6 +331,7 @@ Namespace Values
             Return value - value Mod divisor
         End Function
         '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
+        '''<remarks>Verification is disabled because the verifier suggests a tautological precondition.</remarks>
         <Extension()> <Pure()>
         <ContractVerification(False)>
         Public Function FloorMultiple(ByVal value As UInt16, ByVal divisor As UInt16) As UInt16
@@ -385,9 +390,7 @@ Namespace Values
             Return result
         End Function
 
-        ''' <summary>
-        ''' Determines the value of a sequence of 2 bytes treated as base-256 digits.
-        ''' </summary>
+        '''<summary>Determines the value of a sequence of 2 bytes treated as base-256 digits.</summary>
         <Extension()> <Pure()>
         <ContractVerification(False)>
         Public Function ToUInt16(ByVal data As IEnumerable(Of Byte),
@@ -414,9 +417,7 @@ Namespace Values
 
             Return BitConverter.ToUInt16(bytes, 0)
         End Function
-        ''' <summary>
-        ''' Determines the value of a sequence of 4 bytes treated as base-256 digits.
-        ''' </summary>
+        '''<summary>Determines the value of a sequence of 4 bytes treated as base-256 digits.</summary>
         <Extension()> <Pure()>
         <ContractVerification(False)>
         Public Function ToUInt32(ByVal data As IEnumerable(Of Byte),
@@ -443,11 +444,10 @@ Namespace Values
 
             Return BitConverter.ToUInt32(bytes, 0)
         End Function
-        ''' <summary>
-        ''' Determines the value of a sequence of 8 bytes treated as base-256 digits.
-        ''' </summary>
+        '''<summary>Determines the value of a sequence of 8 bytes treated as base-256 digits.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "ArrayLowerBound-128-0")>
+        <SuppressMessage("Microsoft.Contracts", "ArrayUpperBound-128-0")>
         Public Function ToUInt64(ByVal data As IEnumerable(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt64
             Const size As Integer = 8

@@ -148,24 +148,45 @@ Namespace Collections
         End Function
         '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
         <Pure()> <Extension()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of UInt32))() IsNot Nothing")>
         Public Function Range(ByVal limit As UInt32) As IEnumerable(Of UInt32)
             Contract.Requires(limit >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of UInt32))() IsNot Nothing)
-            Return From i In CInt(limit).Range Select CUInt(i)
+            Return Iterator Function()
+                       Dim e = 0UI
+                       While e < limit
+                           Yield e
+                           e += 1UI
+                       End While
+                   End Function()
         End Function
         '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
         <Pure()> <Extension()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of UInt16))() IsNot Nothing")>
         Public Function Range(ByVal limit As UInt16) As IEnumerable(Of UInt16)
             Contract.Requires(limit >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of UInt16))() IsNot Nothing)
-            Return From i In CInt(limit).Range Select CUShort(i)
+            Return Iterator Function()
+                       Dim e = 0US
+                       While e < limit
+                           Yield e
+                           e += 1US
+                       End While
+                   End Function()
         End Function
         '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
         <Pure()> <Extension()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of Byte))() IsNot Nothing")>
         Public Function Range(ByVal limit As Byte) As IEnumerable(Of Byte)
             Contract.Requires(limit >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Byte))() IsNot Nothing)
-            Return From i In CInt(limit).Range Select CByte(i)
+            Return Iterator Function()
+                       Dim e = CByte(0)
+                       While e < limit
+                           Yield e
+                           e += CByte(1)
+                       End While
+                   End Function()
         End Function
 
         '''<summary>Enumerates items in the sequence, offset by the given amount.</summary>

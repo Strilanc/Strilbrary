@@ -24,7 +24,7 @@ Namespace Values
         End Function
         '''<summary>Exposes a sequence's underlying non-null values as a sequence.</summary>
         <Pure()> <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.ForAll(Contract.Result(Of IEnumerable(Of T))(), Function(e) e IsNot Nothing)")>
         Public Function Values(Of T)(ByVal sequence As IEnumerable(Of NonNull(Of T))) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
