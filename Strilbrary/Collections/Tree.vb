@@ -69,7 +69,7 @@ Namespace Collections
                                                    ).ToReadableList)
         End Function
         <Extension()> <Pure()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "Nonnull-111-0")>
         Public Function SelectMany(Of TArg, TMid, TResult)(ByVal tree As ITree(Of TArg),
                                                            ByVal projection1 As Func(Of TArg, ITree(Of TMid)),
                                                            ByVal projection2 As Func(Of TArg, TMid, TResult)) As ITree(Of TResult)

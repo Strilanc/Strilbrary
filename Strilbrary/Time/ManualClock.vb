@@ -22,18 +22,22 @@ Namespace Time
             Contract.Assume(_time.Ticks = 0)
         End Sub
 
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Me.ElapsedTime = Contract.OldValue(Me.ElapsedTime) + dt")>
         Public Sub Advance(ByVal dt As TimeSpan)
             Contract.Requires(dt.Ticks >= 0)
             Contract.Ensures(Me.ElapsedTime = Contract.OldValue(Me.ElapsedTime) + dt)
             SyncLock _lock
                 _time += dt
-                While _asyncWaits.Count > 0 AndAlso _asyncWaits.Peek.Item1 <= ElapsedTime
-                    Dim futureAction = _asyncWaits.Dequeue.Item2
+                While _asyncWaits.Count > 0
+                    Dim pair = _asyncWaits.Peek()
+                    Contract.Assume(pair IsNot Nothing)
+                    If pair.Item1 > ElapsedTime Then Exit While
+                    Dim futureAction = pair.Item2
                     Contract.Assume(futureAction IsNot Nothing)
                     futureAction.SetResult(Nothing)
                 End While
             End SyncLock
+            Contract.Assume(_time.Ticks >= 0)
         End Sub
 
         Public ReadOnly Property ElapsedTime As TimeSpan Implements IClock.ElapsedTime
@@ -44,7 +48,6 @@ Namespace Time
             End Get
         End Property
 
-        <ContractVerification(False)>
         Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
             Dim result = New TaskCompletionSource(Of NoValue)
             SyncLock _lock
@@ -54,6 +57,7 @@ Namespace Time
                     _asyncWaits.Enqueue(Tuple.Create(time, result))
                 End If
             End SyncLock
+            Contract.Assume(result.Task IsNot Nothing)
             Return result.Task
         End Function
     End Class

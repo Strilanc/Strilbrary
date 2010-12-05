@@ -39,8 +39,8 @@ Namespace Threading
 
         '''<summary>Becomes ready once disposal has completed.</summary>
         Public ReadOnly Property DisposalTask As Task Implements IDisposableWithTask.DisposalTask
-            <ContractVerification(False)>
             Get
+                Contract.Assume(_disposalTask.Task IsNot Nothing)
                 Return _disposalTask.Task
             End Get
         End Property

@@ -16,13 +16,12 @@ Namespace Time
             Contract.Invariant(_elapsedTime.Ticks >= 0)
         End Sub
 
-        <ContractVerification(False)>
         Public Sub New()
             Me._lastTick = Environment.TickCount
             Me._elapsedTime = New TimeSpan(0)
+            Contract.Assume(Me._elapsedTime.Ticks >= 0)
         End Sub
 
-        <ContractVerification(False)>
         Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
             Dim result = New TaskCompletionSource(Of NoValue)
             Dim dt = time - ElapsedTime
@@ -37,16 +36,17 @@ Namespace Time
                 timer.AutoReset = False
                 timer.Start()
             End If
+            Contract.Assume(result.Task IsNot Nothing)
             Return result.Task
         End Function
 
         Public ReadOnly Property ElapsedTime As TimeSpan Implements IClock.ElapsedTime
-            <ContractVerification(False)>
             Get
                 SyncLock _lock
                     Dim tick = Environment.TickCount
                     _elapsedTime += (tick - _lastTick).UnsignedValue.Milliseconds
                     _lastTick = tick
+                    Contract.Assume(_elapsedTime.Ticks >= 0)
                     Return _elapsedTime
                 End SyncLock
             End Get

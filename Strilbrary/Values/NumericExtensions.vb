@@ -392,7 +392,8 @@ Namespace Values
 
         '''<summary>Determines the value of a sequence of 2 bytes treated as base-256 digits.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "ArrayLowerBound-128-0")>
+        <SuppressMessage("Microsoft.Contracts", "ArrayUpperBound-128-0")>
         Public Function ToUInt16(ByVal data As IEnumerable(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
             Const size As Integer = 2
@@ -419,7 +420,8 @@ Namespace Values
         End Function
         '''<summary>Determines the value of a sequence of 4 bytes treated as base-256 digits.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "ArrayLowerBound-128-0")>
+        <SuppressMessage("Microsoft.Contracts", "ArrayUpperBound-128-0")>
         Public Function ToUInt32(ByVal data As IEnumerable(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt32
             Const size As Integer = 4

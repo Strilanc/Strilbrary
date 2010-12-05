@@ -43,7 +43,7 @@
 
         '''<summary>Wraps a readable list in a list view.</summary>
         <Extension()> <Pure()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of ListView(Of T))().Count = list.Count")>
         Private Function ToView(Of T)(ByVal list As IRist(Of T)) As ListView(Of T)
             Contract.Requires(list IsNot Nothing)
             Contract.Ensures(Contract.Result(Of ListView(Of T))() IsNot Nothing)

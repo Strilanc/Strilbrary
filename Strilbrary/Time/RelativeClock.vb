@@ -16,11 +16,13 @@ Namespace Time
             Contract.Invariant(_baseClock IsNot Nothing)
         End Sub
 
-        <ContractVerification(False)>
         Public Sub New(ByVal parentClock As IClock,
                        ByVal timeOffsetFromParent As TimeSpan)
             Contract.Requires(parentClock IsNot Nothing)
             Contract.Ensures(Me.StartingTimeOnParentClock = -timeOffsetFromParent)
+            If parentClock.ElapsedTime < -timeOffsetFromParent Then
+                Throw New ArgumentException("Negative initial time.")
+            End If
 
             Me._timeOffsetFromParent = timeOffsetFromParent
             Me._timeOffsetFromBase = timeOffsetFromParent
@@ -33,6 +35,7 @@ Namespace Time
                 Me._baseClock = relativeParentClock._baseClock
                 Me._timeOffsetFromBase += relativeParentClock._timeOffsetFromBase
             End If
+            Contract.Assume(Me.StartingTimeOnParentClock = -timeOffsetFromParent)
         End Sub
 
         Public ReadOnly Property StartingTimeOnParentClock As TimeSpan
@@ -46,9 +49,10 @@ Namespace Time
         End Function
 
         Public ReadOnly Property ElapsedTime As TimeSpan Implements IClock.ElapsedTime
-            <ContractVerification(False)>
             Get
-                Return _baseClock.ElapsedTime + _timeOffsetFromBase
+                Dim result = _baseClock.ElapsedTime + _timeOffsetFromBase
+                Contract.Assume(result.Ticks >= 0)
+                Return result
             End Get
         End Property
     End Class
