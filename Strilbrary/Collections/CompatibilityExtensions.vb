@@ -27,7 +27,7 @@ Namespace Collections
             Return If(TryCast(sequence, IReadableList(Of T)), sequence.ToArray.AsReadableList)
         End Function
 
-        <DebuggerDisplay("{ToString}")>
+        <DebuggerDisplay("{ToString()}")>
         Private Class ReadableListToListBridge(Of T)
             Implements IList(Of T)
 
@@ -103,7 +103,7 @@ Namespace Collections
                 Return _subList.ToString
             End Function
         End Class
-        <DebuggerDisplay("{ToString}")>
+        <DebuggerDisplay("{ToString()}")>
         Private Class ListToReadableListBridge(Of T)
             Implements IReadableList(Of T)
 

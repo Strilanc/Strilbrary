@@ -1,7 +1,7 @@
 ﻿Imports Strilbrary.Exceptions
 
 Namespace Values
-    <DebuggerDisplay("{ToString}")>
+    <DebuggerDisplay("{ToString()}")>
     Public Structure NonNull(Of T)
         Private ReadOnly _value As T
 

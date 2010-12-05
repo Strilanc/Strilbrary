@@ -1,6 +1,6 @@
 Namespace Values
     '''<summary>Stores bits and provides methods to add and remove the bits of common numeric types.</summary>
-    <DebuggerDisplay("{ToString}")>
+    <DebuggerDisplay("{ToString()}")>
     Public NotInheritable Class BitBuffer
         Private _words As New LinkedList(Of BitWord64)()
         Private _bitCount As Integer

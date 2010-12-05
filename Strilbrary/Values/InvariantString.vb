@@ -2,7 +2,7 @@
     ''' <summary>
     ''' A string with case-insensitive equality.
     ''' </summary>
-    <DebuggerDisplay("{ToString}")>
+    <DebuggerDisplay("{ToString()}")>
     Public Structure InvariantString
         Implements IEquatable(Of String)
         Implements IComparable(Of String)

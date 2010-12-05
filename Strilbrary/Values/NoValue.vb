@@ -1,6 +1,6 @@
 ﻿Namespace Values
     '''<summary>A type used to represent lack of a value in cases where a value would normally be required.</summary>
-    <DebuggerDisplay("{ToString}")>
+    <DebuggerDisplay("{ToString()}")>
     Public Structure NoValue
         Implements IEquatable(Of NoValue)
         Public Overloads Function Equals(ByVal other As NoValue) As Boolean Implements IEquatable(Of NoValue).Equals

@@ -1,6 +1,6 @@
 ﻿Namespace Values
     '''<summary>Stores up to 64 bits.</summary>
-    <DebuggerDisplay("{ToString}")>
+    <DebuggerDisplay("{ToString()}")>
     Public Structure BitWord64
         Implements IEquatable(Of BitWord64)
 

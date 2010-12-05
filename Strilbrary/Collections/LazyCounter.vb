@@ -1,5 +1,5 @@
 ﻿'''<summary>Counts the elements from an enumerator and exposes operations which do not enumerate more items than necessary for the result.</summary>
-<DebuggerDisplay("{ToString}")>
+<DebuggerDisplay("{ToString()}")>
 Public NotInheritable Class LazyCounter
     Implements IComparable(Of LazyCounter)
     Implements IEquatable(Of LazyCounter)

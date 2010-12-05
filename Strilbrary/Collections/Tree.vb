@@ -22,7 +22,7 @@ Namespace Collections
         End Property
     End Class
 
-    <DebuggerDisplay("{ToString}")>
+    <DebuggerDisplay("{ToString()}")>
     Public Class Tree(Of T)
         Implements ITree(Of T)
         Private ReadOnly _value As T

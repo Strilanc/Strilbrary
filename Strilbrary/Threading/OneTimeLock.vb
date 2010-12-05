@@ -9,7 +9,7 @@ Namespace Threading
     End Enum
 
     '''<summary>A thread-safe lock which can be acquired once, and never released.</summary>
-    <DebuggerDisplay("{ToString}")>
+    <DebuggerDisplay("{ToString()}")>
     Public NotInheritable Class OnetimeLock
         Private _acquired As Int32
 

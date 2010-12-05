@@ -1,6 +1,6 @@
 ﻿Namespace Values
     '''<summary>A 64-bit integer which explicitly allows overflow and underflow.</summary>
-    <DebuggerDisplay("{ToString} (mod 2^64)")>
+    <DebuggerDisplay("{ToString()} (mod 2^64)")>
     Public Structure ModInt64
         Implements IEquatable(Of ModInt64)
         Private Const BitCount As Int32 = 64

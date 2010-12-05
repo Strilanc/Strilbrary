@@ -4,7 +4,7 @@ Namespace Collections
     ''' <summary>
     ''' Exposes a contiguous subset of a readable list as a readable list.
     ''' </summary>
-    <DebuggerDisplay("{ToString}")>
+    <DebuggerDisplay("{ToString()}")>
     Friend NotInheritable Class ListView(Of T)
         Implements IReadableList(Of T)
 
