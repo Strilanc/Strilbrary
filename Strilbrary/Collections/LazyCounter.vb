@@ -47,7 +47,7 @@ Public NotInheritable Class LazyCounter
         End If
     End Sub
     '''<summary>The current count after advancing until finished.</summary>
-    <ContractVerification(False)>
+    <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-CurrentCount >= Contract.OldValue(CurrentCount)")>
     Public Function FinalCount() As Integer
         Contract.Ensures(Finished)
         Contract.Ensures(CurrentCount = Contract.Result(Of Integer)())
@@ -59,7 +59,9 @@ Public NotInheritable Class LazyCounter
     End Function
     '''<summary>Advances until finished or the current count is at least the limit.</summary>
     '''<returns>The new current count.</returns>
-    <ContractVerification(False)>
+    <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-CurrentCount = Contract.Result(Of Integer)()")>
+    <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-CurrentCount >= Contract.OldValue(CurrentCount)")>
+    <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Finished OrElse CurrentCount >= limit")>
     Public Function CountTo(ByVal limit As Integer) As Integer
         Contract.Requires(limit >= 0)
         Contract.Ensures(CurrentCount = Contract.Result(Of Integer)())
@@ -72,7 +74,9 @@ Public NotInheritable Class LazyCounter
     End Function
     '''<summary>Advances until finished or the current count is over the limit.</summary>
     '''<returns>The new current count.</returns>
-    <ContractVerification(False)>
+    <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-CurrentCount = Contract.Result(Of Integer)()")>
+    <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-CurrentCount >= Contract.OldValue(CurrentCount)")>
+    <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Finished OrElse CurrentCount > limit")>
     Public Function CountPast(ByVal limit As Integer) As Integer
         Contract.Requires(limit >= 0)
         Contract.Ensures(CurrentCount = Contract.Result(Of Integer)())
@@ -85,7 +89,8 @@ Public NotInheritable Class LazyCounter
     End Function
 
     '''<summary>Compares eventual final counts without advancing more than necessary.</summary>
-    <ContractVerification(False)>
+    <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Me.CurrentCount >= Contract.OldValue(Me.CurrentCount)")>
+    <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-other.CurrentCount >= Contract.OldValue(other.CurrentCount)")>
     Public Function CompareTo(ByVal other As LazyCounter) As Integer Implements IComparable(Of LazyCounter).CompareTo
         Contract.Ensures(Me.CurrentCount >= Contract.OldValue(Me.CurrentCount))
         Contract.Ensures(other.CurrentCount >= Contract.OldValue(other.CurrentCount))
@@ -101,7 +106,8 @@ Public NotInheritable Class LazyCounter
     End Function
     '''<summary>Strictly compares eventual final counts without advancing more than necessary.</summary>
     '''<remarks>Slightly more efficient than CompareTo in some cases.</remarks>
-    <ContractVerification(False)>
+    <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Me.CurrentCount >= Contract.OldValue(Me.CurrentCount)")>
+    <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-other.CurrentCount >= Contract.OldValue(other.CurrentCount)")>
     Private Function IsLessThan(ByVal other As LazyCounter) As Boolean
         Contract.Ensures(Me.CurrentCount >= Contract.OldValue(Me.CurrentCount))
         Contract.Ensures(other.CurrentCount >= Contract.OldValue(other.CurrentCount))

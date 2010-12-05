@@ -217,6 +217,7 @@ Namespace Streams
             Contract.Ensures(stream.Position = position + data.Count)
             stream.Position = position
             stream.Write(data)
+            Contract.Assume(stream.Position = position + data.Count)
         End Sub
         ''' <summary>
         ''' Reads an exact amount of bytes from the stream, starting at the given position.
@@ -234,7 +235,9 @@ Namespace Streams
             Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))().Count = exactCount)
             Contract.Ensures(stream.Position = position + exactCount)
             stream.Position = position
-            Return stream.ReadExact(exactCount)
+            Dim result = stream.ReadExact(exactCount)
+            Contract.Assume(stream.Position = position + exactCount)
+            Return result
         End Function
 
         ''' <summary>
@@ -293,7 +296,7 @@ Namespace Streams
         ''' Throws an IOException if the stream ends prematurely.
         ''' </summary>
         <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "Requires-53-25")>
         Public Function ReadSingle(ByVal stream As IReadableStream) As Single
             Contract.Requires(stream IsNot Nothing)
             Return BitConverter.ToSingle(stream.ReadExact(4).ToArray, 0)
@@ -303,7 +306,7 @@ Namespace Streams
         ''' Throws an IOException if the stream ends prematurely.
         ''' </summary>
         <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "Requires-53-25")>
         Public Function ReadDouble(ByVal stream As IReadableStream) As Double
             Contract.Requires(stream IsNot Nothing)
             Return BitConverter.ToDouble(stream.ReadExact(8).ToArray, 0)

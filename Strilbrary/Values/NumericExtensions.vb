@@ -83,7 +83,6 @@ Namespace Values
             Contract.Ensures((value - Contract.Result(Of Int32)()) Mod divisor = 0)
             Dim result = value Mod divisor
             If result < 0 Then result += divisor
-            Contract.Assume(result >= 0)
             Contract.Assume((value - result) Mod divisor = 0)
             Return result
         End Function
@@ -136,8 +135,8 @@ Namespace Values
             Contract.Ensures((value - Contract.Result(Of Int32)()) Mod divisor = 0)
             Dim result = value Mod divisor
             If result <= 0 Then result += divisor
-            Contract.Assume(result > 0)
             Contract.Assume((value - result) Mod divisor = 0)
+            Contract.Assume(result <= divisor)
             Return result
         End Function
         '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
@@ -254,9 +253,7 @@ Namespace Values
             Contract.Ensures(Contract.Result(Of UInt32)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of UInt32)() >= value)
             Contract.Ensures(Contract.Result(Of UInt32)() < value + divisor)
-            Dim result = value + divisor - value.PositiveMod(divisor)
-            Contract.Assume(result Mod divisor = 0)
-            Return result
+            Return value + divisor - value.PositiveMod(divisor)
         End Function
         '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
         <Extension()> <Pure()>

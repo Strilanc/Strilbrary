@@ -132,6 +132,7 @@ Namespace Streams
                 End Get
             End Property
 
+            <ContractVerification(False)>
             Public Overrides Function Read(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer) As Integer
                 If _readStream Is Nothing Then Throw New NotSupportedException()
                 If count = 0 Then Return 0
@@ -142,6 +143,7 @@ Namespace Streams
                 Return data.Count
             End Function
 
+            <ContractVerification(False)>
             Public Overrides Sub Write(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer)
                 If _writeStream Is Nothing Then Throw New NotSupportedException()
                 _writeStream.Write(buffer.AsReadableList.SubView(offset, count))

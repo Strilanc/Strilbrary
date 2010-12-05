@@ -54,7 +54,8 @@ Namespace Collections
 
         '''<summary>Determines the maximum element in a sequence based on the comparable result of a projection.</summary>
         <Pure()> <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "Nonnull-89-0")>
+        <SuppressMessage("Microsoft.Contracts", "Requires-48-84")>
         Public Function MaxRelativeTo(Of TInput, TComparable As IComparable(Of TComparable))(
                         ByVal sequence As IEnumerable(Of TInput),
                         ByVal projection As Func(Of TInput, TComparable)) As TInput
@@ -68,7 +69,8 @@ Namespace Collections
         End Function
         '''<summary>Determines the minimum element in a sequence based on the comparable result of a projection.</summary>
         <Pure()> <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "Nonnull-89-0")>
+        <SuppressMessage("Microsoft.Contracts", "Requires-48-84")>
         Public Function MinRelativeTo(Of TInput, TComparable As IComparable(Of TComparable))(
                         ByVal sequence As IEnumerable(Of TInput),
                         ByVal projection As Func(Of TInput, TComparable)) As TInput
@@ -132,6 +134,7 @@ Namespace Collections
 
         '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
         <Pure()> <Extension()>
+        <ContractVerification(False)>
         Public Function Range(ByVal limit As Int32) As IEnumerable(Of Int32)
             Contract.Requires(limit >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Int32))() IsNot Nothing)
@@ -187,7 +190,7 @@ Namespace Collections
 
         '''<summary>Returns a sequence consisting of a value repeated a specified number of times.</summary>
         <Pure()> <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of T))().Count = count")>
         Public Function Repeated(Of T)(ByVal value As T, ByVal count As Integer) As IEnumerable(Of T)
             Contract.Requires(count >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
@@ -196,7 +199,7 @@ Namespace Collections
         End Function
         '''<summary>Returns a never-ending sequence consisting of a repeated value.</summary>
         <Pure()> <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of TValue))() IsNot Nothing")>
         Public Function RepeatForever(Of TValue)(ByVal value As TValue) As IEnumerable(Of TValue)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TValue))() IsNot Nothing)
             Return Iterator Function()
@@ -208,7 +211,7 @@ Namespace Collections
 
         '''<summary>Enumerates all contiguous subsequences of the given size from the given sequence.</summary>
         <Pure()> <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of IReadableList(Of T)))() IsNot Nothing")>
         Public Function Roll(Of T)(ByVal sequence As IEnumerable(Of T), ByVal windowSize As Integer) As IEnumerable(Of IReadableList(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(windowSize > 0)
@@ -228,7 +231,7 @@ Namespace Collections
 
         '''<summary>Pads a sequence to a given minimum length.</summary>
         <Pure()> <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of T))() IsNot Nothing")>
         Public Function PaddedTo(Of T)(ByVal sequence As IEnumerable(Of T),
                                        ByVal minimumCount As Integer,
                                        Optional ByVal paddingValue As T = Nothing) As IEnumerable(Of T)
@@ -264,7 +267,7 @@ Namespace Collections
 
         '''<summary>Interleaves the items of multiple sequences into a single sequence.</summary>
         <Pure()> <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of T))() IsNot Nothing")>
         Public Function Interleaved(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
             Contract.Requires(sequences IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
@@ -287,7 +290,7 @@ Namespace Collections
 
         '''<summary>Groups a sequence based on the position of items (modulo the given sequence count).</summary>
         <Pure()> <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of IEnumerable(Of T)))() IsNot Nothing")>
         Public Function Deinterleaved(Of T)(ByVal sequence As IEnumerable(Of T), ByVal sequenceCount As Integer) As IEnumerable(Of IEnumerable(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(sequenceCount > 0)
@@ -302,7 +305,7 @@ Namespace Collections
 
         '''<summary>Selects every nth item in a sequence, starting with the first item.</summary>
         <Pure()> <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of T))() IsNot Nothing")>
         Public Function [Step](Of T)(ByVal sequence As IEnumerable(Of T), ByVal stepSize As Integer) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(stepSize > 0)
@@ -321,7 +324,7 @@ Namespace Collections
 
         '''<summary>Splits a sequence into continuous segments of a given size (with the last partition possibly being smaller).</summary>
         <Pure()> <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of IEnumerable(Of T)))() IsNot Nothing")>
         Public Function Partitioned(Of T)(ByVal sequence As IEnumerable(Of T),
                                           ByVal partitionSize As Integer) As IEnumerable(Of IEnumerable(Of T))
             Contract.Requires(sequence IsNot Nothing)
@@ -358,7 +361,7 @@ Namespace Collections
         End Function
         '''<summary>Returns all but the last specified number of items in a sequence, or no items if there are fewer items than the specified number.</summary>
         <Extension()>
-        <ContractVerification(False)>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of T))() IsNot Nothing")>
         Public Function SkipLast(Of T)(ByVal sequence As IEnumerable(Of T),
                                        ByVal count As Integer) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
@@ -379,8 +382,9 @@ Namespace Collections
         ''' Returns the intermediate results of applying an accumulator function over a sequence.
         ''' The specified seed is used as the initial accumulator value, and is not included in the results.
         ''' </summary>
-        <ContractVerification(False)>
         <Extension()> <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of TAccumulate))() IsNot Nothing")>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of TAccumulate))().Count = sequence.Count")>
         Public Function PartialAggregates(Of TValue, TAccumulate)(ByVal sequence As IEnumerable(Of TValue),
                                                                   ByVal seed As TAccumulate,
                                                                   ByVal func As Func(Of TAccumulate, TValue, TAccumulate)) As IEnumerable(Of TAccumulate)

@@ -80,7 +80,7 @@
     <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
     <CodeContractsLibPaths />
     <CodeContractsPlatformPath />
-    <CodeContractsExtraAnalysisOptions>-show:progress -outputwarnmasks</CodeContractsExtraAnalysisOptions>
+    <CodeContractsExtraAnalysisOptions>-show:progress -outputwarnmasks -maxWarnings 10000</CodeContractsExtraAnalysisOptions>
     <CodeContractsBaseLineFile />
     <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
     <CodeContractsRunInBackground>True</CodeContractsRunInBackground>

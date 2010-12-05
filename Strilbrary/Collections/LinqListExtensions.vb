@@ -37,6 +37,7 @@
             For i = 0 To n - 1
                 ret.Add(list(n - i - 1))
             Next i
+            Contract.Assume(ret.Count = list.Count)
             Return ret
         End Function
 
