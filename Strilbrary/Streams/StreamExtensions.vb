@@ -169,11 +169,11 @@ Namespace Streams
         ''' </summary>
         <Extension()>
         Public Function ReadBestEffort(ByVal stream As IReadableStream,
-                                       ByVal maxCount As Integer) As IReadableList(Of Byte)
+                                       ByVal maxCount As Integer) As IRist(Of Byte)
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(maxCount > 0)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))().Count <= maxCount)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count <= maxCount)
             Dim result = New List(Of Byte)(capacity:=maxCount)
             While result.Count < maxCount
                 Dim readData = stream.Read(maxCount - result.Count)
@@ -192,14 +192,14 @@ Namespace Streams
         ''' </summary>
         <Extension()>
         Public Function ReadExact(ByVal stream As IReadableStream,
-                                  ByVal exactCount As Integer) As IReadableList(Of Byte)
+                                  ByVal exactCount As Integer) As IRist(Of Byte)
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(exactCount > 0)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))().Count = exactCount)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count = exactCount)
             Dim result = ReadBestEffort(stream, maxCount:=exactCount)
             If result.Count < exactCount Then
-                 Throw New IO.IOException("Stream ended before enough data could be read.")
+                Throw New IO.IOException("Stream ended before enough data could be read.")
             End If
             Return result
         End Function
@@ -209,7 +209,7 @@ Namespace Streams
         <Extension()>
         Public Sub WriteAt(ByVal stream As IRandomWritableStream,
                            ByVal position As Long,
-                           ByVal data As IReadableList(Of Byte))
+                           ByVal data As IRist(Of Byte))
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(data IsNot Nothing)
             Contract.Requires(position >= 0)
@@ -226,13 +226,13 @@ Namespace Streams
         <Extension()>
         Public Function ReadExactAt(ByVal stream As IRandomReadableStream,
                                     ByVal position As Long,
-                                    ByVal exactCount As Integer) As IReadableList(Of Byte)
+                                    ByVal exactCount As Integer) As IRist(Of Byte)
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(position >= 0)
             Contract.Requires(exactCount > 0)
             Contract.Requires(position + exactCount <= stream.Length)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))().Count = exactCount)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count = exactCount)
             Contract.Ensures(stream.Position = position + exactCount)
             stream.Position = position
             Dim result = stream.ReadExact(exactCount)
@@ -360,9 +360,9 @@ Namespace Streams
 
         '''<summary>Reads all remaining data from the stream.</summary>
         <Extension()>
-        Public Function ReadRemaining(ByVal stream As IReadableStream) As IReadableList(Of Byte)
+        Public Function ReadRemaining(ByVal stream As IReadableStream) As IRist(Of Byte)
             Contract.Requires(stream IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of Byte))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
             Dim result = New List(Of Byte)(capacity:=1024)
             Do
                 Dim read = stream.Read(1024)

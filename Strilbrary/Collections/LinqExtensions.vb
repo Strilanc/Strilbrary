@@ -212,10 +212,10 @@ Namespace Collections
         '''<summary>Enumerates all contiguous subsequences of the given size from the given sequence.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of IReadableList(Of T)))() IsNot Nothing")>
-        Public Function Roll(Of T)(ByVal sequence As IEnumerable(Of T), ByVal windowSize As Integer) As IEnumerable(Of IReadableList(Of T))
+        Public Function Roll(Of T)(ByVal sequence As IEnumerable(Of T), ByVal windowSize As Integer) As IEnumerable(Of IRist(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(windowSize > 0)
-            Contract.Ensures(Contract.Result(Of IEnumerable(Of IReadableList(Of T)))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of IRist(Of T)))() IsNot Nothing)
 
             Return Iterator Function()
                        Dim rollingWindow = New Queue(Of T)(capacity:=windowSize)

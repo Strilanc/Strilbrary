@@ -4,7 +4,7 @@ Namespace Collections
     Public Module CompatibilityExtensions
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IList(Of T))().IsReadOnly")>
-        Public Function AsList(Of T)(ByVal this As IReadableList(Of T)) As IList(Of T)
+        Public Function AsList(Of T)(ByVal this As IRist(Of T)) As IList(Of T)
             Contract.Requires(this IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IList(Of T))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IList(Of T))().Count = this.Count)
@@ -14,30 +14,30 @@ Namespace Collections
             Return list
         End Function
         <Extension()> <Pure()>
-        Public Function AsReadableList(Of T)(ByVal this As IList(Of T)) As IReadableList(Of T)
+        Public Function AsReadableList(Of T)(ByVal this As IList(Of T)) As IRist(Of T)
             Contract.Requires(this IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of T))() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of T))().Count = this.Count)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = this.Count)
             Return New ListToReadableListBridge(Of T)(this)
         End Function
         <Extension()> <Pure()>
-        Public Function ToReadableList(Of T)(ByVal sequence As IEnumerable(Of T)) As IReadableList(Of T)
+        Public Function ToReadableList(Of T)(ByVal sequence As IEnumerable(Of T)) As IRist(Of T)
             Contract.Requires(sequence IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of T))() IsNot Nothing)
-            Return If(TryCast(sequence, IReadableList(Of T)), sequence.ToArray.AsReadableList)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Return If(TryCast(sequence, IRist(Of T)), sequence.ToArray.AsReadableList)
         End Function
 
         <DebuggerDisplay("{ToString()}")>
         Private Class ReadableListToListBridge(Of T)
             Implements IList(Of T)
 
-            Private ReadOnly _subList As IReadableList(Of T)
+            Private ReadOnly _subList As IRist(Of T)
 
             <ContractInvariantMethod()> Private Sub ObjectInvariant()
                 Contract.Invariant(_subList IsNot Nothing)
             End Sub
 
-            Public Sub New(ByVal subList As IReadableList(Of T))
+            Public Sub New(ByVal subList As IRist(Of T))
                 Contract.Requires(subList IsNot Nothing)
                 Contract.Ensures(Me.Count = subList.Count)
                 Me._subList = subList
@@ -105,7 +105,7 @@ Namespace Collections
         End Class
         <DebuggerDisplay("{ToString()}")>
         Private Class ListToReadableListBridge(Of T)
-            Implements IReadableList(Of T)
+            Implements IRist(Of T)
 
             Private ReadOnly _subList As IList(Of T)
 
@@ -128,10 +128,10 @@ Namespace Collections
                     Return _subList.Count
                 End Get
             End Property
-            Public Function IndexOf(ByVal item As T) As Integer Implements IReadableList(Of T).IndexOf
+            Public Function IndexOf(ByVal item As T) As Integer Implements IRist(Of T).IndexOf
                 Return _subList.IndexOf(item)
             End Function
-            Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
+            Public ReadOnly Property Item(ByVal index As Integer) As T Implements IRist(Of T).Item
                 Get
                     Return _subList.Item(index)
                 End Get

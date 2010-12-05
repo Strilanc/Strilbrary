@@ -44,7 +44,7 @@
         '''<summary>Wraps a readable list in a list view.</summary>
         <Extension()> <Pure()>
         <ContractVerification(False)>
-        Private Function ToView(Of T)(ByVal list As IReadableList(Of T)) As ListView(Of T)
+        Private Function ToView(Of T)(ByVal list As IRist(Of T)) As ListView(Of T)
             Contract.Requires(list IsNot Nothing)
             Contract.Ensures(Contract.Result(Of ListView(Of T))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of ListView(Of T))().Count = list.Count)
@@ -52,23 +52,23 @@
         End Function
         '''<summary>Returns a list containing a contiguous subset of the given list starting at the given offset.</summary>
         <Extension()> <Pure()>
-        Public Function SubView(Of T)(ByVal list As IReadableList(Of T), ByVal offset As Integer) As IReadableList(Of T)
+        Public Function SubView(Of T)(ByVal list As IRist(Of T), ByVal offset As Integer) As IRist(Of T)
             Contract.Requires(list IsNot Nothing)
             Contract.Requires(offset >= 0)
             Contract.Requires(offset <= list.Count)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of T))() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of T))().Count = list.Count - offset)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = list.Count - offset)
             Return list.ToView.SubView(offset)
         End Function
         '''<summary>Returns a list containing a contiguous subset of the given list starting at the given offset and running for the given length.</summary>
         <Extension()> <Pure()>
-        Public Function SubView(Of T)(ByVal list As IReadableList(Of T), ByVal offset As Integer, ByVal length As Integer) As IReadableList(Of T)
+        Public Function SubView(Of T)(ByVal list As IRist(Of T), ByVal offset As Integer, ByVal length As Integer) As IRist(Of T)
             Contract.Requires(list IsNot Nothing)
             Contract.Requires(offset >= 0)
             Contract.Requires(length >= 0)
             Contract.Requires(offset + length <= list.Count)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of T))() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IReadableList(Of T))().Count = length)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = length)
             Return list.ToView.SubView(offset, length)
         End Function
     End Module

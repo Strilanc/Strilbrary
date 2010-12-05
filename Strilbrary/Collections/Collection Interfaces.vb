@@ -21,8 +21,8 @@
     End Interface
 
     '''<summary>A readable list of items.</summary>
-    <ContractClass(GetType(IReadableListContractClass(Of )))>
-    Public Interface IReadableList(Of T)
+    <ContractClass(GetType(IRistContractClass(Of )))>
+    Public Interface IRist(Of T)
         Inherits IReadableCollection(Of T)
         Inherits IIndexedEnumerable(Of T)
         Function IndexOf(ByVal item As T) As Integer
@@ -87,11 +87,11 @@
             Throw New NotSupportedException
         End Function
     End Class
-    <ContractClassFor(GetType(IReadableList(Of )))>
-    Public MustInherit Class IReadableListContractClass(Of T)
-        Implements IReadableList(Of T)
-        Public Function IndexOf(ByVal item As T) As Integer Implements IReadableList(Of T).IndexOf
-            Contract.Ensures(Contract.Result(Of Integer)() < DirectCast(Me, IReadableList(Of T)).Count)
+    <ContractClassFor(GetType(IRist(Of )))>
+    Public MustInherit Class IRistContractClass(Of T)
+        Implements IRist(Of T)
+        Public Function IndexOf(ByVal item As T) As Integer Implements IRist(Of T).IndexOf
+            Contract.Ensures(Contract.Result(Of Integer)() < DirectCast(Me, IRist(Of T)).Count)
             Contract.Ensures(Contract.Result(Of Integer)() >= -1)
             Throw New NotSupportedException
         End Function

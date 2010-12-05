@@ -24,7 +24,7 @@ Namespace Streams
             _emptied = Not Me._streams.MoveNext()
         End Sub
 
-        Public Function Read(ByVal maxCount As Integer) As IReadableList(Of Byte) Implements IReadableStream.Read
+        Public Function Read(ByVal maxCount As Integer) As IRist(Of Byte) Implements IReadableStream.Read
             Dim result = New List(Of Byte)
             While result.Count < maxCount AndAlso Not _emptied
                 Contract.Assume(_streams.Current IsNot Nothing)

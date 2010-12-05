@@ -6,9 +6,9 @@ Namespace Collections
     ''' </summary>
     <DebuggerDisplay("{ToString()}")>
     Friend NotInheritable Class ListView(Of T)
-        Implements IReadableList(Of T)
+        Implements IRist(Of T)
 
-        Private ReadOnly _items As IReadableList(Of T)
+        Private ReadOnly _items As IRist(Of T)
         Private ReadOnly _offset As Integer
         Private ReadOnly _length As Integer
 
@@ -19,7 +19,7 @@ Namespace Collections
             Contract.Invariant(_offset + _length <= _items.Count)
         End Sub
 
-        Public Sub New(ByVal items As IReadableList(Of T),
+        Public Sub New(ByVal items As IRist(Of T),
                        ByVal offset As Integer,
                        ByVal length As Integer)
             Contract.Requires(items IsNot Nothing)
@@ -33,7 +33,7 @@ Namespace Collections
             Me._length = length
         End Sub
 
-        Default Public ReadOnly Property Item(ByVal index As Integer) As T Implements IReadableList(Of T).Item
+        Default Public ReadOnly Property Item(ByVal index As Integer) As T Implements IRist(Of T).Item
             Get
                 Return _items(_offset + index)
             End Get
@@ -68,7 +68,7 @@ Namespace Collections
             Return IndexOf(item) <> -1
         End Function
         <Pure()>
-        Public Function IndexOf(ByVal item As T) As Integer Implements IReadableList(Of T).IndexOf
+        Public Function IndexOf(ByVal item As T) As Integer Implements IRist(Of T).IndexOf
             For i = 0 To Me.Count - 1
                 If item Is Nothing Then
                     If Me.Item(i) Is Nothing Then Return i
@@ -96,13 +96,13 @@ Namespace Collections
             Implements IEnumerator(Of T)
 
             Private _index As Int32 = -1
-            Private ReadOnly _list As IReadableList(Of T)
+            Private ReadOnly _list As IRist(Of T)
 
             <ContractInvariantMethod()> Private Sub ObjectInvariant()
                 Contract.Invariant(_list IsNot Nothing)
             End Sub
 
-            Public Sub New(ByVal list As IReadableList(Of T))
+            Public Sub New(ByVal list As IRist(Of T))
                 Contract.Requires(list IsNot Nothing)
                 Me._list = list
             End Sub

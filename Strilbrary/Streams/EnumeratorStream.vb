@@ -14,7 +14,7 @@ Namespace Streams
             Me._enumerator = enumerator
         End Sub
 
-        Public Function Read(ByVal maxCount As Integer) As IReadableList(Of Byte) Implements IReadableStream.Read
+        Public Function Read(ByVal maxCount As Integer) As IRist(Of Byte) Implements IReadableStream.Read
             Dim result = New List(Of Byte)(capacity:=maxCount)
             While result.Count < maxCount AndAlso _enumerator.MoveNext
                 result.Add(_enumerator.Current)
