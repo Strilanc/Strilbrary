@@ -7,9 +7,9 @@ Imports Strilbrary.Collections
 
 <TestClass()>
 Public Class LinqExtensionsTest
-    Private Shared ReadOnly L0() As Int32 = {}
-    Private Shared ReadOnly L1() As Int32 = {1}
-    Private Shared ReadOnly L2() As Int32 = {1, 2}
+    Private Shared ReadOnly L0 As IEnumerable(Of Int32) = From x In New Int32() {}
+    Private Shared ReadOnly L1 As IEnumerable(Of Int32) = From x In {1}
+    Private Shared ReadOnly L2 As IEnumerable(Of Int32) = From x In {1, 2}
     Private Shared ReadOnly LInf As IEnumerable(Of Int32) = Strilbrary.Collections.RepeatForever(0)
 
     Private Function SequenceSequenceEqual(Of T)(ByVal s1 As IEnumerable(Of IEnumerable(Of T)), ByVal s2 As IEnumerable(Of IEnumerable(Of T))) As Boolean

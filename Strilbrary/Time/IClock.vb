@@ -8,10 +8,11 @@ Namespace Time
         ''' Returns a task which completes once the given time has been reached by the clock.
         ''' The resulting task is instantly ready if the given time has already been reached.
         ''' </summary>
-        Function AsyncWaitUntil(ByVal time As TimeSpan) As task
+        Function AsyncWaitUntil(ByVal time As TimeSpan) As Task
 
         ''' <summary>
         ''' Determines the time elapsed on the clock since it was started.
+        ''' This value may not be stable, but must never decrease.
         ''' </summary>
         ReadOnly Property ElapsedTime() As TimeSpan
 

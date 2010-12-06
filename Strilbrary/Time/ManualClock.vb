@@ -9,12 +9,12 @@ Namespace Time
     Public Class ManualClock
         Implements IClock
         Private _time As New TimeSpan(ticks:=0)
-        Private ReadOnly _asyncWaits As New PriorityQueue(Of Tuple(Of TimeSpan, TaskCompletionSource(Of NoValue)))(Function(x, y) -x.item1.compareto(y.item1))
+        Private ReadOnly _waitQueue As New PriorityQueue(Of Tuple(Of TimeSpan, TaskCompletionSource(Of NoValue)))(Function(x, y) -x.Item1.CompareTo(y.Item1))
         Private ReadOnly _lock As New Object()
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(_time.Ticks >= 0)
-            Contract.Invariant(_asyncWaits IsNot Nothing)
+            Contract.Invariant(_waitQueue IsNot Nothing)
             Contract.Invariant(_lock IsNot Nothing)
         End Sub
 
@@ -28,13 +28,13 @@ Namespace Time
             Contract.Ensures(Me.ElapsedTime = Contract.OldValue(Me.ElapsedTime) + dt)
             SyncLock _lock
                 _time += dt
-                While _asyncWaits.Count > 0
-                    Dim pair = _asyncWaits.Peek()
-                    Contract.Assume(pair IsNot Nothing)
-                    If pair.Item1 > ElapsedTime Then Exit While
-                    Dim futureAction = pair.Item2
-                    Contract.Assume(futureAction IsNot Nothing)
-                    futureAction.SetResult(Nothing)
+                While _waitQueue.Count > 0
+                    Dim timeTaskPair = _waitQueue.Peek()
+                    Contract.Assume(timeTaskPair IsNot Nothing)
+                    If timeTaskPair.Item1 > ElapsedTime Then Exit While
+                    _waitQueue.Dequeue()
+                    Contract.Assume(timeTaskPair.Item2 IsNot Nothing)
+                    timeTaskPair.Item2.SetResult(Nothing)
                 End While
             End SyncLock
             Contract.Assume(_time.Ticks >= 0)
@@ -49,16 +49,14 @@ Namespace Time
         End Property
 
         Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
-            Dim result = New TaskCompletionSource(Of NoValue)
             SyncLock _lock
-                If time <= ElapsedTime Then
-                    result.SetResult(Nothing)
-                Else
-                    _asyncWaits.Enqueue(Tuple.Create(time, result))
-                End If
+                If time <= ElapsedTime Then Return CompletedTask()
+
+                Dim result = New TaskCompletionSource(Of NoValue)
+                _waitQueue.Enqueue(Tuple.Create(time, result))
+                Contract.Assume(result.Task IsNot Nothing)
+                Return result.Task
             End SyncLock
-            Contract.Assume(result.Task IsNot Nothing)
-            Return result.Task
         End Function
     End Class
 End Namespace

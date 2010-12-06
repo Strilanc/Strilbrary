@@ -23,19 +23,17 @@ Namespace Time
         End Sub
 
         Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
-            Dim result = New TaskCompletionSource(Of NoValue)
             Dim dt = time - ElapsedTime
-            If dt.Ticks <= 0 Then
-                result.SetResult(Nothing)
-            Else
-                Dim timer = New Timers.Timer(dt.TotalMilliseconds)
-                AddHandler timer.Elapsed, Sub()
-                                              timer.Dispose()
-                                              result.SetResult(Nothing)
-                                          End Sub
-                timer.AutoReset = False
-                timer.Start()
-            End If
+            If dt.Ticks <= 0 Then Return CompletedTask()
+
+            Dim result = New TaskCompletionSource(Of NoValue)
+            Dim timer = New Timers.Timer(dt.TotalMilliseconds)
+            AddHandler timer.Elapsed, Sub()
+                                          timer.Dispose()
+                                          result.SetResult(Nothing)
+                                      End Sub
+            timer.AutoReset = False
+            timer.Start()
             Contract.Assume(result.Task IsNot Nothing)
             Return result.Task
         End Function

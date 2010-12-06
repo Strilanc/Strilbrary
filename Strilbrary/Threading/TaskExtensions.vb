@@ -4,6 +4,14 @@ Imports System.Threading
 
 Namespace Threading
     Public Module TaskExtensions
+        <Pure()>
+        Public Function CompletedTask() As Task
+            Dim result = New TaskCompletionSource(Of NoValue)
+            result.SetResult(Nothing)
+            Contract.Assume(result.Task IsNot Nothing)
+            Return result.Task
+        End Function
+
         '''<summary>Wraps a value in an instantly completed task.</summary>
         <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TValue))().Status = TaskStatus.RanToCompletion")>
