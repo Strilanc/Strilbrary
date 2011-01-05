@@ -124,6 +124,7 @@ Public NotInheritable Class LazyCounter
 
     Public Shared Widening Operator CType(ByVal count As Int32) As LazyCounter
         Contract.Requires(count >= 0)
+        Contract.Ensures(Contract.Result(Of LazyCounter)() IsNot Nothing)
         Return New LazyCounter(initialCount:=count)
     End Operator
     Public Shared Widening Operator CType(ByVal value As LazyCounter) As Int32

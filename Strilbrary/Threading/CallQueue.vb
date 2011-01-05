@@ -1,5 +1,6 @@
 Imports Strilbrary.Values
 Imports Strilbrary.Exceptions
+Imports System.Threading
 
 Namespace Threading
     '''<summary>A thread-safe queue for running actions in order.</summary>
@@ -79,26 +80,22 @@ Namespace Threading
         End Function
     End Class
 
-    '''<summary>Runs queued calls on a control's thread.</summary>
-    Public NotInheritable Class InvokedCallQueue
+    '''<summary>Queues calls on a control's synchronization context.</summary>
+    Public NotInheritable Class ControlCallQueue
         Inherits CallQueue
-        Private ReadOnly _control As Control
+        Private ReadOnly _eventualContext As Task(Of SynchronizationContext)
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
-            Contract.Invariant(_control IsNot Nothing)
+            Contract.Invariant(_eventualContext IsNot Nothing)
         End Sub
 
         Public Sub New(ByVal control As Control, ByVal initiallyStarted As Boolean)
             MyBase.New(initiallyStarted)
             Contract.Requires(control IsNot Nothing)
-            Me._control = control
+            Me._eventualContext = control.EventualSynchronizationContextAsync()
         End Sub
         Protected Overrides Sub BeginConsuming(ByVal action As Action)
-            _control.AsyncInvokedAction(action).Catch(
-                Sub(ex) ex.RaiseAsUnexpected(
-                    "Invalid Invoke from {0}.StartRunning() ({1}, {2})".Frmt(Me.GetType.Name,
-                                                                             _control.GetType.Name,
-                                                                             _control.Name)))
+            _eventualContext.ContinueWithAction(Sub(context) context.Post(Sub() action(), Nothing))
         End Sub
     End Class
     '''<summary>Runs queued calls on an independent thread.</summary>

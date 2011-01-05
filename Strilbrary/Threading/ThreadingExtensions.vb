@@ -132,5 +132,32 @@ Namespace Threading
             Return task.ContinueWith(Function(t) queue.QueueAction(Sub() If t.Status = TaskStatus.Faulted Then action(t.Exception)),
                                      TaskContinuationOptions.NotOnCanceled).Unwrap
         End Function
+
+        ''' <summary>
+        ''' Returns the eventual synchronization context of a control.
+        ''' The result is available once the control has a handle.
+        ''' The result will hang if the control will never have a handle (eg. the handle has been destroyed).
+        ''' </summary>
+        ''' <remarks>
+        ''' Must not be called while the control handle is being created or destroyed.
+        ''' </remarks>
+        <Extension()>
+        Public Function EventualSynchronizationContextAsync(ByVal control As Control) As Task(Of SynchronizationContext)
+            Contract.Requires(control IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of Task(Of SynchronizationContext))() IsNot Nothing)
+
+            Dim result = New TaskCompletionSource(Of SynchronizationContext)
+
+            If Not control.IsHandleCreated Then
+                AddHandler control.HandleCreated, Sub() result.SetResult(SynchronizationContext.Current)
+            ElseIf control.InvokeRequired Then
+                control.BeginInvoke(Sub() result.SetResult(SynchronizationContext.Current))
+            Else
+                result.SetResult(SynchronizationContext.Current)
+            End If
+
+            Contract.Assume(result.Task IsNot Nothing)
+            Return result.Task
+        End Function
     End Module
 End Namespace
