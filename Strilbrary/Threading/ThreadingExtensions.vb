@@ -135,29 +135,47 @@ Namespace Threading
 
         ''' <summary>
         ''' Returns the eventual synchronization context of a control.
-        ''' The result is available once the control has a handle.
-        ''' The result will hang if the control will never have a handle (eg. the handle has been destroyed).
+        ''' The context is available once the control has a handle.
+        ''' The context will hang if the control will never have a handle (eg. the handle has been destroyed).
         ''' </summary>
         ''' <remarks>
         ''' Must not be called while the control handle is being created or destroyed.
         ''' </remarks>
         <Extension()>
-        Public Function EventualSynchronizationContextAsync(ByVal control As Control) As Task(Of SynchronizationContext)
+        Public Function EventualSynchronizationContext(ByVal control As Control) As SynchronizationContext
             Contract.Requires(control IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task(Of SynchronizationContext))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of SynchronizationContext)() IsNot Nothing)
 
             Dim result = New TaskCompletionSource(Of SynchronizationContext)
 
             If Not control.IsHandleCreated Then
-                AddHandler control.HandleCreated, Sub() result.SetResult(SynchronizationContext.Current)
+                AddHandler control.HandleCreated, Sub() result.TrySetResult(SynchronizationContext.Current)
             ElseIf control.InvokeRequired Then
                 control.BeginInvoke(Sub() result.SetResult(SynchronizationContext.Current))
             Else
-                result.SetResult(SynchronizationContext.Current)
+                Return SynchronizationContext.Current
             End If
 
             Contract.Assume(result.Task IsNot Nothing)
-            Return result.Task
+            Return New EventualSynchronizationContext(result.Task)
+        End Function
+
+        Public Function MakeControlCallQueue(ByVal control As Control) As CallQueue
+            Contract.Requires(control IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of CallQueue)() IsNot Nothing)
+            Return New CallQueue(control.EventualSynchronizationContext())
+        End Function
+        Public Function MakeThreadedCallQueue() As CallQueue
+            Contract.Ensures(Contract.Result(Of CallQueue)() IsNot Nothing)
+            Return New CallQueue(New RunnerSynchronizationContext(AddressOf ThreadedAction))
+        End Function
+        Public Function MakeThreadPooledCallQueue() As CallQueue
+            Contract.Ensures(Contract.Result(Of CallQueue)() IsNot Nothing)
+            Return New CallQueue(New RunnerSynchronizationContext(AddressOf ThreadPooledAction))
+        End Function
+        Public Function MakeTaskedCallQueue() As CallQueue
+            Contract.Ensures(Contract.Result(Of CallQueue)() IsNot Nothing)
+            Return New CallQueue(New RunnerSynchronizationContext(AddressOf TaskedAction))
         End Function
     End Module
 End Namespace

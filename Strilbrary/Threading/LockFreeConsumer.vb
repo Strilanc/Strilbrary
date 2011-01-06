@@ -15,53 +15,46 @@ Namespace Threading
 
         Private ReadOnly queue As New SingleConsumerLockFreeQueue(Of T)
         Private ReadOnly consumer As Action(Of T)
-        Private ReadOnly runner As Action
+        Private ReadOnly context As SynchronizationContext
         Private running As Integer 'stores consumer state and is used as a semaphore
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(queue IsNot Nothing)
             Contract.Invariant(consumer IsNot Nothing)
-            Contract.Invariant(runner IsNot Nothing)
+            Contract.Invariant(context IsNot Nothing)
         End Sub
 
-        ''' <param name="runner">Used to call the Run method in the desired fashion (eg. on a new thread or invoked on a control).</param>
+        ''' <param name="context">The synchronization context used to run queued actions.</param>
         ''' <param name="consumer">Consumes a queued item.</param>
-        Public Sub New(ByVal runner As Action, ByVal consumer As Action(Of T))
-            Contract.Requires(runner IsNot Nothing)
+        Public Sub New(ByVal context As SynchronizationContext, ByVal consumer As Action(Of T))
+            Contract.Requires(context IsNot Nothing)
             Contract.Requires(consumer IsNot Nothing)
-            Me.runner = runner
+            Me.context = context
             Me.consumer = consumer
         End Sub
 
         '''<summary>Enqueues an item to be consumed by the consumer.</summary>
         Public Sub EnqueueConsume(ByVal item As T)
             queue.BeginEnqueue(item)
-
-            'Start the consumer thread if it is not already running
-            If TryAcquireConsumer() Then
-                Call runner()
-            End If
+            TryBeginConsuming()
         End Sub
         ''' <summary>
         ''' Enqueues a sequence of items to be consumed by the consumer.
         ''' The items are guaranteed to end up adjacent in the queue.
         ''' </summary>
         Public Sub EnqueueConsume(ByVal items As IEnumerable(Of T))
+            Contract.Requires(items IsNot Nothing)
             queue.BeginEnqueue(items)
-
-            'Start the consumer thread if it is not already running
-            If TryAcquireConsumer() Then
-                Call runner()
-            End If
+            TryBeginConsuming()
         End Sub
 
         '''<summary>Returns true if consumer responsibilities were acquired by this thread.</summary>
         Private Function TryAcquireConsumer() As Boolean
             'Don't bother acquiring if there are no items to consume
-            'This unsafe check is alright because enqueuers call this method after enqueuing
+            'This check is not stable but alright because enqueuers call this method after enqueuing
             'Even if an item is queued between the check and returning false, the enqueuer will call this method again
             'So we never end up with a non-empty idle queue
-            If queue.WasEmpty Then Return False
+            If Not queue.HasItems Then Return False
 
             'Try to acquire consumer responsibilities
             Return Interlocked.Exchange(running, 1) = 0
@@ -73,7 +66,7 @@ Namespace Threading
         Private Function TryReleaseConsumer() As Boolean
             Do
                 'Don't release while there's still things to consume
-                If Not queue.WasEmpty Then Return False
+                If queue.HasItems Then Return False
 
                 'Release consumer responsibilities
                 Interlocked.Exchange(running, 0)
@@ -90,15 +83,21 @@ Namespace Threading
             Loop
         End Function
 
-        ''' <summary>Consumes queued items until there are none left.</summary>
-        Public Sub Run()
+        '''<summary>Start the consumer if there is work to do and it is not already running</summary>
+        Private Sub TryBeginConsuming()
+            If TryAcquireConsumer() Then
+                context.Post(Sub() RunConsumer(), Nothing)
+            End If
+        End Sub
+        '''<summary>Consumes queued items until there are none left.</summary>
+        Private Sub RunConsumer()
             Do Until TryReleaseConsumer()
                 Call consumer(queue.Dequeue())
             Loop
         End Sub
 
         Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
-            Return queue.GetEnumerator
+            Return queue.GetEnumerator()
         End Function
         Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
             Return GetEnumerator()

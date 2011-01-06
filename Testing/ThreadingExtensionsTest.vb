@@ -92,7 +92,7 @@ Public Class ThreadingExtensionsTest
     <TestMethod()>
     Public Sub QueueCallOnSuccessTest()
         Dim flag = False
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)()
         Dim result = task.Task.QueueContinueWithAction(q, Sub() flag = True)
         ExpectTaskToIdle(result)
@@ -102,7 +102,7 @@ Public Class ThreadingExtensionsTest
     End Sub
     <TestMethod()>
     Public Sub QueueCallOnSuccessTest_Fail()
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)()
         task.SetResult(True)
         Dim result = task.Task.QueueContinueWithAction(q, Sub() Throw New InvalidOperationException("Mock Exception"))
@@ -111,7 +111,7 @@ Public Class ThreadingExtensionsTest
     <TestMethod()>
     Public Sub QueueCallOnSuccessTest_Fail2()
         Dim flag = True
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)()
         task.SetException(New InvalidOperationException("Mock Exception"))
         Dim result = task.Task.QueueContinueWithAction(q, Sub() flag = False)
@@ -122,7 +122,7 @@ Public Class ThreadingExtensionsTest
     <TestMethod()>
     Public Sub QueueCallOnValueSuccessTest()
         Dim flag = False
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)
         Dim result = task.Task.QueueContinueWithAction(q, Sub(value) flag = value)
         ExpectTaskToIdle(result)
@@ -132,7 +132,7 @@ Public Class ThreadingExtensionsTest
     End Sub
     <TestMethod()>
     Public Sub QueueCallOnValueSuccessTest_Fail()
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)()
         task.SetResult(True)
         Dim result = task.Task.QueueContinueWithAction(q, Sub(value) Throw New InvalidOperationException("Mock Exception"))
@@ -141,7 +141,7 @@ Public Class ThreadingExtensionsTest
     <TestMethod()>
     Public Sub QueueCallOnValueSuccessTest_Fail2()
         Dim flag = True
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)()
         task.SetException(New InvalidOperationException("Mock Exception"))
         Dim result = task.Task.QueueContinueWithAction(q, Sub(value) flag = False)
@@ -151,7 +151,7 @@ Public Class ThreadingExtensionsTest
 
     <TestMethod()>
     Public Sub QueueEvalOnSuccessTest()
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)()
         Dim result = task.Task.QueueContinueWithFunc(q, Function() True)
         ExpectTaskToIdle(result)
@@ -161,7 +161,7 @@ Public Class ThreadingExtensionsTest
     End Sub
     <TestMethod()>
     Public Sub QueueEvalOnSuccessTest_Fail()
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)()
         task.SetResult(True)
         Dim result = task.Task.QueueContinueWithFunc(q, Function() As Boolean
@@ -172,7 +172,7 @@ Public Class ThreadingExtensionsTest
     <TestMethod()>
     Public Sub QueueEvalOnSuccessTest_Fail2()
         Dim flag = True
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)
         task.SetException(New InvalidOperationException("Mock Exception"))
         Dim result = task.Task.QueueContinueWithFunc(q, Function()
@@ -185,7 +185,7 @@ Public Class ThreadingExtensionsTest
 
     <TestMethod()>
     Public Sub QueueEvalOnValueSuccessTest()
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)()
         Dim result = task.Task.QueueContinueWithFunc(q, Function(value) value)
         ExpectTaskToIdle(result)
@@ -195,7 +195,7 @@ Public Class ThreadingExtensionsTest
     End Sub
     <TestMethod()>
     Public Sub QueueEvalOnValueSuccessTest_Fail()
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)()
         task.SetResult(True)
         Dim result = task.Task.QueueContinueWithFunc(q, Function(value) As Boolean
@@ -206,7 +206,7 @@ Public Class ThreadingExtensionsTest
     <TestMethod()>
     Public Sub QueueEvalOnValueSuccessTest_Fail2()
         Dim flag = True
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)()
         task.SetException(New InvalidOperationException("Mock Exception"))
         Dim result = task.Task.QueueContinueWithFunc(q, Function(value)
@@ -221,7 +221,7 @@ Public Class ThreadingExtensionsTest
     <TestMethod()>
     Public Sub QueueCatchTest()
         Dim flag = False
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)
         task.SetException(New InvalidOperationException("Mock Exception"))
         Dim result = task.Task.QueueCatch(q, Sub(ex) flag = TypeOf ex.InnerExceptions.Single Is InvalidOperationException)
@@ -231,7 +231,7 @@ Public Class ThreadingExtensionsTest
     <TestMethod()>
     Public Sub QueueCatchTest_Miss()
         Dim flag = True
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)
         task.SetResult(True)
         Dim result = task.Task.QueueCatch(q, Sub(exception) flag = False)
@@ -240,7 +240,7 @@ Public Class ThreadingExtensionsTest
     End Sub
     <TestMethod()>
     Public Sub QueueCatchTest_Fail()
-        Dim q = New ThreadPooledCallQueue()
+        Dim q = MakeThreadPooledCallQueue()
         Dim task = New TaskCompletionSource(Of Boolean)
         task.SetException(New InvalidOperationException("Mock Exception"))
         Dim result = task.Task.QueueCatch(q, Sub(exception) Throw New InvalidOperationException("Mock Exception 2"))

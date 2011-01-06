@@ -138,6 +138,7 @@
     <Compile Include="Streams\EnumeratorStream.vb" />
     <Compile Include="Streams\Stream Interface Converters.vb" />
     <Compile Include="Streams\Stream Interfaces.vb" />
+    <Compile Include="Threading\Contexts.vb" />
     <Compile Include="Threading\TaskExtensions.vb" />
     <Compile Include="Time\IClock.vb" />
     <Compile Include="Time\RelativeClock.vb" />

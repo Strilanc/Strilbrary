@@ -6,7 +6,7 @@ Namespace Threading
         Private ReadOnly _cooldown As TimeSpan
         Private _nextAction As Action
         Private _running As Boolean
-        Private ReadOnly inQueue As CallQueue = New TaskedCallQueue()
+        Private ReadOnly inQueue As CallQueue = MakeTaskedCallQueue()
         Private ReadOnly _clock As Time.IClock
 
         <ContractInvariantMethod()>
