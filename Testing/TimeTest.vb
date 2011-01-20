@@ -133,6 +133,12 @@ Public Class TimeTest
         c.Advance(2.Seconds)
         WaitForTaskToSucceed(t)
     End Sub
+    <TestMethod()>
+    Public Sub RelativeClockTest_NoNegative()
+        ExpectException(Of ArgumentException)(Sub()
+                                                  Dim r = New RelativeClock(New ManualClock(), New TimeSpan(-1))
+                                              End Sub)
+    End Sub
 
     <TestMethod()>
     Public Sub SystemAsyncWaitUntilTest_Positive()

@@ -105,6 +105,7 @@
     <Compile Include="BitBufferTest.vb" />
     <Compile Include="CallQueueTest.vb" />
     <Compile Include="Common\Common.vb" />
+    <Compile Include="BitExtensionTest.vb" />
     <Compile Include="ModInt64Test.vb" />
     <Compile Include="LinqExtensionsTest.vb" />
     <Compile Include="MiscTest.vb" />

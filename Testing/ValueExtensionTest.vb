@@ -257,6 +257,8 @@ Public Class ValueExtensionTest
         Assert.IsTrue("FF 10 AB 24 05".FromHexStringToBytes.SequenceEqual({&HFF, &H10, &HAB, &H24, &H5}))
         Assert.IsTrue("ff 10 ab 24 5".FromHexStringToBytes.SequenceEqual({&HFF, &H10, &HAB, &H24, &H5}))
         Assert.IsTrue("1 2 3".FromHexStringToBytes.SequenceEqual({1, 2, 3}))
+        ExpectException(Of ArgumentException)(Sub() Call "g".FromHexStringToBytes())
+        ExpectException(Of ArgumentException)(Sub() Call "111".FromHexStringToBytes())
     End Sub
 
     <TestMethod()>
@@ -270,6 +272,7 @@ Public Class ValueExtensionTest
     Public Sub FromHexToUInt64Test()
         Assert.IsTrue("0123456789ABCdef".FromHexToUInt64(ByteOrder.LittleEndian) = &HFEDCBA9876543210UL)
         Assert.IsTrue("0123456789ABCdef".FromHexToUInt64(ByteOrder.BigEndian) = &H123456789ABCDEFUL)
+        ExpectException(Of ArgumentException)(Sub() Call "g".FromHexToUInt64(ByteOrder.LittleEndian))
     End Sub
 
     <TestMethod()>
@@ -568,5 +571,15 @@ Public Class ValueExtensionTest
     Public Sub AsStringTest()
         Assert.IsTrue(New Char() {}.AsString = "")
         Assert.IsTrue({"5"c, "4"c}.AsString = "54")
+    End Sub
+
+    <TestMethod()>
+    Public Sub NoValueTest()
+        Assert.IsTrue(New NoValue().Equals(New NoValue()))
+        Assert.IsTrue(New NoValue().Equals(DirectCast(New NoValue(), Object)))
+        Assert.IsTrue(Not New NoValue().Equals(New Object()))
+        Assert.IsTrue(New NoValue() = New NoValue())
+        Assert.IsTrue(Not New NoValue() <> New NoValue())
+        Assert.IsTrue(New NoValue().GetHashCode() = 0)
     End Sub
 End Class
