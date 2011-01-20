@@ -12,7 +12,7 @@ Namespace Time
 
         ''' <summary>
         ''' Determines the time elapsed on the clock since it was started.
-        ''' This value may not be stable, but must never decrease.
+        ''' This value may not be stable, but must never decrease (monotinicity).
         ''' </summary>
         ReadOnly Property ElapsedTime() As TimeSpan
 

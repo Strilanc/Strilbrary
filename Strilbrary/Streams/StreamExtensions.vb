@@ -171,7 +171,7 @@ Namespace Streams
         Public Function ReadBestEffort(ByVal stream As IReadableStream,
                                        ByVal maxCount As Integer) As IRist(Of Byte)
             Contract.Requires(stream IsNot Nothing)
-            Contract.Requires(maxCount > 0)
+            Contract.Requires(maxCount >= 0)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count <= maxCount)
             Dim result = New List(Of Byte)(capacity:=maxCount)
@@ -194,7 +194,7 @@ Namespace Streams
         Public Function ReadExact(ByVal stream As IReadableStream,
                                   ByVal exactCount As Integer) As IRist(Of Byte)
             Contract.Requires(stream IsNot Nothing)
-            Contract.Requires(exactCount > 0)
+            Contract.Requires(exactCount >= 0)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count = exactCount)
             Dim result = ReadBestEffort(stream, maxCount:=exactCount)
@@ -229,7 +229,7 @@ Namespace Streams
                                     ByVal exactCount As Integer) As IRist(Of Byte)
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(position >= 0)
-            Contract.Requires(exactCount > 0)
+            Contract.Requires(exactCount >= 0)
             Contract.Requires(position + exactCount <= stream.Length)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count = exactCount)

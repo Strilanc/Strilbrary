@@ -94,7 +94,7 @@ Namespace Values
             Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
 
             If data Like "*[!0-9A-Fa-f ]*" Then Throw New ArgumentException("Invalid characters.")
-            If data Like "*[! ][! ][! ]*" Then Throw New ArgumentException("Contains a hex value which won't fit in a byte.")
+            If data Like "*[! ][! ][! ]*" Then Throw New ArgumentException("Contains a hex value with more than 2 digits.")
             Dim words = data.Split(" "c)
             Dim bb(0 To words.Length - 1) As Byte
             For i = 0 To words.Length - 1

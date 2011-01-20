@@ -29,7 +29,7 @@ Namespace Time
         <Extension()>
         Public Function AsyncRepeat(ByVal clock As IClock,
                                     ByVal period As TimeSpan,
-                                    ByVal action As action) As IDisposable
+                                    ByVal action As Action) As IDisposable
             Contract.Requires(clock IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IDisposable)() IsNot Nothing)

@@ -153,6 +153,7 @@ Namespace Threading
             ElseIf control.InvokeRequired Then
                 control.BeginInvoke(Sub() result.SetResult(SynchronizationContext.Current))
             Else
+                Contract.Assume(SynchronizationContext.Current IsNot Nothing)
                 Return SynchronizationContext.Current
             End If
 

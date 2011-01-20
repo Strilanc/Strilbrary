@@ -4,6 +4,7 @@ Imports System.Threading
 
 Namespace Threading
     Public Module TaskExtensions
+        '''<summary>Returns a Task object which has already RanToCompletion.</summary>
         <Pure()>
         Public Function CompletedTask() As Task
             Dim result = New TaskCompletionSource(Of NoValue)

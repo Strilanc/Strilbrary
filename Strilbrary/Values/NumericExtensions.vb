@@ -392,13 +392,13 @@ Namespace Values
 
         '''<summary>Determines the value of a sequence of 2 bytes treated as base-256 digits.</summary>
         <Extension()> <Pure()>
-        <SuppressMessage("Microsoft.Contracts", "ArrayLowerBound-128-0")>
-        <SuppressMessage("Microsoft.Contracts", "ArrayUpperBound-128-0")>
+        <SuppressMessage("Microsoft.Contracts", "ArrayLowerBound-138-0")>
+        <SuppressMessage("Microsoft.Contracts", "ArrayUpperBound-138-0")>
         Public Function ToUInt16(ByVal data As IEnumerable(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
             Const size As Integer = 2
             Contract.Requires(data IsNot Nothing)
-            If data.Count <> size Then Throw New ArgumentOutOfRangeException("data", "Incorrect number of bytes.")
+            If data.LazyCount <> size Then Throw New ArgumentOutOfRangeException("data", "Incorrect number of bytes.")
 
             'Handle endian-ness
             Dim reverse = False
@@ -420,13 +420,13 @@ Namespace Values
         End Function
         '''<summary>Determines the value of a sequence of 4 bytes treated as base-256 digits.</summary>
         <Extension()> <Pure()>
-        <SuppressMessage("Microsoft.Contracts", "ArrayLowerBound-128-0")>
-        <SuppressMessage("Microsoft.Contracts", "ArrayUpperBound-128-0")>
+        <SuppressMessage("Microsoft.Contracts", "ArrayLowerBound-138-0")>
+        <SuppressMessage("Microsoft.Contracts", "ArrayUpperBound-138-0")>
         Public Function ToUInt32(ByVal data As IEnumerable(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt32
             Const size As Integer = 4
             Contract.Requires(data IsNot Nothing)
-            If data.Count <> size Then Throw New ArgumentOutOfRangeException("data", "Incorrect number of bytes.")
+            If data.LazyCount <> size Then Throw New ArgumentOutOfRangeException("data", "Incorrect number of bytes.")
 
             'Handle endian-ness
             Dim reverse = False
@@ -448,13 +448,13 @@ Namespace Values
         End Function
         '''<summary>Determines the value of a sequence of 8 bytes treated as base-256 digits.</summary>
         <Extension()> <Pure()>
-        <SuppressMessage("Microsoft.Contracts", "ArrayLowerBound-128-0")>
-        <SuppressMessage("Microsoft.Contracts", "ArrayUpperBound-128-0")>
+        <SuppressMessage("Microsoft.Contracts", "ArrayLowerBound-138-0")>
+        <SuppressMessage("Microsoft.Contracts", "ArrayUpperBound-138-0")>
         Public Function ToUInt64(ByVal data As IEnumerable(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt64
             Const size As Integer = 8
             Contract.Requires(data IsNot Nothing)
-            If data.Count <> size Then Throw New ArgumentOutOfRangeException("data", "Incorrect number of bytes.")
+            If data.LazyCount <> size Then Throw New ArgumentOutOfRangeException("data", "Incorrect number of bytes.")
 
             'Handle endian-ness
             Dim reverse = False

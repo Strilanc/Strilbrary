@@ -3,7 +3,7 @@ Imports Strilbrary.Exceptions
 Imports System.Threading
 
 Namespace Threading
-    '''<summary>A thread-safe queue for running actions in order.</summary>
+    '''<summary>Runs queued actions in order within a synchronization context, exposing the results as tasks.</summary>
     Public NotInheritable Class CallQueue
         Inherits TaskScheduler
 
@@ -24,7 +24,7 @@ Namespace Threading
         End Sub
 
         Protected Overrides Function GetScheduledTasks() As IEnumerable(Of Task)
-            Return _consumerQueue.AsEnumerable
+            Return _consumerQueue
         End Function
         Protected Overrides Sub QueueTask(ByVal task As Task)
             _consumerQueue.EnqueueConsume(task)
@@ -36,7 +36,7 @@ Namespace Threading
         '''<summary>Enqueues an action to be run and exposes it as a task.</summary>
         Public Function QueueAction(ByVal action As Action) As Task
             Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of task)() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
             Dim task = New Task(action)
             task.Start(Me)
             Return task
