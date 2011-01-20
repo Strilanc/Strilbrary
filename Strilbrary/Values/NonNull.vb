@@ -3,6 +3,8 @@
 Namespace Values
     <DebuggerDisplay("{ToString()}")>
     Public Structure NonNull(Of T)
+        Implements IEquatable(Of NonNull(Of T))
+
         Private ReadOnly _value As T
 
         Public Sub New(ByVal value As T)
@@ -28,7 +30,24 @@ Namespace Values
         End Operator
 
         Public Overrides Function ToString() As String
-            Return _value.ToString
+            Return Value.ToString()
         End Function
+        Public Overrides Function GetHashCode() As Integer
+            Return Value.GetHashCode()
+        End Function
+        Public Overrides Function Equals(ByVal obj As Object) As Boolean
+            If TypeOf obj Is NonNull(Of T) Then Return Value.Equals(DirectCast(obj, NonNull(Of T)).Value)
+            If TypeOf obj Is T Then Return Value.Equals(DirectCast(obj, T))
+            Return False
+        End Function
+        Public Overloads Function Equals(ByVal other As NonNull(Of T)) As Boolean Implements IEquatable(Of NonNull(Of T)).Equals
+            Return Me.Value.Equals(other.Value)
+        End Function
+        Public Shared Operator =(ByVal value1 As NonNull(Of T), ByVal value2 As NonNull(Of T)) As Boolean
+            Return value1.Value.Equals(value2.Value)
+        End Operator
+        Public Shared Operator <>(ByVal value1 As NonNull(Of T), ByVal value2 As NonNull(Of T)) As Boolean
+            Return Not value1.Value.Equals(value2.Value)
+        End Operator
     End Structure
 End Namespace
