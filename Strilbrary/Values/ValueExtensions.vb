@@ -51,5 +51,12 @@ Namespace Values
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
             Return New String(chars.ToArray)
         End Function
+
+        <Extension()> <Pure()>
+        Public Function Maybe(Of T)(ByVal value As T) As Maybe(Of T)
+            Contract.Requires(value IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of Maybe(Of T))().HasValue)
+            Return New Maybe(Of T)(value)
+        End Function
     End Module
 End Namespace
