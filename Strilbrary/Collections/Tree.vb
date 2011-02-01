@@ -4,14 +4,14 @@ Namespace Collections
     <ContractClass(GetType(ITreeContractClass(Of )))>
     Public Interface ITree(Of Out T)
         ReadOnly Property Value As T
-        ReadOnly Property Children As IIndexedEnumerable(Of ITree(Of T))
+        ReadOnly Property Children As IRist(Of ITree(Of T))
     End Interface
     <ContractClassFor(GetType(ITree(Of )))>
     Public MustInherit Class ITreeContractClass(Of T)
         Implements ITree(Of T)
-        Public ReadOnly Property Children As IIndexedEnumerable(Of ITree(Of T)) Implements ITree(Of T).Children
+        Public ReadOnly Property Children As IRist(Of ITree(Of T)) Implements ITree(Of T).Children
             Get
-                Contract.Ensures(Contract.Result(Of IIndexedEnumerable(Of ITree(Of T)))() IsNot Nothing)
+                Contract.Ensures(Contract.Result(Of IRist(Of ITree(Of T)))() IsNot Nothing)
                 Throw New NotSupportedException
             End Get
         End Property
@@ -26,13 +26,13 @@ Namespace Collections
     Public Class Tree(Of T)
         Implements ITree(Of T)
         Private ReadOnly _value As T
-        Private ReadOnly _children As IIndexedEnumerable(Of ITree(Of T))
+        Private ReadOnly _children As IRist(Of ITree(Of T))
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(_children IsNot Nothing)
         End Sub
 
-        Public Sub New(ByVal value As T, ByVal children As IIndexedEnumerable(Of ITree(Of T)))
+        Public Sub New(ByVal value As T, ByVal children As IRist(Of ITree(Of T)))
             Contract.Requires(children IsNot Nothing)
             Contract.Ensures(Me._children Is children)
             Me._value = value
@@ -44,9 +44,9 @@ Namespace Collections
                 Return _value
             End Get
         End Property
-        Public ReadOnly Property Children As IIndexedEnumerable(Of ITree(Of T)) Implements ITree(Of T).Children
+        Public ReadOnly Property Children As IRist(Of ITree(Of T)) Implements ITree(Of T).Children
             Get
-                Contract.Ensures(Contract.Result(Of IIndexedEnumerable(Of ITree(Of T)))() IsNot Nothing)
+                Contract.Ensures(Contract.Result(Of IRist(Of ITree(Of T)))() IsNot Nothing)
                 Return _children
             End Get
         End Property

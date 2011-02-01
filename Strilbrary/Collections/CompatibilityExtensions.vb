@@ -70,9 +70,13 @@ Namespace Collections
             Public Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
                 Return _subList.GetEnumerator()
             End Function
-            <SuppressMessage("Microsoft.Contracts", "Ensures-43-12")>
             Public Function IndexOf(ByVal item As T) As Integer Implements IList(Of T).IndexOf
-                Return _subList.IndexOf(item)
+                For i = 0 To _subList.Count
+                    If item.Equals(_subList.Item(i)) Then
+                        Return i
+                    End If
+                Next i
+                Return -1
             End Function
             Default Public Property Item(ByVal index As Integer) As T Implements IList(Of T).Item
                 <SuppressMessage("Microsoft.Contracts", "Requires-21-7")>
@@ -119,18 +123,12 @@ Namespace Collections
                 Me._subList = subList
             End Sub
 
-            Public Function Contains(ByVal item As T) As Boolean Implements IReadableCollection(Of T).Contains
-                Return _subList.Contains(item)
-            End Function
-            Public ReadOnly Property Count As Integer Implements IReadableCollection(Of T).Count
+            Public ReadOnly Property Count As Integer Implements IRist(Of T).Count
                 Get
                     Contract.Ensures(Contract.Result(Of Integer)() = Me._subList.Count)
                     Return _subList.Count
                 End Get
             End Property
-            Public Function IndexOf(ByVal item As T) As Integer Implements IRist(Of T).IndexOf
-                Return _subList.IndexOf(item)
-            End Function
             Public ReadOnly Property Item(ByVal index As Integer) As T Implements IRist(Of T).Item
                 Get
                     Return _subList.Item(index)

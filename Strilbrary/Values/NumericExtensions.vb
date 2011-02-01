@@ -479,7 +479,7 @@ Namespace Values
         ''' Determines the value of a list of 2 bytes treated as base-256 digits.
         ''' </summary>
         <Extension()> <Pure()>
-        Public Function ToUInt16(ByVal data As IIndexedEnumerable(Of Byte),
+        Public Function ToUInt16(ByVal data As IRist(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
             Const size As Integer = 2
             Contract.Requires(data IsNot Nothing)
@@ -505,7 +505,7 @@ Namespace Values
         ''' Determines the value of a list of 4 bytes treated as base-256 digits.
         ''' </summary>
         <Extension()> <Pure()>
-        Public Function ToUInt32(ByVal data As IIndexedEnumerable(Of Byte),
+        Public Function ToUInt32(ByVal data As IRist(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt32
             Const size As Integer = 4
             Contract.Requires(data IsNot Nothing)
@@ -531,7 +531,7 @@ Namespace Values
         ''' Determines the value of a list of 8 bytes treated as base-256 digits.
         ''' </summary>
         <Extension()> <Pure()>
-        Public Function ToUInt64(ByVal data As IIndexedEnumerable(Of Byte),
+        Public Function ToUInt64(ByVal data As IRist(Of Byte),
                                  Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt64
             Const size As Integer = 8
             Contract.Requires(data IsNot Nothing)

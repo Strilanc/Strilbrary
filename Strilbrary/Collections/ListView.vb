@@ -38,7 +38,7 @@ Namespace Collections
                 Return _items(_offset + index)
             End Get
         End Property
-        Public ReadOnly Property Count As Integer Implements IReadableCollection(Of T).Count
+        Public ReadOnly Property Count As Integer Implements IRist(Of T).Count
             Get
                 Contract.Ensures(Contract.Result(Of Integer)() = _length)
                 Return _length
@@ -63,21 +63,6 @@ Namespace Collections
             Return New ListView(Of T)(_items, Me._offset + relativeOffset, relativeLength)
         End Function
 
-        <Pure()>
-        Public Function Contains(ByVal item As T) As Boolean Implements IReadableCollection(Of T).Contains
-            Return IndexOf(item) <> -1
-        End Function
-        <Pure()>
-        Public Function IndexOf(ByVal item As T) As Integer Implements IRist(Of T).IndexOf
-            For i = 0 To Me.Count - 1
-                If item Is Nothing Then
-                    If Me.Item(i) Is Nothing Then Return i
-                Else
-                    If item.Equals(Me.Item(i)) Then Return i
-                End If
-            Next i
-            Return -1
-        End Function
         Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
             Return New Enumerator(Me)
         End Function
