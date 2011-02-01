@@ -126,15 +126,15 @@ Public Class LinqExtensionsTest
 
     <TestMethod()>
     Public Sub MaxRelativeToTest()
-        Assert.IsTrue({0, 1}.MaxRelativeTo(Function(e) e * e) = 1)
-        Assert.IsTrue({4, 2, -10, 3}.MaxRelativeTo(Function(e) e * e) = -10)
-        Assert.IsTrue({-1}.MaxRelativeTo(Function(e) e * e) = -1)
+        Assert.IsTrue({0, 1}.MaxBy(Function(e) e * e) = 1)
+        Assert.IsTrue({4, 2, -10, 3}.MaxBy(Function(e) e * e) = -10)
+        Assert.IsTrue({-1}.MaxBy(Function(e) e * e) = -1)
     End Sub
     <TestMethod()>
     Public Sub MinRelativeToTest()
-        Assert.IsTrue({0, 1}.MinRelativeTo(Function(e) e * e) = 0)
-        Assert.IsTrue({4, 2, -10, 3}.MinRelativeTo(Function(e) e * e) = 2)
-        Assert.IsTrue({-1}.MinRelativeTo(Function(e) e * e) = -1)
+        Assert.IsTrue({0, 1}.MinBy(Function(e) e * e) = 0)
+        Assert.IsTrue({4, 2, -10, 3}.MinBy(Function(e) e * e) = 2)
+        Assert.IsTrue({-1}.MinBy(Function(e) e * e) = -1)
     End Sub
 
     <TestMethod()>

@@ -62,7 +62,7 @@ Namespace Collections
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "Nonnull-89-0")>
         <SuppressMessage("Microsoft.Contracts", "Requires-48-84")>
-        Public Function MaxRelativeTo(Of TInput, TComparable As IComparable(Of TComparable))(
+        Public Function MaxBy(Of TInput, TComparable As IComparable(Of TComparable))(
                         ByVal sequence As IEnumerable(Of TInput),
                         ByVal projection As Func(Of TInput, TComparable)) As TInput
             Contract.Requires(sequence IsNot Nothing)
@@ -77,7 +77,7 @@ Namespace Collections
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "Nonnull-89-0")>
         <SuppressMessage("Microsoft.Contracts", "Requires-48-84")>
-        Public Function MinRelativeTo(Of TInput, TComparable As IComparable(Of TComparable))(
+        Public Function MinBy(Of TInput, TComparable As IComparable(Of TComparable))(
                         ByVal sequence As IEnumerable(Of TInput),
                         ByVal projection As Func(Of TInput, TComparable)) As TInput
             Contract.Requires(sequence IsNot Nothing)
