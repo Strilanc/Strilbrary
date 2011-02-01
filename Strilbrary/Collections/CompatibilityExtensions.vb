@@ -55,6 +55,7 @@ Namespace Collections
                 End Get
             End Property
 
+            <SuppressMessage("Microsoft.Contracts", "Ensures-25-12")>
             Public Function Contains(ByVal item As T) As Boolean Implements ICollection(Of T).Contains
                 Return _subList.Contains(item)
             End Function
@@ -70,8 +71,9 @@ Namespace Collections
             Public Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
                 Return _subList.GetEnumerator()
             End Function
+            <SuppressMessage("Microsoft.Contracts", "Ensures-43-51")>
             Public Function IndexOf(ByVal item As T) As Integer Implements IList(Of T).IndexOf
-                For i = 0 To _subList.Count
+                For i = 0 To _subList.Count - 1
                     If item.Equals(_subList.Item(i)) Then
                         Return i
                     End If
