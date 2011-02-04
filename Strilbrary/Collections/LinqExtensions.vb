@@ -2,6 +2,34 @@
 
 Namespace Collections
     Public Module LinqExtensions
+        '''<summary>Returns a sequence's count if there is a known fast way to get it, or else returns nothing.</summary>
+        <Pure()> <Extension()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Int32?)() Is Nothing OrElse Contract.Result(Of Int32?)().Value >= 0")>
+        Friend Function TryFastCount(ByVal sequence As IEnumerable) As Int32?
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of Int32?)() Is Nothing OrElse Contract.Result(Of Int32?)().Value >= 0)
+            Dim asCollection = TryCast(sequence, ICollection)
+            If asCollection IsNot Nothing Then Return asCollection.Count
+            Dim asSized = TryCast(sequence, ICounted)
+            If asSized IsNot Nothing Then Return asSized.Count
+            Return Nothing
+        End Function
+
+        '''<summary>Returns the index of the first item in the sequence equal to the target, or null if there is no such item.</summary>
+        <Extension()> <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Not Contract.Result(Of Int32?).HasValue OrElse Contract.Result(Of Int32?).Value >= 0")>
+        Public Function IndexOf(Of T)(ByVal sequence As IEnumerable(Of T), ByVal target As T) As Int32?
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Ensures(Not Contract.Result(Of Int32?).HasValue OrElse Contract.Result(Of Int32?).Value >= 0)
+            Dim eq = EqualityComparer(Of T).Default
+            Dim i = 0
+            For Each item In sequence
+                If eq.Equals(item, target) Then Return i
+                i += 1
+            Next item
+            Return Nothing
+        End Function
+
         '''<summary>Determines if a sequence has no elements.</summary>
         <Extension()> <Pure()>
         Public Function None(Of T)(ByVal sequence As IEnumerable(Of T)) As Boolean
@@ -15,10 +43,11 @@ Namespace Collections
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of LazyCounter)() IsNot Nothing)
 
-            Dim list = TryCast(sequence, IList(Of T))
-            If list IsNot Nothing Then Return list.Count
-            Dim counted = TryCast(sequence, ICounted)
-            If counted IsNot Nothing Then Return counted.Count
+            Dim fastCount = sequence.TryFastCount()
+            If fastCount.HasValue Then
+                Contract.Assume(fastCount.Value >= 0)
+                Return fastCount.Value
+            End If
 
             Return New LazyCounter(sequence.GetEnumerator())
         End Function
@@ -304,15 +333,21 @@ Namespace Collections
                        Dim enumerators = (From sequence In sequences
                                           Select sequence.GetEnumerator
                                           ).ToArray
-                       Do
-                           Dim used = False
+                       Try
+                           Do
+                               Dim used = False
+                               For Each enumerator In enumerators
+                                   If Not enumerator.MoveNext() Then Continue For
+                                   used = True
+                                   Yield enumerator.Current
+                               Next enumerator
+                               If Not used Then Exit Do
+                           Loop
+                       Finally
                            For Each enumerator In enumerators
-                               If Not enumerator.MoveNext() Then Continue For
-                               used = True
-                               Yield enumerator.Current
+                               enumerator.Dispose()
                            Next enumerator
-                           If Not used Then Exit Do
-                       Loop
+                       End Try
                    End Function()
         End Function
 
