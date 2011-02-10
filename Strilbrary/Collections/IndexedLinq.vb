@@ -122,5 +122,155 @@ Namespace Collections
             Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
             Return If(TryCast(sequence, IRist(Of T)), sequence.ToArray().AsRist())
         End Function
+
+        '''<summary>Exposes a sequence as a readable list if it is actually a list type, or else returns nothing.</summary>
+        <Pure()> <Extension()>
+        Friend Function TryFastAsRist(Of T)(ByVal sequence As IEnumerable(Of T)) As IRist(Of T)
+            Contract.Requires(sequence IsNot Nothing)
+
+            Dim asRist = TryCast(sequence, IRist(Of T))
+            If asRist IsNot Nothing Then Return asRist
+
+            Dim asList = TryCast(sequence, IList(Of T))
+            If asList IsNot Nothing Then Return asList.AsRist()
+
+            Return Nothing
+        End Function
+
+        ''' <summary>
+        ''' Exposes a sequence as a readable list.
+        ''' The exposed list is lazily cached as items are requested, or delegates directly if the underlying sequence is a list.
+        ''' Not safe to access from multiple threads.
+        ''' </summary>
+        <Extension()> <Pure()>
+        Public Function AsRistLazy(Of T)(ByVal sequence As IEnumerable(Of T)) As IRist(Of T)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+
+            Dim list = sequence.TryFastAsRist()
+            If list IsNot Nothing Then Return list
+
+            Dim knownCount = sequence.TryFastCount()
+            Dim buffer = New List(Of T)()
+            Dim finished = False
+            Dim iter = sequence.GetEnumerator()
+            Return New Rist(Of T)(
+                getter:=Function(i)
+                            If Not finished Then
+                                Do
+                                    If buffer.Count > i Then Exit Do
+                                    If Not iter.MoveNext() Then
+                                        finished = True
+                                        iter.Dispose()
+                                        Exit Do
+                                    End If
+                                    buffer.Add(iter.Current())
+                                Loop
+                            End If
+                            Return buffer(i)
+                        End Function,
+                counter:=Function()
+                             If knownCount.HasValue Then Return knownCount.Value
+                             If Not finished Then
+                                 Try
+                                     While iter.MoveNext()
+                                         buffer.Add(iter.Current())
+                                     End While
+                                     finished = True
+                                 Finally
+                                     iter.Dispose()
+                                 End Try
+                             End If
+                             Return buffer.Count
+                         End Function,
+                efficientIterator:=sequence)
+        End Function
+
+        '''<summary>Wraps a caching layer around a readable list.</summary>
+        <Extension()> <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IRist(Of T))().Count = sequence.Count")>
+        Public Function WithCaching(Of T)(ByVal sequence As IRist(Of T)) As IRist(Of T)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = sequence.Count)
+            Dim cache(0 To sequence.Count - 1) As Values.Maybe(Of T)
+            Return New Rist(Of T)(
+                getter:=Function(i)
+                            If Not cache(i).HasValue Then cache(i) = sequence(i)
+                            Return cache(i).Value
+                        End Function,
+                counter:=Function() sequence.Count)
+        End Function
+
+        '''<summary>Exposes the projected items of a readable list as a readable list.</summary>
+        <Extension()> <Pure()>
+        Public Function [Select](Of TIn, TOut)(ByVal sequence As IRist(Of TIn), ByVal projection As Func(Of TIn, TOut)) As IRist(Of TOut)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(projection IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of TOut))() IsNot Nothing)
+            Return New Rist(Of TOut)(
+                getter:=Function(i) projection(sequence(i)),
+                counter:=Function() sequence.Count,
+                efficientIterator:=sequence.AsEnumerable().Select(projection))
+        End Function
+
+        '''<summary>Exposes the projected items of a pair of readable lists as a readable list.</summary>
+        <Extension()> <Pure()>
+        Public Function Zip(Of TIn1, TIn2, TOut)(ByVal sequence1 As IRist(Of TIn1),
+                                                 ByVal sequence2 As IRist(Of TIn2),
+                                                 ByVal projection As Func(Of TIn1, TIn2, TOut)) As IRist(Of TOut)
+            Contract.Requires(sequence1 IsNot Nothing)
+            Contract.Requires(sequence2 IsNot Nothing)
+            Contract.Requires(projection IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of TOut))() IsNot Nothing)
+            Return New Rist(Of TOut)(
+                getter:=Function(i) projection(sequence1(i), sequence2(i)),
+                counter:=Function() Math.Min(sequence1.Count, sequence2.Count),
+                efficientIterator:=sequence1.AsEnumerable().Zip(sequence2, projection))
+        End Function
+
+        '''<summary>Exposes the projected items of a sized sequence as a sized sequence.</summary>
+        <Extension()> <Pure()>
+        Public Function [Select](Of TIn, TOut)(ByVal sequence As ISizedEnumerable(Of TIn),
+                                               ByVal projection As Func(Of TIn, TOut)) As ISizedEnumerable(Of TOut)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(projection IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of ISizedEnumerable(Of TOut))() IsNot Nothing)
+            Return New SizedEnumerable(Of TOut)(
+                count:=sequence.Count,
+                iterator:=sequence.AsEnumerable().Select(projection))
+        End Function
+
+        '''<summary>Exposes the projected items of a pair of sized sequences as a sized sequence.</summary>
+        <Extension()> <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of ISizedEnumerable(Of TOut))().Count = Math.Min(sequence1.Count, sequence2.Count)")>
+        Public Function Zip(Of TIn1, TIn2, TOut)(ByVal sequence1 As ISizedEnumerable(Of TIn1),
+                                                 ByVal sequence2 As ISizedEnumerable(Of TIn2),
+                                                 ByVal projection As Func(Of TIn1, TIn2, TOut)) As ISizedEnumerable(Of TOut)
+            Contract.Requires(sequence1 IsNot Nothing)
+            Contract.Requires(sequence2 IsNot Nothing)
+            Contract.Requires(projection IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of ISizedEnumerable(Of TOut))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of ISizedEnumerable(Of TOut))().Count = Math.Min(sequence1.Count, sequence2.Count))
+            Return New SizedEnumerable(Of TOut)(
+                count:=Math.Min(sequence1.Count, sequence2.Count),
+                iterator:=sequence1.AsEnumerable().Zip(sequence2, projection))
+        End Function
+
+        '''<summary>Exposes the intermediate results of aggregating a sized sequence as a sized sequence.</summary>
+        <Extension()> <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of ISizedEnumerable(Of TAccumulate))().Count = sequence.Count")>
+        Public Function PartialAggregates(Of TValue, TAccumulate)(ByVal sequence As ISizedEnumerable(Of TValue),
+                                                                  ByVal seed As TAccumulate,
+                                                                  ByVal func As Func(Of TAccumulate, TValue, TAccumulate)) As ISizedEnumerable(Of TAccumulate)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(func IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of ISizedEnumerable(Of TAccumulate))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of ISizedEnumerable(Of TAccumulate))().Count = sequence.Count)
+
+            Return New SizedEnumerable(Of TAccumulate)(
+                count:=sequence.Count,
+                iterator:=sequence.AsEnumerable().PartialAggregates(seed, func))
+        End Function
     End Module
 End Namespace
