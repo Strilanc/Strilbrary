@@ -25,6 +25,9 @@ Namespace Time
         ''' <summary>
         ''' Begins periodically calling an action, and returns an IDisposable to end the repetition.
         ''' The first call happens after the period has elapsed (instead of immediately).
+        ''' The period is from start time to start time, not end time to start time.
+        ''' The action may be started again while it is running.
+        ''' Beware repeating an action faster than the time it takes to complete.
         ''' </summary>
         <Extension()>
         Public Function AsyncRepeat(ByVal clock As IClock,
@@ -39,9 +42,9 @@ Namespace Time
             Dim t = clock.ElapsedTime
             callback = Sub()
                            If stopFlag Then Return
-                           Call action()
                            t += period
                            clock.AsyncWaitUntil(t).ContinueWithAction(callback)
+                           Call action()
                        End Sub
             t += period
             clock.AsyncWaitUntil(t).ContinueWithAction(callback)

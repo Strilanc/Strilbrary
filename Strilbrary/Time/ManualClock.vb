@@ -9,7 +9,7 @@ Namespace Time
     Public Class ManualClock
         Implements IClock
         Private _time As New TimeSpan(ticks:=0)
-        Private ReadOnly _waitQueue As New PriorityQueue(Of Tuple(Of TimeSpan, TaskCompletionSource(Of NoValue)))(Function(x, y) -x.Item1.CompareTo(y.Item1))
+        Private ReadOnly _waitQueue As New PriorityQueue(Of Tuple(Of TimeSpan, TaskCompletionSource(Of NoValue)))(Function(x, y) y.Item1.CompareTo(x.Item1))
         Private ReadOnly _lock As New Object()
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()

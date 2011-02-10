@@ -2,6 +2,7 @@
 Imports Strilbrary.Values
 
 Namespace Time
+    '''<summary>Represents a clock used to track and react to the progression of a monotonically increasing quantity like time.</summary>
     <ContractClass(GetType(IClock.ContractClass))>
     Public Interface IClock
         ''' <summary>
