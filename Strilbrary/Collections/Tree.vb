@@ -66,7 +66,7 @@ Namespace Collections
             Return New Tree(Of TResult)(value:=projection(tree.Value),
                                         children:=(From child In tree.Children
                                                    Select child.Select(projection)
-                                                   ).ToReadableList)
+                                                   ).ToRist)
         End Function
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "Nonnull-111-0")>
@@ -80,7 +80,7 @@ Namespace Collections
             Return New Tree(Of TResult)(value:=projection2(tree.Value, projection1(tree.Value).Value),
                                         children:=(From child In tree.Children
                                                    Select child.SelectMany(projection1, projection2)
-                                                   ).ToReadableList)
+                                                   ).ToRist)
         End Function
         <Extension()> <Pure()>
         Public Function Where(Of TValue)(ByVal tree As ITree(Of TValue),
@@ -98,7 +98,7 @@ Namespace Collections
             Contract.Ensures(Contract.Result(Of ITree(Of TValue))() IsNot Nothing)
             Return New Tree(Of TValue)(tree.Value, (From child In tree.Children
                                                     Where predicate(child.Value)
-                                                    ).ToReadableList)
+                                                    ).ToRist)
         End Function
     End Module
 End Namespace

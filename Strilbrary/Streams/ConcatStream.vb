@@ -39,7 +39,7 @@ Namespace Streams
                 End Select
             End While
             Contract.Assume(result.Count <= maxCount)
-            Return result.AsReadableList
+            Return result.AsRist
         End Function
 
         Public Sub Dispose() Implements IDisposable.Dispose

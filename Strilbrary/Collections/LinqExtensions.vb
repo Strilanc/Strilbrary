@@ -279,7 +279,7 @@ Namespace Collections
                        For Each item In sequence
                            rollingWindow.Enqueue(item)
                            If rollingWindow.Count >= windowSize Then
-                               Yield rollingWindow.ToReadableList()
+                               Yield rollingWindow.ToRist()
                                rollingWindow.Dequeue()
                            End If
                        Next item

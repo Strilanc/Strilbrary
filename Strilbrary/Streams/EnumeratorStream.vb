@@ -19,7 +19,7 @@ Namespace Streams
             While result.Count < maxCount AndAlso _enumerator.MoveNext
                 result.Add(_enumerator.Current)
             End While
-            Return result.AsReadableList
+            Return result.AsRist
         End Function
 
         Public Sub Dispose() Implements IDisposable.Dispose

@@ -13,19 +13,6 @@ Namespace Collections
             'Contract.Assume(list.IsReadOnly) '[would fix the unproven postcondition, but causes a can-be-proven-warning!]
             Return list
         End Function
-        <Extension()> <Pure()>
-        Public Function AsReadableList(Of T)(ByVal this As IList(Of T)) As IRist(Of T)
-            Contract.Requires(this IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = this.Count)
-            Return New ListToReadableListBridge(Of T)(this)
-        End Function
-        <Extension()> <Pure()>
-        Public Function ToReadableList(Of T)(ByVal sequence As IEnumerable(Of T)) As IRist(Of T)
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
-            Return If(TryCast(sequence, IRist(Of T)), sequence.ToArray.AsReadableList)
-        End Function
 
         <DebuggerDisplay("{ToString()}")>
         Private Class ReadableListToListBridge(Of T)
@@ -107,47 +94,6 @@ Namespace Collections
             End Sub
             Public Overrides Function ToString() As String
                 Return _subList.ToString
-            End Function
-        End Class
-        <DebuggerDisplay("{ToString()}")>
-        Private Class ListToReadableListBridge(Of T)
-            Implements IRist(Of T)
-
-            Private ReadOnly _subList As IList(Of T)
-
-            <ContractInvariantMethod()> Private Sub ObjectInvariant()
-                Contract.Invariant(_subList IsNot Nothing)
-            End Sub
-
-            Public Sub New(ByVal subList As IList(Of T))
-                Contract.Requires(subList IsNot Nothing)
-                Contract.Ensures(Me.Count = subList.Count)
-                Me._subList = subList
-            End Sub
-
-            Public ReadOnly Property Count As Integer Implements IRist(Of T).Count
-                Get
-                    Contract.Ensures(Contract.Result(Of Integer)() = Me._subList.Count)
-                    Return _subList.Count
-                End Get
-            End Property
-            Public ReadOnly Property Item(ByVal index As Integer) As T Implements IRist(Of T).Item
-                Get
-                    Return _subList.Item(index)
-                End Get
-            End Property
-            Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
-                Return _subList.GetEnumerator
-            End Function
-            Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements IEnumerable.GetEnumerator
-                Return _subList.GetEnumerator
-            End Function
-
-            Public Overrides Function ToString() As String
-                Const MaxItems As Integer = 10
-                Return "Count: {0}, Items: [{1}{2}".Frmt(Me.Count,
-                                                         Me.Take(MaxItems).StringJoin(", "),
-                                                         If(Me.Count <= MaxItems, "]", ", ..."))
             End Function
         End Class
     End Module

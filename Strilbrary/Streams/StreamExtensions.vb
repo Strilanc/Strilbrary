@@ -184,7 +184,7 @@ Namespace Streams
                 End Select
             End While
             Contract.Assume(result.Count = maxCount)
-            Return result.AsReadableList
+            Return result.AsRist
         End Function
         ''' <summary>
         ''' Reads an exact amount of bytes from the stream (as opposed to the default Read which may return fewer bytes).
@@ -317,7 +317,7 @@ Namespace Streams
         Public Sub Write(ByVal stream As IWritableStream,
                          ByVal value As Byte)
             Contract.Requires(stream IsNot Nothing)
-            stream.Write({value}.AsReadableList)
+            stream.Write({value}.AsRist)
         End Sub
         '''<summary>Writes a UInt16 to the stream.</summary>
         <Extension()>
@@ -325,7 +325,7 @@ Namespace Streams
                          ByVal value As UInt16,
                          Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian)
             Contract.Requires(stream IsNot Nothing)
-            stream.Write(value.Bytes(byteOrder).AsReadableList)
+            stream.Write(value.Bytes(byteOrder).AsRist)
         End Sub
         '''<summary>Writes a UInt32 to the stream.</summary>
         <Extension()>
@@ -333,7 +333,7 @@ Namespace Streams
                          ByVal value As UInt32,
                          Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian)
             Contract.Requires(stream IsNot Nothing)
-            stream.Write(value.Bytes(byteOrder).AsReadableList)
+            stream.Write(value.Bytes(byteOrder).AsRist)
         End Sub
         '''<summary>Writes a UInt64 to the stream.</summary>
         <Extension()>
@@ -341,21 +341,21 @@ Namespace Streams
                          ByVal value As UInt64,
                          Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian)
             Contract.Requires(stream IsNot Nothing)
-            stream.Write(value.Bytes(byteOrder).AsReadableList)
+            stream.Write(value.Bytes(byteOrder).AsRist)
         End Sub
         '''<summary>Writes a Single to the stream.</summary>
         <Extension()>
         Public Sub Write(ByVal stream As IWritableStream,
                          ByVal value As Single)
             Contract.Requires(stream IsNot Nothing)
-            stream.Write(BitConverter.GetBytes(value).AsReadableList)
+            stream.Write(BitConverter.GetBytes(value).AsRist)
         End Sub
         '''<summary>Writes a Double to the stream.</summary>
         <Extension()>
         Public Sub Write(ByVal stream As IWritableStream,
                          ByVal value As Double)
             Contract.Requires(stream IsNot Nothing)
-            stream.Write(BitConverter.GetBytes(value).AsReadableList)
+            stream.Write(BitConverter.GetBytes(value).AsRist)
         End Sub
 
         '''<summary>Reads all remaining data from the stream.</summary>
@@ -369,7 +369,7 @@ Namespace Streams
                 If read.Count = 0 Then Exit Do
                 result.AddRange(read)
             Loop
-            Return result.AsReadableList
+            Return result.AsRist
         End Function
 
         '''<summary>Exposes a sequence of bytes as an IReadableStream.</summary>

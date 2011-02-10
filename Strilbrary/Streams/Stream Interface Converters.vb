@@ -26,7 +26,7 @@ Namespace Streams
             Public Function Read(ByVal maxLength As Integer) As IRist(Of Byte) Implements IReadableStream.Read
                 Dim buffer(0 To maxLength - 1) As Byte
                 Dim n = _stream.Read(buffer, 0, maxLength)
-                Return New ListView(Of Byte)(buffer.AsReadableList, 0, n)
+                Return New ListView(Of Byte)(buffer.AsRist, 0, n)
             End Function
 
             Public Sub Write(ByVal data As IRist(Of Byte)) Implements IWritableStream.Write
@@ -146,7 +146,7 @@ Namespace Streams
             <SuppressMessage("Microsoft.Contracts", "Unsafe-1-0")>
             Public Overrides Sub Write(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer)
                 If _writeStream Is Nothing Then Throw New NotSupportedException()
-                _writeStream.Write(buffer.AsReadableList.SubView(offset, count))
+                _writeStream.Write(buffer.AsRist.SubView(offset, count))
             End Sub
             Public Overrides Sub Flush()
                 If _writeStream IsNot Nothing Then _writeStream.Flush()

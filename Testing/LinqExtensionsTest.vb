@@ -239,10 +239,10 @@ Public Class LinqExtensionsTest
     End Sub
     <TestMethod()>
     Public Sub SubViewTest()
-        Assert.IsTrue({1, 2, 3}.AsReadableList.SubView(0).SequenceEqual({1, 2, 3}))
-        Assert.IsTrue({1, 2, 3}.AsReadableList.SubView(1).SequenceEqual({2, 3}))
-        Assert.IsTrue({1, 2, 3}.AsReadableList.SubView(1, 1).SequenceEqual({2}))
-        Assert.IsTrue({1, 2, 3}.AsReadableList.SubView(1, 0).SequenceEqual({}))
+        Assert.IsTrue({1, 2, 3}.AsRist.SubView(0).SequenceEqual({1, 2, 3}))
+        Assert.IsTrue({1, 2, 3}.AsRist.SubView(1).SequenceEqual({2, 3}))
+        Assert.IsTrue({1, 2, 3}.AsRist.SubView(1, 1).SequenceEqual({2}))
+        Assert.IsTrue({1, 2, 3}.AsRist.SubView(1, 0).SequenceEqual({}))
     End Sub
 
     <TestMethod()>

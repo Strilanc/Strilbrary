@@ -101,4 +101,26 @@ Namespace Collections
                                                      If(Me.Count <= MaxItems, "]", ", ..."))
         End Function
     End Class
+
+    Public Module IndexedLinqExtensions
+        '''<summary>Exposes a list as a readable list.</summary>
+        <Extension()> <Pure()>
+        Public Function AsRist(Of T)(ByVal list As IList(Of T)) As IRist(Of T)
+            Contract.Requires(list IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = list.Count)
+            Return New Rist(Of T)(
+                getter:=Function(i) list(i),
+                counter:=Function() list.Count,
+                efficientIterator:=list)
+        End Function
+
+        '''<summary>Creates a copy of the given sequence and exposes it as a readable list.</summary>
+        <Extension()> <Pure()>
+        Public Function ToRist(Of T)(ByVal sequence As IEnumerable(Of T)) As IRist(Of T)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Return If(TryCast(sequence, IRist(Of T)), sequence.ToArray().AsRist())
+        End Function
+    End Module
 End Namespace
