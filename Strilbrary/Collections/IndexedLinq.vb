@@ -109,34 +109,26 @@ Namespace Collections
             Contract.Requires(list IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = list.Count)
-            Return New Rist(Of T)(
-                getter:=Function(i) list(i),
-                counter:=Function() list.Count,
-                efficientIterator:=list)
+            Dim r = New Rist(Of T)(getter:=Function(i) list(i),
+                                   counter:=Function() list.Count,
+                                   efficientIterator:=list)
+            Contract.Assume(r.Count = list.Count)
+            Return r
         End Function
-
-        '''<summary>Creates a copy of the given sequence and exposes it as a readable list.</summary>
+        '''<summary>Creates a copy of the given sequence and exposes the copy as a readable list.</summary>
         <Extension()> <Pure()>
         Public Function ToRist(Of T)(ByVal sequence As IEnumerable(Of T)) As IRist(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
-            Return If(TryCast(sequence, IRist(Of T)), sequence.ToArray().AsRist())
+            Return sequence.ToArray().AsRist()
         End Function
-
-        '''<summary>Exposes a sequence as a readable list if it is actually a list type, or else returns nothing.</summary>
-        <Pure()> <Extension()>
-        Friend Function TryFastAsRist(Of T)(ByVal sequence As IEnumerable(Of T)) As IRist(Of T)
+        '''<summary>Creates a copy of the given sequence, unless it is already an IRist, and exposes it as a readable list.</summary>
+        <Extension()> <Pure()>
+        Public Function AsRist(Of T)(ByVal sequence As IEnumerable(Of T)) As IRist(Of T)
             Contract.Requires(sequence IsNot Nothing)
-
-            Dim asRist = TryCast(sequence, IRist(Of T))
-            If asRist IsNot Nothing Then Return asRist
-
-            Dim asList = TryCast(sequence, IList(Of T))
-            If asList IsNot Nothing Then Return asList.AsRist()
-
-            Return Nothing
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Return If(TryCast(sequence, IRist(Of T)), sequence.ToRist())
         End Function
-
         ''' <summary>
         ''' Exposes a sequence as a readable list.
         ''' The exposed list is lazily cached as items are requested, or delegates directly if the underlying sequence is a list.
@@ -147,8 +139,11 @@ Namespace Collections
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
 
-            Dim list = sequence.TryFastAsRist()
-            If list IsNot Nothing Then Return list
+            Dim asRist = TryCast(sequence, IRist(Of T))
+            If asRist IsNot Nothing Then Return asRist
+
+            Dim asList = TryCast(sequence, IList(Of T))
+            If asList IsNot Nothing Then Return asList.AsRist()
 
             Dim knownCount = sequence.TryFastCount()
             Dim buffer = New List(Of T)()
@@ -184,6 +179,37 @@ Namespace Collections
                              Return buffer.Count
                          End Function,
                 efficientIterator:=sequence)
+        End Function
+
+        '''<summary>Wraps a readable list in a list view.</summary>
+        <Extension()> <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of ListView(Of T))().Count = list.Count")>
+        Private Function AsView(Of T)(ByVal list As IRist(Of T)) As ListView(Of T)
+            Contract.Requires(list IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of ListView(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of ListView(Of T))().Count = list.Count)
+            Return If(TryCast(list, ListView(Of T)), New ListView(Of T)(list, 0, list.Count))
+        End Function
+        '''<summary>Returns a list containing a contiguous subset of the given list starting at the given offset.</summary>
+        <Extension()> <Pure()>
+        Public Function SubView(Of T)(ByVal list As IRist(Of T), ByVal offset As Integer) As IRist(Of T)
+            Contract.Requires(list IsNot Nothing)
+            Contract.Requires(offset >= 0)
+            Contract.Requires(offset <= list.Count)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = list.Count - offset)
+            Return list.AsView().SubView(offset)
+        End Function
+        '''<summary>Returns a list containing a contiguous subset of the given list starting at the given offset and running for the given length.</summary>
+        <Extension()> <Pure()>
+        Public Function SubView(Of T)(ByVal list As IRist(Of T), ByVal offset As Integer, ByVal length As Integer) As IRist(Of T)
+            Contract.Requires(list IsNot Nothing)
+            Contract.Requires(offset >= 0)
+            Contract.Requires(length >= 0)
+            Contract.Requires(offset + length <= list.Count)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = length)
+            Return list.AsView().SubView(offset, length)
         End Function
 
         '''<summary>Wraps a caching layer around a readable list.</summary>

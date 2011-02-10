@@ -184,7 +184,6 @@
     <Compile Include="Values\NumericExtensions.vb" />
     <Compile Include="Streams\ConcatStream.vb" />
     <Compile Include="Threading\DisposableWithTask.vb" />
-    <Compile Include="Collections\LinqListExtensions.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

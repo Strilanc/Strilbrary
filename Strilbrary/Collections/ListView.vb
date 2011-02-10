@@ -63,8 +63,10 @@ Namespace Collections
             Return New ListView(Of T)(_items, Me._offset + relativeOffset, relativeLength)
         End Function
 
-        Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
-            Return New Enumerator(Me)
+        Public Iterator Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
+            For i = _offset To _offset + _length - 1
+                Yield _items(i)
+            Next i
         End Function
         Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
             Return GetEnumerator()
@@ -76,48 +78,5 @@ Namespace Collections
                                                      Me.Take(MaxItems).StringJoin(", "),
                                                      If(Me.Count <= MaxItems, "]", ", ..."))
         End Function
-
-        Private Class Enumerator
-            Implements IEnumerator(Of T)
-
-            Private _index As Int32 = -1
-            Private ReadOnly _list As IRist(Of T)
-
-            <ContractInvariantMethod()> Private Sub ObjectInvariant()
-                Contract.Invariant(_list IsNot Nothing)
-            End Sub
-
-            Public Sub New(ByVal list As IRist(Of T))
-                Contract.Requires(list IsNot Nothing)
-                Me._list = list
-            End Sub
-
-            Public ReadOnly Property Current As T Implements IEnumerator(Of T).Current
-                Get
-                    If _index < 0 Then Throw New InvalidOperationException("Enumerator not started.")
-                    If _index >= _list.Count Then Throw New InvalidOperationException("Enumerator finished.")
-                    Return _list(_index)
-                End Get
-            End Property
-
-            Private ReadOnly Property CurrentObj As Object Implements System.Collections.IEnumerator.Current
-                Get
-                    Return Current
-                End Get
-            End Property
-
-            Public Function MoveNext() As Boolean Implements System.Collections.IEnumerator.MoveNext
-                _index += 1
-                Return _index < _list.Count
-            End Function
-
-            Public Sub Reset() Implements System.Collections.IEnumerator.Reset
-                Throw New NotSupportedException
-            End Sub
-
-            Private Sub Dispose() Implements IDisposable.Dispose
-                _index = _list.Count
-            End Sub
-        End Class
     End Class
 End Namespace
