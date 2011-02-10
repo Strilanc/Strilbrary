@@ -13,7 +13,7 @@
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(_denominator > 0)
-            Contract.Invariant(BigInteger.GreatestCommonDivisor(_numerator, _denominator) = 1)
+            'Contract.Invariant(BigInteger.GreatestCommonDivisor(_numerator, _denominator) = 1) 'GCD needs to be marked pure
         End Sub
 
         ''' <summary>
@@ -27,6 +27,7 @@
             Me._numerator = numerator / gcd
             Me._denominator = denominator / gcd
             Contract.Assume(_denominator > 0)
+            Contract.Assume(BigInteger.GreatestCommonDivisor(_numerator, _denominator) = 1)
         End Sub
 
         Public ReadOnly Property Numerator As BigInteger
@@ -175,7 +176,9 @@
         <Pure()> <Extension()>
         Public Function Abs(ByVal value As Rational) As Rational
             Contract.Ensures(Contract.Result(Of Rational)() >= 0)
-            Return If(value.Sign() < 0, -value, value)
+            Dim r = If(value.Sign() < 0, -value, value)
+            Contract.Assume(r >= 0)
+            Return r
         End Function
     End Module
 End Namespace
