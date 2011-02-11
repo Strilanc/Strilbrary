@@ -202,6 +202,63 @@ Namespace Collections
                 efficientIterator:=sequence1.AsEnumerable().Zip(sequence2, projection))
         End Function
 
+        <Pure()> <Extension()>
+        Public Function Take(Of T)(ByVal rist As IRist(Of T), ByVal maxTakeCount As Int32) As IRist(Of T)
+            Contract.Requires(rist IsNot Nothing)
+            Contract.Requires(maxTakeCount >= 0)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = Math.Min(rist.Count, maxTakeCount))
+            Return New Rist(Of T)(getter:=Function(i) rist(i),
+                                  count:=Math.Min(rist.Count, maxTakeCount))
+        End Function
+        <Pure()> <Extension()>
+        Public Function Skip(Of T)(ByVal rist As IRist(Of T), ByVal maxSkipCount As Int32) As IRist(Of T)
+            Contract.Requires(rist IsNot Nothing)
+            Contract.Requires(maxSkipCount >= 0)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = rist.Count - Math.Min(rist.Count, maxSkipCount))
+            Return New Rist(Of T)(getter:=Function(i) rist(i + maxSkipCount),
+                                  count:=rist.Count - Math.Min(rist.Count, maxSkipCount))
+        End Function
+        <Pure()> <Extension()>
+        Public Function TakeLastExact(Of T)(ByVal rist As IRist(Of T), ByVal exactTakeCount As Int32) As IRist(Of T)
+            Contract.Requires(rist IsNot Nothing)
+            Contract.Requires(exactTakeCount >= 0)
+            Contract.Requires(exactTakeCount <= rist.Count)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = exactTakeCount)
+            Return New Rist(Of T)(getter:=Function(i) rist(rist.Count - exactTakeCount + i),
+                                  count:=exactTakeCount)
+        End Function
+        <Pure()> <Extension()>
+        Public Function SkipLastExact(Of T)(ByVal rist As IRist(Of T), ByVal exactSkipCount As Int32) As IRist(Of T)
+            Contract.Requires(rist IsNot Nothing)
+            Contract.Requires(exactSkipCount >= 0)
+            Contract.Requires(exactSkipCount <= rist.Count)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = rist.Count - exactSkipCount)
+            Return New Rist(Of T)(getter:=Function(i) rist(i),
+                                  count:=rist.Count - exactSkipCount)
+        End Function
+        <Pure()> <Extension()>
+        Public Function TakeLast(Of T)(ByVal rist As IRist(Of T), ByVal maxTakeCount As Int32) As IRist(Of T)
+            Contract.Requires(rist IsNot Nothing)
+            Contract.Requires(maxTakeCount >= 0)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = Math.Min(rist.Count, maxTakeCount))
+            Return New Rist(Of T)(getter:=Function(i) rist(rist.Count - Math.Min(rist.Count, maxTakeCount) + i),
+                                  count:=Math.Min(rist.Count, maxTakeCount))
+        End Function
+        <Pure()> <Extension()>
+        Public Function SkipLast(Of T)(ByVal rist As IRist(Of T), ByVal maxSkipCount As Int32) As IRist(Of T)
+            Contract.Requires(rist IsNot Nothing)
+            Contract.Requires(maxSkipCount >= 0)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = rist.Count - Math.Min(rist.Count, maxSkipCount))
+            Return New Rist(Of T)(getter:=Function(i) rist(i),
+                                  count:=rist.Count - Math.Min(rist.Count, maxSkipCount))
+        End Function
+
         '''<summary>Exposes the projected items of a sized sequence as a sized sequence.</summary>
         <Extension()> <Pure()>
         Public Function [Select](Of TIn, TOut)(ByVal sequence As ISizedEnumerable(Of TIn),
