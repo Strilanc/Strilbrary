@@ -128,7 +128,8 @@
   <ItemGroup>
     <CodeAnalysisDictionary Include="CustomDictionary.xml" />
     <Compile Include="Collections\CompatibilityExtensions.vb" />
-    <Compile Include="Collections\IndexedLinq.vb" />
+    <Compile Include="Collections\SizedExtensions.vb" />
+    <Compile Include="Collections\RistExtensions.vb" />
     <Compile Include="Collections\LazyCounter.vb" />
     <Compile Include="Collections\PriorityQueue.vb" />
     <Compile Include="Collections\LinqExtensions.vb" />
