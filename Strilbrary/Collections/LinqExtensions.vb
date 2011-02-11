@@ -175,7 +175,7 @@ Namespace Collections
             Contract.Requires(limit >= 0)
             Contract.Ensures(Contract.Result(Of IRist(Of Int32))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of Int32))().Count = limit)
-            Return New Rist(Of Int32)(getter:=Function(i) i, counter:=Function() limit)
+            Return New Rist(Of Int32)(getter:=Function(i) i, count:=limit)
         End Function
         '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
         <Pure()> <Extension()>
@@ -198,9 +198,7 @@ Namespace Collections
             Contract.Requires(limit >= 0)
             Contract.Ensures(Contract.Result(Of IRist(Of UInt16))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of UInt16))().Count = limit)
-            Dim r = New Rist(Of UInt16)(getter:=Function(i) CUShort(i), counter:=Function() limit)
-            Contract.Assume(r.Count = limit)
-            Return r
+            Return New Rist(Of UInt16)(getter:=Function(i) CUShort(i), count:=limit)
         End Function
         '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
         <Pure()> <Extension()>
@@ -209,9 +207,7 @@ Namespace Collections
             Contract.Requires(limit >= 0)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count = limit)
-            Dim r = New Rist(Of Byte)(getter:=Function(i) CByte(i), counter:=Function() limit)
-            Contract.Assume(r.Count = limit)
-            Return r
+            Return New Rist(Of Byte)(getter:=Function(i) CByte(i), count:=limit)
         End Function
 
         '''<summary>Enumerates items in the sequence, offset by the given amount.</summary>
@@ -247,7 +243,7 @@ Namespace Collections
             Contract.Requires(count >= 0)
             Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = count)
-            Return New Rist(Of T)(getter:=Function(i) value, counter:=Function() count)
+            Return New Rist(Of T)(getter:=Function(i) value, count:=count)
         End Function
         '''<summary>Returns a never-ending sequence consisting of a repeated value.</summary>
         <Pure()> <Extension()>

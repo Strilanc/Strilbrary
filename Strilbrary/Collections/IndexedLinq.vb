@@ -48,36 +48,36 @@ Namespace Collections
     Public Class Rist(Of T)
         Implements IRist(Of T)
 
-        Private ReadOnly _counter As Func(Of Int32)
+        Private ReadOnly _count As Int32
         Private ReadOnly _getter As Func(Of Int32, T)
         Private ReadOnly _iterator As IEnumerable(Of T)
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
-            Contract.Invariant(_counter IsNot Nothing)
+            Contract.Invariant(_count >= 0)
             Contract.Invariant(_getter IsNot Nothing)
             Contract.Invariant(_iterator IsNot Nothing)
         End Sub
 
         Public Sub New(ByVal getter As Func(Of Int32, T),
-                       ByVal counter As Func(Of Int32),
+                       ByVal count As Int32,
                        Optional ByVal efficientIterator As IEnumerable(Of T) = Nothing)
             Contract.Requires(getter IsNot Nothing)
-            Contract.Requires(counter IsNot Nothing)
+            Contract.Requires(count >= 0)
+            Contract.Ensures(Me.Count = count)
             Me._getter = getter
-            Me._counter = counter
+            Me._count = count
             Me._iterator = If(efficientIterator, Iterator Function()
-                                                     For i = 0 To _counter() - 1
+                                                     For i = 0 To _count - 1
                                                          Yield _getter(i)
                                                      Next i
                                                  End Function())
+            Contract.Assume(Me.Count = count)
             Contract.Assume(_iterator IsNot Nothing)
         End Sub
 
         Public ReadOnly Property Count As Integer Implements ICounted.Count
             Get
-                Dim result = _counter()
-                If result < 0 Then Throw New Exceptions.InvalidStateException("Invalid count.")
-                Return result
+                Return _count
             End Get
         End Property
         Default Public ReadOnly Property Item(ByVal index As Integer) As T Implements IRist(Of T).Item
@@ -109,11 +109,9 @@ Namespace Collections
             Contract.Requires(list IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = list.Count)
-            Dim r = New Rist(Of T)(getter:=Function(i) list(i),
-                                   counter:=Function() list.Count,
-                                   efficientIterator:=list)
-            Contract.Assume(r.Count = list.Count)
-            Return r
+            Return New Rist(Of T)(getter:=Function(i) list(i),
+                                  count:=list.Count,
+                                  efficientIterator:=list)
         End Function
         '''<summary>Creates a copy of the given sequence and exposes the copy as a readable list.</summary>
         <Extension()> <Pure()>
@@ -128,57 +126,6 @@ Namespace Collections
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
             Return If(TryCast(sequence, IRist(Of T)), sequence.ToRist())
-        End Function
-        ''' <summary>
-        ''' Exposes a sequence as a readable list.
-        ''' The exposed list is lazily cached as items are requested, or delegates directly if the underlying sequence is a list.
-        ''' Not safe to access from multiple threads.
-        ''' </summary>
-        <Extension()> <Pure()>
-        Public Function AsRistLazy(Of T)(ByVal sequence As IEnumerable(Of T)) As IRist(Of T)
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
-
-            Dim asRist = TryCast(sequence, IRist(Of T))
-            If asRist IsNot Nothing Then Return asRist
-
-            Dim asList = TryCast(sequence, IList(Of T))
-            If asList IsNot Nothing Then Return asList.AsRist()
-
-            Dim knownCount = sequence.TryFastCount()
-            Dim buffer = New List(Of T)()
-            Dim finished = False
-            Dim iter = sequence.GetEnumerator()
-            Return New Rist(Of T)(
-                getter:=Function(i)
-                            If Not finished Then
-                                Do
-                                    If buffer.Count > i Then Exit Do
-                                    If Not iter.MoveNext() Then
-                                        finished = True
-                                        iter.Dispose()
-                                        Exit Do
-                                    End If
-                                    buffer.Add(iter.Current())
-                                Loop
-                            End If
-                            Return buffer(i)
-                        End Function,
-                counter:=Function()
-                             If knownCount.HasValue Then Return knownCount.Value
-                             If Not finished Then
-                                 Try
-                                     While iter.MoveNext()
-                                         buffer.Add(iter.Current())
-                                     End While
-                                     finished = True
-                                 Finally
-                                     iter.Dispose()
-                                 End Try
-                             End If
-                             Return buffer.Count
-                         End Function,
-                efficientIterator:=sequence)
         End Function
 
         '''<summary>Wraps a readable list in a list view.</summary>
@@ -225,7 +172,7 @@ Namespace Collections
                             If Not cache(i).HasValue Then cache(i) = sequence(i)
                             Return cache(i).Value
                         End Function,
-                counter:=Function() sequence.Count)
+                count:=sequence.Count)
         End Function
 
         '''<summary>Exposes the projected items of a readable list as a readable list.</summary>
@@ -236,7 +183,7 @@ Namespace Collections
             Contract.Ensures(Contract.Result(Of IRist(Of TOut))() IsNot Nothing)
             Return New Rist(Of TOut)(
                 getter:=Function(i) projection(sequence(i)),
-                counter:=Function() sequence.Count,
+                count:=sequence.Count,
                 efficientIterator:=sequence.AsEnumerable().Select(projection))
         End Function
 
@@ -251,7 +198,7 @@ Namespace Collections
             Contract.Ensures(Contract.Result(Of IRist(Of TOut))() IsNot Nothing)
             Return New Rist(Of TOut)(
                 getter:=Function(i) projection(sequence1(i), sequence2(i)),
-                counter:=Function() Math.Min(sequence1.Count, sequence2.Count),
+                count:=Math.Min(sequence1.Count, sequence2.Count),
                 efficientIterator:=sequence1.AsEnumerable().Zip(sequence2, projection))
         End Function
 
