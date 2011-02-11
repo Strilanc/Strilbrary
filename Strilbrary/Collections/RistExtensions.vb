@@ -30,7 +30,6 @@ Namespace Collections
                                                      Next i
                                                  End Function())
             Contract.Assume(Me.Count = count)
-            Contract.Assume(_iterator IsNot Nothing)
         End Sub
 
         Public ReadOnly Property Count As Integer Implements ICounted.Count
@@ -60,7 +59,7 @@ Namespace Collections
         End Function
     End Class
 
-    Public Module IndexedLinqExtensions
+    Public Module RistExtensions
         '''<summary>Exposes a list as a readable list.</summary>
         <Extension()> <Pure()>
         Public Function AsRist(Of T)(ByVal list As IList(Of T)) As IRist(Of T)
