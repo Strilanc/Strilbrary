@@ -274,11 +274,6 @@ Public Class LinqExtensionsTest
     End Sub
 
     <TestMethod()>
-    Public Sub IterateTest()
-        Assert.IsTrue(5.Iterate(Function(acc) If(acc <= 0, Nothing, Tuple.Create(acc - 1, acc * acc))).SequenceEqual({25, 16, 9, 4, 1}))
-    End Sub
-
-    <TestMethod()>
     Public Sub ZipWithPartialAggregatesTest()
         Assert.IsTrue({1, 2, 3, 4, 5}.ZipWithPartialAggregates(0, Function(acc, e) acc + e).SequenceEqual({1, 2, 3, 4, 5}.Zip({1, 3, 6, 10, 15})))
         Assert.IsTrue(New Int32() {}.ZipWithPartialAggregates(0, Function(acc, e) acc + e).SequenceEqual({}))

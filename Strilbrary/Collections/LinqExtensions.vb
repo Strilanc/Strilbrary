@@ -171,10 +171,11 @@ Namespace Collections
         '''<remarks>Verification disabled due to incorrect contracts on Enumerable.Range</remarks>
         <Pure()> <Extension()>
         <ContractVerification(False)>
-        Public Function Range(ByVal limit As Int32) As IEnumerable(Of Int32)
+        Public Function Range(ByVal limit As Int32) As IRist(Of Int32)
             Contract.Requires(limit >= 0)
-            Contract.Ensures(Contract.Result(Of IEnumerable(Of Int32))() IsNot Nothing)
-            Return Enumerable.Range(0, limit)
+            Contract.Ensures(Contract.Result(Of IRist(Of Int32))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of Int32))().Count = limit)
+            Return New Rist(Of Int32)(getter:=Function(i) i, counter:=Function() limit)
         End Function
         '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
         <Pure()> <Extension()>
@@ -193,30 +194,24 @@ Namespace Collections
         '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of UInt16))() IsNot Nothing")>
-        Public Function Range(ByVal limit As UInt16) As IEnumerable(Of UInt16)
+        Public Function Range(ByVal limit As UInt16) As IRist(Of UInt16)
             Contract.Requires(limit >= 0)
-            Contract.Ensures(Contract.Result(Of IEnumerable(Of UInt16))() IsNot Nothing)
-            Return Iterator Function()
-                       Dim e = 0US
-                       While e < limit
-                           Yield e
-                           e += 1US
-                       End While
-                   End Function()
+            Contract.Ensures(Contract.Result(Of IRist(Of UInt16))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of UInt16))().Count = limit)
+            Dim r = New Rist(Of UInt16)(getter:=Function(i) CUShort(i), counter:=Function() limit)
+            Contract.Assume(r.Count = limit)
+            Return r
         End Function
         '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of Byte))() IsNot Nothing")>
-        Public Function Range(ByVal limit As Byte) As IEnumerable(Of Byte)
+        Public Function Range(ByVal limit As Byte) As IRist(Of Byte)
             Contract.Requires(limit >= 0)
-            Contract.Ensures(Contract.Result(Of IEnumerable(Of Byte))() IsNot Nothing)
-            Return Iterator Function()
-                       Dim e = CByte(0)
-                       While e < limit
-                           Yield e
-                           e += CByte(1)
-                       End While
-                   End Function()
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count = limit)
+            Dim r = New Rist(Of Byte)(getter:=Function(i) CByte(i), counter:=Function() limit)
+            Contract.Assume(r.Count = limit)
+            Return r
         End Function
 
         '''<summary>Enumerates items in the sequence, offset by the given amount.</summary>
@@ -247,12 +242,12 @@ Namespace Collections
 
         '''<summary>Returns a sequence consisting of a value repeated a specified number of times.</summary>
         <Pure()> <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of T))().Count = count")>
-        Public Function Repeated(Of T)(ByVal value As T, ByVal count As Integer) As IEnumerable(Of T)
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IRist(Of T))().Count = count")>
+        Public Function Repeated(Of T)(ByVal value As T, ByVal count As Integer) As IRist(Of T)
             Contract.Requires(count >= 0)
-            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IEnumerable(Of T))().Count = count)
-            Return Enumerable.Repeat(value, count)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = count)
+            Return New Rist(Of T)(getter:=Function(i) value, counter:=Function() count)
         End Function
         '''<summary>Returns a never-ending sequence consisting of a repeated value.</summary>
         <Pure()> <Extension()>
@@ -477,25 +472,6 @@ Namespace Collections
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of TValue, TAggregate)))() IsNot Nothing)
             Return sequence.PartialAggregates(seed:=Tuple.Create([Default](Of TValue), seed),
                                               func:=Function(acc, e) Tuple.Create(e, func(acc.Item2, e)))
-        End Function
-
-        ''' <summary>
-        ''' Iteratively generates the values of a sequence.
-        ''' The sequence ends once the state function returns null.
-        ''' </summary>
-        <Pure()> <Extension()>
-        Public Function Iterate(Of TState, TResult)(ByVal seed As TState,
-                                                    ByVal func As Func(Of TState, Tuple(Of TState, TResult))) As IEnumerable(Of TResult)
-            Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IEnumerable(Of TResult))() IsNot Nothing)
-            Return True.RepeatForever().
-                   PartialAggregates(seed:=Tuple.Create(seed, [Default](Of TResult)),
-                                     func:=Function(acc, e)
-                                               If acc Is Nothing Then Return acc
-                                               Return func(acc.Item1)
-                                           End Function).
-                   TakeWhile(Function(e) e IsNot Nothing).
-                   Select(Function(e) e.Item2)
         End Function
 
         '''<summary>Returns the first element of a sequence, or a specified default value if the sequence contains no elements.</summary>
