@@ -5,12 +5,12 @@ Namespace Collections
         '''<summary>Returns a sequence's count if there is a known fast way to get it, or else returns nothing.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Int32?)() Is Nothing OrElse Contract.Result(Of Int32?)().Value >= 0")>
-        Friend Function TryFastCount(ByVal sequence As IEnumerable) As Int32?
+        Friend Function TryFastCount(Of T)(ByVal sequence As IEnumerable(Of T)) As Int32?
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Int32?)() Is Nothing OrElse Contract.Result(Of Int32?)().Value >= 0)
             Dim asCollection = TryCast(sequence, ICollection)
             If asCollection IsNot Nothing Then Return asCollection.Count
-            Dim asSized = TryCast(sequence, ICounted)
+            Dim asSized = TryCast(sequence, IRist(Of T))
             If asSized IsNot Nothing Then Return asSized.Count
             Return Nothing
         End Function
@@ -168,16 +168,6 @@ Namespace Collections
         End Function
 
         '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
-        '''<remarks>Verification disabled due to incorrect contracts on Enumerable.Range</remarks>
-        <Pure()> <Extension()>
-        <ContractVerification(False)>
-        Public Function Range(ByVal limit As Int32) As IRist(Of Int32)
-            Contract.Requires(limit >= 0)
-            Contract.Ensures(Contract.Result(Of IRist(Of Int32))() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IRist(Of Int32))().Count = limit)
-            Return New Rist(Of Int32)(getter:=Function(i) i, count:=limit)
-        End Function
-        '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of UInt32))() IsNot Nothing")>
         Public Function Range(ByVal limit As UInt32) As IEnumerable(Of UInt32)
@@ -198,16 +188,9 @@ Namespace Collections
             Contract.Requires(limit >= 0)
             Contract.Ensures(Contract.Result(Of IRist(Of UInt16))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of UInt16))().Count = limit)
-            Return New Rist(Of UInt16)(getter:=Function(i) CUShort(i), count:=limit)
-        End Function
-        '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
-        <Pure()> <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of Byte))() IsNot Nothing")>
-        Public Function Range(ByVal limit As Byte) As IRist(Of Byte)
-            Contract.Requires(limit >= 0)
-            Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count = limit)
-            Return New Rist(Of Byte)(getter:=Function(i) CByte(i), count:=limit)
+            Dim r = New Rist(Of UInt16)(getter:=Function(i) CUShort(i), counter:=Function() CInt(limit))
+            Contract.Assume(r.Count = limit)
+            Return r
         End Function
 
         '''<summary>Enumerates items in the sequence, offset by the given amount.</summary>
@@ -236,15 +219,6 @@ Namespace Collections
             Return sequence.Select(Function(item, index) Tuple.Create(item, index))
         End Function
 
-        '''<summary>Returns a sequence consisting of a value repeated a specified number of times.</summary>
-        <Pure()> <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IRist(Of T))().Count = count")>
-        Public Function Repeated(Of T)(ByVal value As T, ByVal count As Integer) As IRist(Of T)
-            Contract.Requires(count >= 0)
-            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = count)
-            Return New Rist(Of T)(getter:=Function(i) value, count:=count)
-        End Function
         '''<summary>Returns a never-ending sequence consisting of a repeated value.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of TValue))() IsNot Nothing")>

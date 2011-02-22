@@ -1,5 +1,3 @@
-Imports Strilbrary.Collections
-
 Namespace Streams
     '''<summary>A readable view of a sequence of bytes.</summary>
     <ContractClass(GetType(IReadableStream.ContractClass))>
@@ -10,7 +8,7 @@ Namespace Streams
         <ContractClassFor(GetType(IReadableStream))>
         MustInherit Class ContractClass
             Implements IReadableStream
-            Public Function Read(ByVal maxCount As Integer) As Collections.IRist(Of Byte) Implements IReadableStream.Read
+            Public Function Read(ByVal maxCount As Integer) As IRist(Of Byte) Implements IReadableStream.Read
                 Contract.Requires(maxCount > 0)
                 Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
                 Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count <= maxCount)

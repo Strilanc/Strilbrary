@@ -1,5 +1,3 @@
-Imports Strilbrary.Collections
-
 Namespace Streams
     Public NotInheritable Class EnumeratorStream
         Implements IReadableStream

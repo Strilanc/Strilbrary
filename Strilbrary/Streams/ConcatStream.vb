@@ -1,5 +1,3 @@
-Imports Strilbrary.Collections
-
 Namespace Streams
     '''<summary>A read-only stream which reads through the contents of multiple readable streams.</summary>
     '''<remarks>Verification disabled due to weird notices appearing (without any associated location, making it hard to track down).</remarks>

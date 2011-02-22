@@ -1,5 +1,4 @@
 Imports Strilbrary.Exceptions
-Imports Strilbrary.Collections
 
 Namespace Values
     Public Module BitExtensions

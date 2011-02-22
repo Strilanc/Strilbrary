@@ -1,5 +1,3 @@
-Imports Strilbrary.Collections
-
 Namespace Values
     Public Module ValueExtensions
         '''<summary>Casts a value's type to a type, using information only available at run-time.</summary>

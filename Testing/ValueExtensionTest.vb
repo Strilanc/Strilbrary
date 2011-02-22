@@ -2,7 +2,6 @@
 Imports System.Numerics
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports Strilbrary.Values
-Imports Strilbrary.Collections
 
 <TestClass()>
 Public Class ValueExtensionTest

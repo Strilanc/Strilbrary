@@ -1,5 +1,4 @@
 ﻿Imports Strilbrary.Values
-Imports Strilbrary.Collections
 Imports Strilbrary.Exceptions
 
 Namespace Streams

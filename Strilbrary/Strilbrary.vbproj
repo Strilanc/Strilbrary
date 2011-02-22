@@ -95,6 +95,9 @@
     <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LinqToLists">
+      <HintPath>..\..\..\..\..\Documents\Visual Studio 2010\Projects\LinqToLists\LinqToLists\bin\Debug\LinqToLists.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
@@ -111,6 +114,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Import Include="LinqToLists" />
+    <Import Include="LinqToLists.Extra" />
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Collections.Generic" />
@@ -127,13 +132,9 @@
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="CustomDictionary.xml" />
-    <Compile Include="Collections\CompatibilityExtensions.vb" />
-    <Compile Include="Collections\SizedExtensions.vb" />
-    <Compile Include="Collections\RistExtensions.vb" />
     <Compile Include="Collections\LazyCounter.vb" />
     <Compile Include="Collections\PriorityQueue.vb" />
     <Compile Include="Collections\LinqExtensions.vb" />
-    <Compile Include="Collections\Collection Interfaces.vb" />
     <Compile Include="Exceptions\Exception Types.vb" />
     <Compile Include="Exceptions\Exception Extensions.vb" />
     <Compile Include="Misc\DelegatedDisposable.vb" />
@@ -164,7 +165,6 @@
     <Compile Include="Threading\LockFreeConsumer.vb" />
     <Compile Include="Threading\SingleConsumerLockFreeQueue.vb" />
     <Compile Include="Threading\OneTimeLock.vb" />
-    <Compile Include="Collections\ListView.vb" />
     <Compile Include="Threading\ThreadingExtensions.vb" />
     <Compile Include="Threading\CallQueue.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

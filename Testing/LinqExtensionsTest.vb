@@ -173,9 +173,7 @@ Public Class LinqExtensionsTest
 
     <TestMethod()>
     Public Sub RangeTest()
-        Assert.IsTrue(5.Range.SequenceEqual({0, 1, 2, 3, 4}))
         Assert.IsTrue(2US.Range.SequenceEqual({0, 1}))
-        Assert.IsTrue(CByte(4).Range.SequenceEqual({0, 1, 2, 3}))
         Assert.IsTrue(3UI.Range.SequenceEqual({0, 1, 2}))
     End Sub
 
@@ -198,10 +196,6 @@ Public Class LinqExtensionsTest
                                                                     Tuple.Create(2, 4)}))
     End Sub
     <TestMethod()>
-    Public Sub RepeatedTest()
-        Assert.IsTrue(2.Repeated(5).SequenceEqual({2, 2, 2, 2, 2}))
-    End Sub
-    <TestMethod()>
     Public Sub IndexesOfTest()
         Assert.IsTrue({1, 2, 3, 2, 3, 2, 1}.IndexesOf(2).SequenceEqual({1, 3, 5}))
     End Sub
@@ -222,27 +216,6 @@ Public Class LinqExtensionsTest
     Public Sub PartitionedTest()
         Assert.IsTrue(SequenceSequenceEqual({1, 2, 3, 4, 5, 6, 7}.Partitioned(3),
                                             {New Int32() {1, 2, 3}, New Int32() {4, 5, 6}, New Int32() {7}}))
-    End Sub
-
-    <TestMethod()>
-    Public Sub ToListTest()
-        Assert.IsTrue({1, 2, 3}.ToList.SequenceEqual({1, 2, 3}))
-    End Sub
-    <TestMethod()>
-    Public Sub ToArrayTest()
-        Assert.IsTrue({1, 2, 3}.ToArray.SequenceEqual({1, 2, 3}))
-    End Sub
-    <TestMethod()>
-    Public Sub ReverseTest()
-        Assert.IsTrue(TypeOf {1, 2, 3}.Reverse Is IList(Of Int32))
-        Assert.IsTrue({1, 2, 3}.Reverse.SequenceEqual({3, 2, 1}))
-    End Sub
-    <TestMethod()>
-    Public Sub SubViewTest()
-        Assert.IsTrue({1, 2, 3}.AsRist.SubView(0).SequenceEqual({1, 2, 3}))
-        Assert.IsTrue({1, 2, 3}.AsRist.SubView(1).SequenceEqual({2, 3}))
-        Assert.IsTrue({1, 2, 3}.AsRist.SubView(1, 1).SequenceEqual({2}))
-        Assert.IsTrue({1, 2, 3}.AsRist.SubView(1, 0).SequenceEqual({}))
     End Sub
 
     <TestMethod()>
@@ -270,7 +243,7 @@ Public Class LinqExtensionsTest
 
     <TestMethod()>
     Public Sub RepeatForeverTest()
-        Assert.IsTrue(5.RepeatForever.Take(100).SequenceEqual(5.Repeated(100)))
+        Assert.IsTrue(5.RepeatForever.Take(100).SequenceEqual(Enumerable.Repeat(5, 100)))
     End Sub
 
     <TestMethod()>
@@ -295,20 +268,20 @@ Public Class LinqExtensionsTest
 
     <TestMethod()>
     Public Sub StepTest()
-        Assert.IsTrue(5.Range().Step(2).SequenceEqual({0, 2, 4}))
-        Assert.IsTrue(6.Range().Step(2).SequenceEqual({0, 2, 4}))
-        Assert.IsTrue(10.Range().Step(1).SequenceEqual(10.Range()))
-        Assert.IsTrue(New Int32() {}.Step(2).SequenceEqual({}))
-        Assert.IsTrue(New Int32() {}.Step(1).SequenceEqual({}))
-        Assert.IsTrue(5.Range().Step(3).SequenceEqual({0, 3}))
-        Assert.IsTrue(5.Range().Step(4).SequenceEqual({0, 4}))
+        Assert.IsTrue(5UI.Range().Step(2).SequenceEqual({0, 2, 4}))
+        Assert.IsTrue(6UI.Range().Step(2).SequenceEqual({0, 2, 4}))
+        Assert.IsTrue(10UI.Range().Step(1).SequenceEqual(10UI.Range()))
+        Assert.IsTrue(New UInt32() {}.Step(2).SequenceEqual({}))
+        Assert.IsTrue(New UInt32() {}.Step(1).SequenceEqual({}))
+        Assert.IsTrue(5UI.Range().Step(3).SequenceEqual({0, 3}))
+        Assert.IsTrue(5UI.Range().Step(4).SequenceEqual({0, 4}))
     End Sub
 
     <TestMethod()>
     Public Sub RollTest()
-        Assert.IsTrue(SequenceSequenceEqual(Of Int32)(5.Range().Roll(2), Array({0, 1}, {1, 2}, {2, 3}, {3, 4})))
-        Assert.IsTrue(SequenceSequenceEqual(Of Int32)(5.Range().Roll(1), Array({0}, {1}, {2}, {3}, {4})))
-        Assert.IsTrue(SequenceSequenceEqual(Of Int32)(5.Range().Roll(6), Array(Of Int32())()))
-        Assert.IsTrue(SequenceSequenceEqual(Of Int32)(5.Range().Roll(5), Array(5.Range())))
+        Assert.IsTrue(SequenceSequenceEqual(Of UInt32)(5UI.Range().Roll(2), Array({0UI, 1UI}, {1UI, 2UI}, {2UI, 3UI}, {3UI, 4UI})))
+        Assert.IsTrue(SequenceSequenceEqual(Of UInt32)(5UI.Range().Roll(1), Array({0UI}, {1UI}, {2UI}, {3UI}, {4UI})))
+        Assert.IsTrue(SequenceSequenceEqual(Of UInt32)(5UI.Range().Roll(6), Array(Of UInt32())()))
+        Assert.IsTrue(SequenceSequenceEqual(Of UInt32)(5UI.Range().Roll(5), Array(5UI.Range())))
     End Sub
 End Class
