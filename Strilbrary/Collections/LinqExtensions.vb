@@ -289,65 +289,89 @@ Namespace Collections
 
         '''<summary>Interleaves the items of multiple sequences into a single sequence.</summary>
         <Pure()> <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of T))() IsNot Nothing")>
         Public Function Interleaved(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
             Contract.Requires(sequences IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
 
-            Return Iterator Function()
-                       Dim enumerators = (From sequence In sequences
-                                          Select sequence.GetEnumerator
-                                          ).ToArray
-                       Try
-                           Do
-                               Dim used = False
-                               For Each enumerator In enumerators
-                                   If Not enumerator.MoveNext() Then Continue For
-                                   used = True
-                                   Yield enumerator.Current
-                               Next enumerator
-                               If Not used Then Exit Do
-                           Loop
-                       Finally
-                           For Each enumerator In enumerators
-                               enumerator.Dispose()
-                           Next enumerator
-                       End Try
-                   End Function()
+            Dim r = Iterator Function()
+                        Dim enumerators = (From sequence In sequences
+                                           Select sequence.GetEnumerator
+                                           ).ToArray
+                        Try
+                            Do
+                                Dim used = False
+                                For Each enumerator In enumerators
+                                    If Not enumerator.MoveNext() Then Continue For
+                                    used = True
+                                    Yield enumerator.Current
+                                Next enumerator
+                                If Not used Then Exit Do
+                            Loop
+                        Finally
+                            For Each enumerator In enumerators
+                                enumerator.Dispose()
+                            Next enumerator
+                        End Try
+                    End Function()
+            Contract.Assume(r IsNot Nothing)
+            Return r
         End Function
 
         '''<summary>Groups a sequence based on the position of items (modulo the given sequence count).</summary>
         <Pure()> <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of IEnumerable(Of T)))() IsNot Nothing")>
-        Public Function Deinterleaved(Of T)(ByVal sequence As IEnumerable(Of T), ByVal sequenceCount As Integer) As IEnumerable(Of IEnumerable(Of T))
+        Public Function Deinterleaved(Of T)(ByVal sequence As IEnumerable(Of T), ByVal sequenceCount As Integer) As IRist(Of IEnumerable(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(sequenceCount > 0)
-            Contract.Ensures(Contract.Result(Of IEnumerable(Of IEnumerable(Of T)))() IsNot Nothing)
-
-            Return Iterator Function()
-                       For i = 0 To sequenceCount - 1
-                           Yield sequence.Skip(i).Step(sequenceCount)
-                       Next i
-                   End Function()
+            Contract.Ensures(Contract.Result(Of IRist(Of IEnumerable(Of T)))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of IEnumerable(Of T)))().Count = sequenceCount)
+            Dim r = New Rist(Of IEnumerable(Of T))(counter:=Function() sequenceCount,
+                                                   getter:=Function(i) sequence.Skip(i).Step(sequenceCount))
+            Contract.Assume(r.Count = sequenceCount)
+            Return r
+        End Function
+        '''<summary>Groups a sequence based on the position of items (modulo the given sequence count).</summary>
+        <Pure()> <Extension()>
+        Public Function Deinterleaved(Of T)(ByVal sequence As IRist(Of T), ByVal sequenceCount As Integer) As IRist(Of IRist(Of T))
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(sequenceCount > 0)
+            Contract.Ensures(Contract.Result(Of IRist(Of IEnumerable(Of T)))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of IEnumerable(Of T)))().Count = sequenceCount)
+            Dim r = New Rist(Of IRist(Of T))(counter:=Function() sequenceCount,
+                                             getter:=Function(i) sequence.Skip(i).Step(sequenceCount))
+            Contract.Assume(r.Count = sequenceCount)
+            Return r
         End Function
 
         '''<summary>Selects every nth item in a sequence, starting with the first item.</summary>
         <Pure()> <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of T))() IsNot Nothing")>
         Public Function [Step](Of T)(ByVal sequence As IEnumerable(Of T), ByVal stepSize As Integer) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(stepSize > 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
 
-            Return Iterator Function()
-                       Dim left = 1
-                       For Each item In sequence
-                           left -= 1
-                           If left > 0 Then Continue For
-                           left = stepSize
-                           Yield item
-                       Next item
-                   End Function()
+            Dim r = Iterator Function()
+                        Dim left = 1
+                        For Each item In sequence
+                            left -= 1
+                            If left > 0 Then Continue For
+                            left = stepSize
+                            Yield item
+                        Next item
+                    End Function()
+            Contract.Assume(r IsNot Nothing)
+            Return r
+        End Function
+        '''<summary>Selects every nth item in a readable list, starting with the first item.</summary>
+        <Pure()> <Extension()>
+        Public Function [Step](Of T)(ByVal sequence As IRist(Of T), ByVal stepSize As Integer) As IRist(Of T)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(stepSize > 0)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = sequence.Count.CeilingMultiple(stepSize) \ stepSize)
+            Dim count = sequence.Count.CeilingMultiple(stepSize) \ stepSize
+            Dim r = New Rist(Of T)(counter:=Function() count, getter:=Function(i) sequence(i * stepSize))
+            Contract.Assume(r.Count = count)
+            Return r
         End Function
 
         '''<summary>Splits a sequence into continuous segments of a given size (with the last partition possibly being smaller).</summary>
