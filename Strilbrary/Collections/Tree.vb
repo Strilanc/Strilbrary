@@ -88,17 +88,8 @@ Namespace Collections
             Contract.Requires(tree IsNot Nothing)
             Contract.Requires(predicate IsNot Nothing)
             If Not predicate(tree.Value) Then Return Nothing
-            Return tree.WhereHelper(predicate)
-        End Function
-        <Extension()> <Pure()>
-        Private Function WhereHelper(Of TValue)(ByVal tree As ITree(Of TValue),
-                                                ByVal predicate As Func(Of TValue, Boolean)) As ITree(Of TValue)
-            Contract.Requires(tree IsNot Nothing)
-            Contract.Requires(predicate IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of ITree(Of TValue))() IsNot Nothing)
-            Return New Tree(Of TValue)(tree.Value, (From child In tree.Children
-                                                    Where predicate(child.Value)
-                                                    ).ToRist)
+            Return New Tree(Of TValue)(tree.Value,
+                                       tree.Children.Where(Function(child) predicate(child.Value)).ToRist())
         End Function
     End Module
 End Namespace

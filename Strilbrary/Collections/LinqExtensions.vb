@@ -140,6 +140,17 @@ Namespace Collections
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
             Return {sequence1, sequence2}.Concat(sequences).Concat
         End Function
+        <Extension()> <Pure()>
+        Public Function Concat(Of T)(ByVal list1 As IRist(Of T), ByVal list2 As IRist(Of T)) As IRist(Of T)
+            Contract.Requires(list1 IsNot Nothing)
+            Contract.Requires(list2 IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = list1.Count + list2.Count)
+            Dim r = New Rist(Of T)(counter:=Function() list1.Count + list2.Count,
+                                   getter:=Function(i) If(i < list1.Count, list1(i), list2(i - list1.Count)))
+            Contract.Assume(r.Count = list1.Count + list2.Count)
+            Return r
+        End Function
 
         '''<summary>Appends values to a sequence.</summary>
         <Pure()> <Extension()>
@@ -149,6 +160,15 @@ Namespace Collections
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
             Return sequence.Concat(values)
         End Function
+        <Pure()> <Extension()>
+        Public Function Append(Of T)(ByVal list As IRist(Of T), ByVal ParamArray values() As T) As IRist(Of T)
+            Contract.Requires(list IsNot Nothing)
+            Contract.Requires(values IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = list.Count + values.Length)
+            Contract.Assume(values.AsRist().Count = values.Length)
+            Return list.Concat(values.AsRist())
+        End Function
 
         '''<summary>Prepends values to a sequence.</summary>
         <Pure()> <Extension()>
@@ -157,6 +177,15 @@ Namespace Collections
             Contract.Requires(values IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
             Return values.Concat(sequence)
+        End Function
+        <Pure()> <Extension()>
+        Public Function Prepend(Of T)(ByVal list As IRist(Of T), ByVal ParamArray values() As T) As IRist(Of T)
+            Contract.Requires(list IsNot Nothing)
+            Contract.Requires(values IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = values.Length + list.Count)
+            Contract.Assume(values.AsRist().Count = values.Length)
+            Return values.AsRist().Concat(list)
         End Function
 
         '''<summary>Caches all the items in a sequence, preventing changes to the sequence from affecting the resulting sequence.</summary>
@@ -482,6 +511,18 @@ Namespace Collections
             Contract.Requires(sequence IsNot Nothing)
             Dim e = sequence.GetEnumerator()
             Return If(e.MoveNext, e.Current, [Default](Of T?))
+        End Function
+
+        <Pure()>
+        Public Function MakeRist(Of T)(ByVal ParamArray values As T()) As IRist(Of T)
+            Contract.Requires(values IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = values.Length)
+            Contract.Ensures(Contract.Result(Of IRist(Of T))().SequenceEqual(values))
+            Dim r = New Rist(Of T)(counter:=Function() values.Length, getter:=Function(i) values(i))
+            Contract.Assume(r.Count = values.Length)
+            Contract.Assume(r.SequenceEqual(values))
+            Return r
         End Function
     End Module
 End Namespace
