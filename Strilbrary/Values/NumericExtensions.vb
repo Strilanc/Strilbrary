@@ -346,47 +346,47 @@ Namespace Values
 #Region "Bytes"
         <Extension()> <Pure()>
         Public Function Bytes(ByVal value As UInt16,
-                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As Byte()
-            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Byte())().Length = 2)
+                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As IRist(Of Byte)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count = 2)
 
-            Dim result = BitConverter.GetBytes(value)
+            Dim result = BitConverter.GetBytes(value).AsRist()
+            Contract.Assume(result.Count = 2)
             Select Case byteOrder
-                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then result = result.Reverse.ToArray
-                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then result = result.Reverse.ToArray
+                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then Return result.Reverse()
+                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then Return result.Reverse()
                 Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
             End Select
-            Contract.Assume(result.Length = 2)
             Return result
         End Function
         <Extension()> <Pure()>
         Public Function Bytes(ByVal value As UInt32,
-                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As Byte()
-            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Byte())().Length = 4)
+                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As IRist(Of Byte)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count = 4)
 
-            Dim result = BitConverter.GetBytes(value)
+            Dim result = BitConverter.GetBytes(value).AsRist()
+            Contract.Assume(result.Count = 4)
             Select Case byteOrder
-                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then result = result.Reverse.ToArray
-                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then result = result.Reverse.ToArray
+                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then Return result.Reverse()
+                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then Return result.Reverse()
                 Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
             End Select
-            Contract.Assume(result.Length = 4)
             Return result
         End Function
         <Extension()> <Pure()>
         Public Function Bytes(ByVal value As UInt64,
-                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As Byte()
-            Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Byte())().Length = 8)
+                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As IRist(Of Byte)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count = 8)
 
-            Dim result = BitConverter.GetBytes(value)
+            Dim result = BitConverter.GetBytes(value).AsRist()
+            Contract.Assume(result.Count = 8)
             Select Case byteOrder
-                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then result = result.Reverse.ToArray
-                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then result = result.Reverse.ToArray
+                Case byteOrder.BigEndian : If BitConverter.IsLittleEndian Then Return result.Reverse()
+                Case byteOrder.LittleEndian : If Not BitConverter.IsLittleEndian Then Return result.Reverse()
                 Case Else : Throw byteOrder.MakeArgumentValueException("byteOrder")
             End Select
-            Contract.Assume(result.Length = 8)
             Return result
         End Function
 

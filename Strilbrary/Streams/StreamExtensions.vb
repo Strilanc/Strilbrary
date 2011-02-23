@@ -139,7 +139,7 @@ Namespace Streams
                          Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian)
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanWrite)
-            stream.Write(value.Bytes(byteOrder))
+            stream.Write(value.Bytes(byteOrder).ToArray())
         End Sub
         '''<summary>Writes a UInt32 to the stream.</summary>
         <Extension()>
@@ -148,7 +148,7 @@ Namespace Streams
                          Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian)
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanWrite)
-            stream.Write(value.Bytes(byteOrder))
+            stream.Write(value.Bytes(byteOrder).ToArray())
         End Sub
         '''<summary>Writes a UInt64 to the stream.</summary>
         <Extension()>
@@ -157,7 +157,7 @@ Namespace Streams
                          Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian)
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanWrite)
-            stream.Write(value.Bytes(byteOrder))
+            stream.Write(value.Bytes(byteOrder).ToArray())
         End Sub
     End Module
 
@@ -324,7 +324,7 @@ Namespace Streams
                          ByVal value As UInt16,
                          Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian)
             Contract.Requires(stream IsNot Nothing)
-            stream.Write(value.Bytes(byteOrder).AsRist)
+            stream.Write(value.Bytes(byteOrder))
         End Sub
         '''<summary>Writes a UInt32 to the stream.</summary>
         <Extension()>
@@ -332,7 +332,7 @@ Namespace Streams
                          ByVal value As UInt32,
                          Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian)
             Contract.Requires(stream IsNot Nothing)
-            stream.Write(value.Bytes(byteOrder).AsRist)
+            stream.Write(value.Bytes(byteOrder))
         End Sub
         '''<summary>Writes a UInt64 to the stream.</summary>
         <Extension()>
@@ -340,21 +340,21 @@ Namespace Streams
                          ByVal value As UInt64,
                          Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian)
             Contract.Requires(stream IsNot Nothing)
-            stream.Write(value.Bytes(byteOrder).AsRist)
+            stream.Write(value.Bytes(byteOrder))
         End Sub
         '''<summary>Writes a Single to the stream.</summary>
         <Extension()>
         Public Sub Write(ByVal stream As IWritableStream,
                          ByVal value As Single)
             Contract.Requires(stream IsNot Nothing)
-            stream.Write(BitConverter.GetBytes(value).AsRist)
+            stream.Write(BitConverter.GetBytes(value).AsRist())
         End Sub
         '''<summary>Writes a Double to the stream.</summary>
         <Extension()>
         Public Sub Write(ByVal stream As IWritableStream,
                          ByVal value As Double)
             Contract.Requires(stream IsNot Nothing)
-            stream.Write(BitConverter.GetBytes(value).AsRist)
+            stream.Write(BitConverter.GetBytes(value).AsRist())
         End Sub
 
         '''<summary>Reads all remaining data from the stream.</summary>
