@@ -10,12 +10,12 @@ Namespace Threading
             Contract.Invariant(_runner IsNot Nothing)
         End Sub
 
-        Public Sub New(ByVal runner As Action(Of Action))
+        Public Sub New(runner As Action(Of Action))
             Contract.Requires(runner IsNot Nothing)
             Me._runner = runner
         End Sub
 
-        Public Overrides Sub Post(ByVal d As SendOrPostCallback, ByVal state As Object)
+        Public Overrides Sub Post(d As SendOrPostCallback, state As Object)
             _runner(Sub() d(state))
         End Sub
         Public Overrides Function CreateCopy() As SynchronizationContext
@@ -32,15 +32,15 @@ Namespace Threading
             Contract.Invariant(_eventualContext IsNot Nothing)
         End Sub
 
-        Public Sub New(ByVal eventualContext As Task(Of SynchronizationContext))
+        Public Sub New(eventualContext As Task(Of SynchronizationContext))
             Contract.Requires(eventualContext IsNot Nothing)
             Me._eventualContext = eventualContext
         End Sub
 
-        Public Overrides Sub Post(ByVal d As SendOrPostCallback, ByVal state As Object)
+        Public Overrides Sub Post(d As SendOrPostCallback, state As Object)
             _eventualContext.ContinueWithAction(Sub(c) c.Post(d, state))
         End Sub
-        Public Overrides Sub Send(ByVal d As SendOrPostCallback, ByVal state As Object)
+        Public Overrides Sub Send(d As SendOrPostCallback, state As Object)
             _eventualContext.ContinueWithAction(Sub(c) c.Send(d, state)).Wait()
         End Sub
         Public Overrides Function CreateCopy() As System.Threading.SynchronizationContext
@@ -52,7 +52,8 @@ Namespace Threading
         Public Overrides Sub OperationStarted()
             _eventualContext.ContinueWithAction(Sub(c) c.OperationStarted())
         End Sub
-        Public Overrides Function Wait(ByVal waitHandles() As IntPtr, ByVal waitAll As Boolean, ByVal millisecondsTimeout As Integer) As Integer
+        <SuppressMessage("Microsoft.Contracts", "Requires-13-64")>
+        Public Overrides Function Wait(waitHandles() As IntPtr, waitAll As Boolean, millisecondsTimeout As Integer) As Integer
             Dim result = -1
             _eventualContext.ContinueWithAction(
                     Sub(c) result = c.Wait(waitHandles, waitAll, millisecondsTimeout)

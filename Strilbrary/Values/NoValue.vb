@@ -3,16 +3,16 @@
     <DebuggerDisplay("{ToString()}")>
     Public Structure NoValue
         Implements IEquatable(Of NoValue)
-        Public Overloads Function Equals(ByVal other As NoValue) As Boolean Implements IEquatable(Of NoValue).Equals
+        Public Overloads Function Equals(other As NoValue) As Boolean Implements IEquatable(Of NoValue).Equals
             Return True
         End Function
-        Public Overrides Function Equals(ByVal obj As Object) As Boolean
+        Public Overrides Function Equals(obj As Object) As Boolean
             Return TypeOf obj Is NoValue
         End Function
-        Public Shared Operator =(ByVal value1 As NoValue, ByVal value2 As NoValue) As Boolean
+        Public Shared Operator =(value1 As NoValue, value2 As NoValue) As Boolean
             Return value1.Equals(value2)
         End Operator
-        Public Shared Operator <>(ByVal value1 As NoValue, ByVal value2 As NoValue) As Boolean
+        Public Shared Operator <>(value1 As NoValue, value2 As NoValue) As Boolean
             Return Not value1.Equals(value2)
         End Operator
         Public Overrides Function GetHashCode() As Integer

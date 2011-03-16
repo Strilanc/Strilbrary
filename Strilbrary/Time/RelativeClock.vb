@@ -15,8 +15,8 @@ Namespace Time
             Contract.Invariant(_baseClock IsNot Nothing)
         End Sub
 
-        Public Sub New(ByVal parentClock As IClock,
-                       ByVal timeOffsetFromParent As TimeSpan)
+        Public Sub New(parentClock As IClock,
+                       timeOffsetFromParent As TimeSpan)
             Contract.Requires(parentClock IsNot Nothing)
             Contract.Ensures(Me.StartingTimeOnParentClock = -timeOffsetFromParent)
             If parentClock.ElapsedTime < -timeOffsetFromParent Then
@@ -43,7 +43,7 @@ Namespace Time
             End Get
         End Property
 
-        Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
+        Public Function AsyncWaitUntil(time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
             Return _baseClock.AsyncWaitUntil(time - _timeOffsetFromBase)
         End Function
 

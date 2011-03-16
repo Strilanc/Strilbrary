@@ -45,7 +45,7 @@ Namespace Threading
             End Get
         End Property
 
-        Protected Overridable Function PerformDispose(ByVal finalizing As Boolean) As Task
+        Protected Overridable Function PerformDispose(finalizing As Boolean) As Task
             Return Nothing
         End Function
 
@@ -55,7 +55,7 @@ Namespace Threading
             End Get
         End Property
 
-        Private Sub Dispose(ByVal finalizing As Boolean)
+        Private Sub Dispose(finalizing As Boolean)
             If Not _disposeLock.TryAcquire Then Return
 
             Dim result = PerformDispose(finalizing)

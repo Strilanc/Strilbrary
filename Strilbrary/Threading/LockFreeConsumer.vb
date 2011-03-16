@@ -26,7 +26,7 @@ Namespace Threading
 
         ''' <param name="context">The synchronization context used to run queued actions.</param>
         ''' <param name="consumer">Consumes a queued item.</param>
-        Public Sub New(ByVal context As SynchronizationContext, ByVal consumer As Action(Of T))
+        Public Sub New(context As SynchronizationContext, consumer As Action(Of T))
             Contract.Requires(context IsNot Nothing)
             Contract.Requires(consumer IsNot Nothing)
             Me.context = context
@@ -34,7 +34,7 @@ Namespace Threading
         End Sub
 
         '''<summary>Enqueues an item to be consumed by the consumer.</summary>
-        Public Sub EnqueueConsume(ByVal item As T)
+        Public Sub EnqueueConsume(item As T)
             queue.BeginEnqueue(item)
             TryBeginConsuming()
         End Sub
@@ -42,7 +42,7 @@ Namespace Threading
         ''' Enqueues a sequence of items to be consumed by the consumer.
         ''' The items are guaranteed to end up adjacent in the queue.
         ''' </summary>
-        Public Sub EnqueueConsume(ByVal items As IEnumerable(Of T))
+        Public Sub EnqueueConsume(items As IEnumerable(Of T))
             Contract.Requires(items IsNot Nothing)
             queue.BeginEnqueue(items)
             TryBeginConsuming()

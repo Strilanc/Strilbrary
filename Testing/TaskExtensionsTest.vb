@@ -7,18 +7,18 @@ Imports Strilbrary.Time
 
 <TestClass()>
 Public Class TaskExtensionsTest
-    Public Shared Sub WaitForTaskToSucceed(ByVal task As Task, Optional ByVal timeoutMilliseconds As Integer = 10000)
+    Public Shared Sub WaitForTaskToSucceed(task As Task, Optional timeoutMilliseconds As Integer = 10000)
         Assert.IsTrue(task.Wait(timeoutMilliseconds))
         Assert.IsTrue(task.Status = TaskStatus.RanToCompletion)
     End Sub
-    Public Shared Sub WaitForTaskToFault(ByVal task As Task, Optional ByVal timeoutMilliseconds As Integer = 10000)
+    Public Shared Sub WaitForTaskToFault(task As Task, Optional timeoutMilliseconds As Integer = 10000)
         Try
             Assert.IsTrue(task.Wait(timeoutMilliseconds))
         Catch ex As Exception
         End Try
         Assert.IsTrue(task.Status = TaskStatus.Faulted)
     End Sub
-    Public Shared Sub ExpectTaskToIdle(ByVal task As Task, Optional ByVal timeoutMilliseconds As Integer = 10)
+    Public Shared Sub ExpectTaskToIdle(task As Task, Optional timeoutMilliseconds As Integer = 10)
         Assert.IsTrue(Not task.Wait(timeoutMilliseconds))
     End Sub
 

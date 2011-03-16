@@ -12,7 +12,7 @@ Namespace Misc
             Contract.Invariant(_disposedLock IsNot Nothing)
         End Sub
 
-        Public Sub New(ByVal disposer As Action)
+        Public Sub New(disposer As Action)
             Contract.Requires(disposer IsNot Nothing)
             Me._disposer = disposer
         End Sub

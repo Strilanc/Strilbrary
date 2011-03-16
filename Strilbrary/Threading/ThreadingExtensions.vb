@@ -6,7 +6,7 @@ Namespace Threading
     <ContractVerification(False)>
     Public Module ThreadingExtensions
         '''<summary>Determines a task for running an action in a new thread.</summary>
-        Public Function ThreadedAction(ByVal action As Action) As Task
+        Public Function ThreadedAction(action As Action) As Task
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
             Dim result = New TaskCompletionSource(Of NoValue)
@@ -14,7 +14,7 @@ Namespace Threading
             Return result.Task
         End Function
         '''<summary>Determines a task value for running a function in a new thread.</summary>
-        Public Function ThreadedFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As Task(Of TReturn)
+        Public Function ThreadedFunc(Of TReturn)(func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
             Dim result = New TaskCompletionSource(Of TReturn)
@@ -23,13 +23,13 @@ Namespace Threading
         End Function
 
         '''<summary>Determines a task for running an action as a task.</summary>
-        Public Function TaskedAction(ByVal action As Action) As Task
+        Public Function TaskedAction(action As Action) As Task
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
             Return Task.Factory.StartNew(action)
         End Function
         '''<summary>Determines a task value for running a function as a task.</summary>
-        Public Function TaskedFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As Task(Of TReturn)
+        Public Function TaskedFunc(Of TReturn)(func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
             Dim result = New TaskCompletionSource(Of TReturn)
@@ -39,7 +39,7 @@ Namespace Threading
         End Function
 
         '''<summary>Determines a task for running an action in the thread pool.</summary>
-        Public Function ThreadPooledAction(ByVal action As Action) As Task
+        Public Function ThreadPooledAction(action As Action) As Task
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
             Dim result = New TaskCompletionSource(Of NoValue)
@@ -47,7 +47,7 @@ Namespace Threading
             Return result.Task
         End Function
         '''<summary>Determines a task value for running a function in the thread pool.</summary>
-        Public Function ThreadPooledFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As Task(Of TReturn)
+        Public Function ThreadPooledFunc(Of TReturn)(func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
             Dim result = New TaskCompletionSource(Of TReturn)
@@ -57,7 +57,7 @@ Namespace Threading
 
         '''<summary>Determines a task for invoking an action on a control's thread.</summary>
         <Extension()>
-        Public Function AsyncInvokedAction(ByVal control As Control, ByVal action As Action) As Task
+        Public Function AsyncInvokedAction(control As Control, action As Action) As Task
             Contract.Requires(control IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
@@ -67,7 +67,7 @@ Namespace Threading
         End Function
         '''<summary>Determines a task value for invoking a function on a control's thread.</summary>
         <Extension()>
-        Public Function AsyncInvokedFunc(Of TReturn)(ByVal control As Control, ByVal func As Func(Of TReturn)) As Task(Of TReturn)
+        Public Function AsyncInvokedFunc(Of TReturn)(control As Control, func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(control IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
@@ -78,9 +78,9 @@ Namespace Threading
 
         '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
         <Extension()>
-        Public Function QueueContinueWithAction(ByVal task As Task,
-                                                ByVal queue As CallQueue,
-                                                ByVal action As Action) As Task
+        Public Function QueueContinueWithAction(task As Task,
+                                                queue As CallQueue,
+                                                action As Action) As Task
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
@@ -89,9 +89,9 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
         <Extension()>
-        Public Function QueueContinueWithAction(Of TArg)(ByVal task As Task(Of TArg),
-                                                         ByVal queue As CallQueue,
-                                                         ByVal action As Action(Of TArg)) As Task
+        Public Function QueueContinueWithAction(Of TArg)(task As Task(Of TArg),
+                                                         queue As CallQueue,
+                                                         action As Action(Of TArg)) As Task
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
@@ -100,9 +100,9 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
         <Extension()>
-        Public Function QueueContinueWithFunc(Of TReturn)(ByVal task As Task,
-                                                          ByVal queue As CallQueue,
-                                                          ByVal func As Func(Of TReturn)) As Task(Of TReturn)
+        Public Function QueueContinueWithFunc(Of TReturn)(task As Task,
+                                                          queue As CallQueue,
+                                                          func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
@@ -111,9 +111,9 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
         <Extension()>
-        Public Function QueueContinueWithFunc(Of TArg, TReturn)(ByVal task As Task(Of TArg),
-                                                                ByVal queue As CallQueue,
-                                                                ByVal func As Func(Of TArg, TReturn)) As Task(Of TReturn)
+        Public Function QueueContinueWithFunc(Of TArg, TReturn)(task As Task(Of TArg),
+                                                                queue As CallQueue,
+                                                                func As Func(Of TArg, TReturn)) As Task(Of TReturn)
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
@@ -122,9 +122,9 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes on a queue if a task faults.</summary>
         <Extension()>
-        Public Function QueueCatch(ByVal task As Task,
-                                   ByVal queue As CallQueue,
-                                   ByVal action As Action(Of AggregateException)) As Task
+        Public Function QueueCatch(task As Task,
+                                   queue As CallQueue,
+                                   action As Action(Of AggregateException)) As Task
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(queue IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
@@ -142,7 +142,7 @@ Namespace Threading
         ''' Must not be called while the control handle is being created or destroyed.
         ''' </remarks>
         <Extension()>
-        Public Function EventualSynchronizationContext(ByVal control As Control) As SynchronizationContext
+        Public Function EventualSynchronizationContext(control As Control) As SynchronizationContext
             Contract.Requires(control IsNot Nothing)
             Contract.Ensures(Contract.Result(Of SynchronizationContext)() IsNot Nothing)
 
@@ -161,7 +161,7 @@ Namespace Threading
             Return New EventualSynchronizationContext(result.Task)
         End Function
 
-        Public Function MakeControlCallQueue(ByVal control As Control) As CallQueue
+        Public Function MakeControlCallQueue(control As Control) As CallQueue
             Contract.Requires(control IsNot Nothing)
             Contract.Ensures(Contract.Result(Of CallQueue)() IsNot Nothing)
             Return New CallQueue(control.EventualSynchronizationContext())

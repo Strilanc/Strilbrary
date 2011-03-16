@@ -8,7 +8,7 @@ Namespace Streams
                 Contract.Invariant(_stream IsNot Nothing)
             End Sub
 
-            Public Sub New(ByVal stream As IO.Stream)
+            Public Sub New(stream As IO.Stream)
                 Contract.Requires(stream IsNot Nothing)
                 Me._stream = stream
             End Sub
@@ -20,8 +20,7 @@ Namespace Streams
                 End Get
             End Property
 
-            <SuppressMessage("Microsoft.Contracts", "Requires-56-34")>
-            Public Function Read(ByVal maxLength As Integer) As IRist(Of Byte) Implements IReadableStream.Read
+            Public Function Read(maxLength As Integer) As IRist(Of Byte) Implements IReadableStream.Read
                 Dim buffer(0 To maxLength - 1) As Byte
                 Dim n = _stream.Read(buffer, 0, maxLength)
                 Dim r = buffer.AsRist()
@@ -29,7 +28,7 @@ Namespace Streams
                 Return r.SubList(0, n)
             End Function
 
-            Public Sub Write(ByVal data As IRist(Of Byte)) Implements IWritableStream.Write
+            Public Sub Write(data As IRist(Of Byte)) Implements IWritableStream.Write
                 Contract.Assume(_stream.CanWrite)
                 _stream.Write(data.ToArray)
             End Sub
@@ -42,7 +41,7 @@ Namespace Streams
                     Contract.Assume(_stream.Position <= Length)
                     Return _stream.Position
                 End Get
-                Set(ByVal value As Long)
+                Set(value As Long)
                     _stream.Position = value
                 End Set
             End Property
@@ -58,21 +57,21 @@ Namespace Streams
         End Class
 
         <Extension()> <Pure()>
-        Public Function AsReadableStream(ByVal stream As IO.Stream) As IReadableStream
+        Public Function AsReadableStream(stream As IO.Stream) As IReadableStream
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanRead)
             Contract.Ensures(Contract.Result(Of IReadableStream)() IsNot Nothing)
             Return New StreamClassToInterfaceWrapper(stream)
         End Function
         <Extension()> <Pure()>
-        Public Function AsWritableStream(ByVal stream As IO.Stream) As IWritableStream
+        Public Function AsWritableStream(stream As IO.Stream) As IWritableStream
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanWrite)
             Contract.Ensures(Contract.Result(Of IWritableStream)() IsNot Nothing)
             Return New StreamClassToInterfaceWrapper(stream)
         End Function
         <Extension()> <Pure()>
-        Public Function AsRandomWritableStream(ByVal stream As IO.Stream) As IRandomWritableStream
+        Public Function AsRandomWritableStream(stream As IO.Stream) As IRandomWritableStream
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanWrite)
             Contract.Requires(stream.CanSeek)
@@ -80,7 +79,7 @@ Namespace Streams
             Return New StreamClassToInterfaceWrapper(stream)
         End Function
         <Extension()> <Pure()>
-        Public Function AsRandomReadableStream(ByVal stream As IO.Stream) As IRandomReadableStream
+        Public Function AsRandomReadableStream(stream As IO.Stream) As IRandomReadableStream
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanRead)
             Contract.Requires(stream.CanSeek)
@@ -88,7 +87,7 @@ Namespace Streams
             Return New StreamClassToInterfaceWrapper(stream)
         End Function
         <Extension()> <Pure()>
-        Public Function AsRandomAccessStream(ByVal stream As IO.Stream) As IRandomAccessStream
+        Public Function AsRandomAccessStream(stream As IO.Stream) As IRandomAccessStream
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanRead)
             Contract.Requires(stream.CanWrite)
@@ -107,7 +106,7 @@ Namespace Streams
             <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Me.CanRead = (readStream IsNot Nothing)")>
             <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Me.CanSeek = (seekStream IsNot Nothing)")>
             <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Me.CanWrite = (writeStream IsNot Nothing)")>
-            Public Sub New(ByVal readStream As IReadableStream, ByVal seekStream As ISeekableStream, ByVal writeStream As IWritableStream)
+            Public Sub New(readStream As IReadableStream, seekStream As ISeekableStream, writeStream As IWritableStream)
                 Contract.Ensures(Me.CanRead = (readStream IsNot Nothing))
                 Contract.Ensures(Me.CanSeek = (seekStream IsNot Nothing))
                 Contract.Ensures(Me.CanWrite = (writeStream IsNot Nothing))
@@ -132,8 +131,7 @@ Namespace Streams
                 End Get
             End Property
 
-            <SuppressMessage("Microsoft.Contracts", "Unsafe-1-0")>
-            Public Overrides Function Read(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer) As Integer
+            Public Overrides Function Read(buffer() As Byte, offset As Integer, count As Integer) As Integer
                 If _readStream Is Nothing Then Throw New NotSupportedException()
                 If count = 0 Then Return 0
                 Dim data = _readStream.Read(count)
@@ -143,10 +141,11 @@ Namespace Streams
                 Return data.Count
             End Function
 
-            <SuppressMessage("Microsoft.Contracts", "Unsafe-1-0")>
-            Public Overrides Sub Write(ByVal buffer() As Byte, ByVal offset As Integer, ByVal count As Integer)
+            Public Overrides Sub Write(buffer() As Byte, offset As Integer, count As Integer)
                 If _writeStream Is Nothing Then Throw New NotSupportedException()
-                _writeStream.Write(buffer.AsRist.SubList(offset, count))
+                Dim r = buffer.AsRist()
+                Contract.Assume(r.Count = buffer.Length)
+                _writeStream.Write(r.SubList(offset, count))
             End Sub
             Public Overrides Sub Flush()
                 If _writeStream IsNot Nothing Then _writeStream.Flush()
@@ -157,7 +156,7 @@ Namespace Streams
                     If _seekStream Is Nothing Then Throw New NotSupportedException()
                     Return _seekStream.Position
                 End Get
-                Set(ByVal value As Long)
+                Set(value As Long)
                     If _seekStream Is Nothing Then Throw New NotSupportedException()
                     If value > _seekStream.Length Then value = _seekStream.Length
                     _seekStream.Position = value
@@ -169,7 +168,7 @@ Namespace Streams
                     Return _seekStream.Length
                 End Get
             End Property
-            Public Overrides Function Seek(ByVal offset As Long, ByVal origin As IO.SeekOrigin) As Long
+            Public Overrides Function Seek(offset As Long, origin As IO.SeekOrigin) As Long
                 If _seekStream Is Nothing Then Throw New NotSupportedException()
                 If origin = IO.SeekOrigin.Current Then offset += Position
                 If origin = IO.SeekOrigin.End Then offset += Length
@@ -177,7 +176,7 @@ Namespace Streams
                 Position = offset
                 Return Position
             End Function
-            Public Overrides Sub SetLength(ByVal value As Long)
+            Public Overrides Sub SetLength(value As Long)
                 Throw New NotSupportedException()
             End Sub
 
@@ -190,7 +189,7 @@ Namespace Streams
         End Class
 
         <Extension()> <Pure()>
-        Public Function AsStream(ByVal stream As IReadableStream) As IO.Stream
+        Public Function AsStream(stream As IReadableStream) As IO.Stream
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)().CanRead)
@@ -202,7 +201,7 @@ Namespace Streams
             Return New StreamInterfaceToClassWrapper(readStream:=stream, seekStream:=Nothing, writeStream:=Nothing)
         End Function
         <Extension()> <Pure()>
-        Public Function AsStream(ByVal stream As IWritableStream) As IO.Stream
+        Public Function AsStream(stream As IWritableStream) As IO.Stream
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)().CanWrite)
@@ -214,7 +213,7 @@ Namespace Streams
             Return New StreamInterfaceToClassWrapper(readStream:=Nothing, seekStream:=Nothing, writeStream:=stream)
         End Function
         <Extension()> <Pure()>
-        Public Function AsStream(ByVal stream As IRandomReadableStream) As IO.Stream
+        Public Function AsStream(stream As IRandomReadableStream) As IO.Stream
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)().CanRead)
@@ -228,7 +227,7 @@ Namespace Streams
             Return New StreamInterfaceToClassWrapper(readStream:=stream, seekStream:=stream, writeStream:=Nothing)
         End Function
         <Extension()> <Pure()>
-        Public Function AsStream(ByVal stream As IRandomWritableStream) As IO.Stream
+        Public Function AsStream(stream As IRandomWritableStream) As IO.Stream
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)().CanWrite)
@@ -242,7 +241,7 @@ Namespace Streams
             Return New StreamInterfaceToClassWrapper(readStream:=Nothing, seekStream:=stream, writeStream:=stream)
         End Function
         <Extension()> <Pure()>
-        Public Function AsStream(ByVal stream As IRandomAccessStream) As IO.Stream
+        Public Function AsStream(stream As IRandomAccessStream) As IO.Stream
             Contract.Requires(stream IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IO.Stream)().CanRead)

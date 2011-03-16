@@ -7,12 +7,12 @@ Namespace Streams
             Contract.Invariant(_enumerator IsNot Nothing)
         End Sub
 
-        Public Sub New(ByVal enumerator As IEnumerator(Of Byte))
+        Public Sub New(enumerator As IEnumerator(Of Byte))
             Contract.Requires(enumerator IsNot Nothing)
             Me._enumerator = enumerator
         End Sub
 
-        Public Function Read(ByVal maxCount As Integer) As IRist(Of Byte) Implements IReadableStream.Read
+        Public Function Read(maxCount As Integer) As IRist(Of Byte) Implements IReadableStream.Read
             Dim result = New List(Of Byte)(capacity:=maxCount)
             While result.Count < maxCount AndAlso _enumerator.MoveNext
                 result.Add(_enumerator.Current)

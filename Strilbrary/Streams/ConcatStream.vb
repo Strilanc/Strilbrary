@@ -11,7 +11,7 @@ Namespace Streams
             Contract.Invariant(_streams IsNot Nothing)
         End Sub
 
-        Public Sub New(ByVal streams As IEnumerable(Of IReadableStream))
+        Public Sub New(streams As IEnumerable(Of IReadableStream))
             Contract.Requires(streams IsNot Nothing)
             If (From stream In streams Where stream Is Nothing).Any Then
                 Throw New ArgumentException("Null stream.")
@@ -21,7 +21,7 @@ Namespace Streams
             _emptied = Not Me._streams.MoveNext()
         End Sub
 
-        Public Function Read(ByVal maxCount As Integer) As IRist(Of Byte) Implements IReadableStream.Read
+        Public Function Read(maxCount As Integer) As IRist(Of Byte) Implements IReadableStream.Read
             Dim result = New List(Of Byte)
             While result.Count < maxCount AndAlso Not _emptied
                 Contract.Assume(_streams.Current IsNot Nothing)

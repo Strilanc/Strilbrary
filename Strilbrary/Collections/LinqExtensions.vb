@@ -5,7 +5,7 @@ Namespace Collections
         '''<summary>Returns a sequence's count if there is a known fast way to get it, or else returns nothing.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Int32?)() Is Nothing OrElse Contract.Result(Of Int32?)().Value >= 0")>
-        Friend Function TryFastCount(Of T)(ByVal sequence As IEnumerable(Of T)) As Int32?
+        Friend Function TryFastCount(Of T)(sequence As IEnumerable(Of T)) As Int32?
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Int32?)() Is Nothing OrElse Contract.Result(Of Int32?)().Value >= 0)
             Dim asCollection = TryCast(sequence, ICollection)
@@ -18,7 +18,7 @@ Namespace Collections
         '''<summary>Returns the index of the first item in the sequence equal to the target, or null if there is no such item.</summary>
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Not Contract.Result(Of Int32?).HasValue OrElse Contract.Result(Of Int32?).Value >= 0")>
-        Public Function IndexOf(Of T)(ByVal sequence As IEnumerable(Of T), ByVal target As T) As Int32?
+        Public Function IndexOf(Of T)(sequence As IEnumerable(Of T), target As T) As Int32?
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Not Contract.Result(Of Int32?).HasValue OrElse Contract.Result(Of Int32?).Value >= 0)
             Dim eq = EqualityComparer(Of T).Default
@@ -32,14 +32,14 @@ Namespace Collections
 
         '''<summary>Determines if a sequence has no elements.</summary>
         <Extension()> <Pure()>
-        Public Function None(Of T)(ByVal sequence As IEnumerable(Of T)) As Boolean
+        Public Function None(Of T)(sequence As IEnumerable(Of T)) As Boolean
             Contract.Requires(sequence IsNot Nothing)
             Return Not sequence.Any()
         End Function
 
         '''<summary>Returns a <see cref="LazyCounter" /> for the number of elements in the given sequence.</summary>
         <Extension()> <Pure()>
-        Public Function LazyCount(Of T)(ByVal sequence As IEnumerable(Of T)) As LazyCounter
+        Public Function LazyCount(Of T)(sequence As IEnumerable(Of T)) As LazyCounter
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of LazyCounter)() IsNot Nothing)
 
@@ -55,8 +55,8 @@ Namespace Collections
 #Region "Min/Max"
         '''<summary>Determines the maximum element in a sequence based on the given comparison function.</summary>
         <Extension()> <Pure()>
-        Public Function Max(Of T)(ByVal sequence As IEnumerable(Of T),
-                                  ByVal comparator As Func(Of T, T, Integer)) As T
+        Public Function Max(Of T)(sequence As IEnumerable(Of T),
+                                  comparator As Func(Of T, T, Integer)) As T
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(comparator IsNot Nothing)
             Contract.Requires(sequence.Any)
@@ -64,8 +64,8 @@ Namespace Collections
         End Function
         '''<summary>Determines the minimum element in a sequence based on the given comparison function.</summary>
         <Extension()> <Pure()>
-        Public Function Min(Of T)(ByVal sequence As IEnumerable(Of T),
-                                  ByVal comparator As Func(Of T, T, Integer)) As T
+        Public Function Min(Of T)(sequence As IEnumerable(Of T),
+                                  comparator As Func(Of T, T, Integer)) As T
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(comparator IsNot Nothing)
             Contract.Requires(sequence.Any)
@@ -74,14 +74,14 @@ Namespace Collections
 
         '''<summary>Determines the maximum element in a sequence.</summary>
         <Pure()> <Extension()>
-        Public Function Max(Of T As IComparable(Of T))(ByVal sequence As IEnumerable(Of T)) As T
+        Public Function Max(Of T As IComparable(Of T))(sequence As IEnumerable(Of T)) As T
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(sequence.Any)
             Return sequence.Max(Function(e) e)
         End Function
         '''<summary>Determines the minimum element in a sequence.</summary>
         <Pure()> <Extension()>
-        Public Function Min(Of T As IComparable(Of T))(ByVal sequence As IEnumerable(Of T)) As T
+        Public Function Min(Of T As IComparable(Of T))(sequence As IEnumerable(Of T)) As T
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(sequence.Any)
             Return sequence.Min(Function(e) e)
@@ -92,8 +92,8 @@ Namespace Collections
         <SuppressMessage("Microsoft.Contracts", "Nonnull-89-0")>
         <SuppressMessage("Microsoft.Contracts", "Requires-48-84")>
         Public Function MaxBy(Of TInput, TComparable As IComparable(Of TComparable))(
-                        ByVal sequence As IEnumerable(Of TInput),
-                        ByVal projection As Func(Of TInput, TComparable)) As TInput
+                        sequence As IEnumerable(Of TInput),
+                        projection As Func(Of TInput, TComparable)) As TInput
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(projection IsNot Nothing)
             Contract.Requires(sequence.Any)
@@ -107,8 +107,8 @@ Namespace Collections
         <SuppressMessage("Microsoft.Contracts", "Nonnull-89-0")>
         <SuppressMessage("Microsoft.Contracts", "Requires-48-84")>
         Public Function MinBy(Of TInput, TComparable As IComparable(Of TComparable))(
-                        ByVal sequence As IEnumerable(Of TInput),
-                        ByVal projection As Func(Of TInput, TComparable)) As TInput
+                        sequence As IEnumerable(Of TInput),
+                        projection As Func(Of TInput, TComparable)) As TInput
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(projection IsNot Nothing)
             Contract.Requires(sequence.Any)
@@ -121,7 +121,7 @@ Namespace Collections
 
         '''<summary>Concatenates a sequence of sequences into a single sequence.</summary>
         <Pure()> <Extension()>
-        Public Function Concat(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
+        Public Function Concat(Of T)(sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
             Contract.Requires(sequences IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
             Return From sequence In sequences
@@ -131,9 +131,9 @@ Namespace Collections
 
         '''<summary>Concatenates an array of sequences into a single sequence.</summary>
         <Pure()>
-        Public Function Concat(Of T)(ByVal sequence1 As IEnumerable(Of T),
-                                     ByVal sequence2 As IEnumerable(Of T),
-                                     ByVal ParamArray sequences() As IEnumerable(Of T)) As IEnumerable(Of T)
+        Public Function Concat(Of T)(sequence1 As IEnumerable(Of T),
+                                     sequence2 As IEnumerable(Of T),
+                                     ParamArray sequences() As IEnumerable(Of T)) As IEnumerable(Of T)
             Contract.Requires(sequence1 IsNot Nothing)
             Contract.Requires(sequence2 IsNot Nothing)
             Contract.Requires(sequences IsNot Nothing)
@@ -141,7 +141,7 @@ Namespace Collections
             Return {sequence1, sequence2}.Concat(sequences).Concat
         End Function
         <Extension()> <Pure()>
-        Public Function Concat(Of T)(ByVal list1 As IRist(Of T), ByVal list2 As IRist(Of T)) As IRist(Of T)
+        Public Function Concat(Of T)(list1 As IRist(Of T), list2 As IRist(Of T)) As IRist(Of T)
             Contract.Requires(list1 IsNot Nothing)
             Contract.Requires(list2 IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
@@ -154,14 +154,14 @@ Namespace Collections
 
         '''<summary>Appends values to a sequence.</summary>
         <Pure()> <Extension()>
-        Public Function Append(Of T)(ByVal sequence As IEnumerable(Of T), ByVal ParamArray values() As T) As IEnumerable(Of T)
+        Public Function Append(Of T)(sequence As IEnumerable(Of T), ParamArray values() As T) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(values IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
             Return sequence.Concat(values)
         End Function
         <Pure()> <Extension()>
-        Public Function Append(Of T)(ByVal list As IRist(Of T), ByVal ParamArray values() As T) As IRist(Of T)
+        Public Function Append(Of T)(list As IRist(Of T), ParamArray values() As T) As IRist(Of T)
             Contract.Requires(list IsNot Nothing)
             Contract.Requires(values IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
@@ -172,14 +172,14 @@ Namespace Collections
 
         '''<summary>Prepends values to a sequence.</summary>
         <Pure()> <Extension()>
-        Public Function Prepend(Of T)(ByVal sequence As IEnumerable(Of T), ByVal ParamArray values() As T) As IEnumerable(Of T)
+        Public Function Prepend(Of T)(sequence As IEnumerable(Of T), ParamArray values() As T) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(values IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
             Return values.Concat(sequence)
         End Function
         <Pure()> <Extension()>
-        Public Function Prepend(Of T)(ByVal list As IRist(Of T), ByVal ParamArray values() As T) As IRist(Of T)
+        Public Function Prepend(Of T)(list As IRist(Of T), ParamArray values() As T) As IRist(Of T)
             Contract.Requires(list IsNot Nothing)
             Contract.Requires(values IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
@@ -190,7 +190,7 @@ Namespace Collections
 
         '''<summary>Caches all the items in a sequence, preventing changes to the sequence from affecting the resulting sequence.</summary>
         <Extension()>
-        Public Function Cache(Of T)(ByVal sequence As IEnumerable(Of T)) As IEnumerable(Of T)
+        Public Function Cache(Of T)(sequence As IEnumerable(Of T)) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
             Return sequence.ToArray
@@ -199,7 +199,7 @@ Namespace Collections
         '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of UInt32))() IsNot Nothing")>
-        Public Function Range(ByVal limit As UInt32) As IEnumerable(Of UInt32)
+        Public Function Range(limit As UInt32) As IEnumerable(Of UInt32)
             Contract.Requires(limit >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of UInt32))() IsNot Nothing)
             Return Iterator Function()
@@ -213,7 +213,7 @@ Namespace Collections
         '''<summary>Determines the sequence of values less than the given limit, starting at 0 and incrementing.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of UInt16))() IsNot Nothing")>
-        Public Function Range(ByVal limit As UInt16) As IRist(Of UInt16)
+        Public Function Range(limit As UInt16) As IRist(Of UInt16)
             Contract.Requires(limit >= 0)
             Contract.Ensures(Contract.Result(Of IRist(Of UInt16))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of UInt16))().Count = limit)
@@ -224,7 +224,7 @@ Namespace Collections
 
         '''<summary>Enumerates items in the sequence, offset by the given amount.</summary>
         <Pure()> <Extension()>
-        Public Function OffsetBy(ByVal sequence As IEnumerable(Of Int32), ByVal offset As Int32) As IEnumerable(Of Int32)
+        Public Function OffsetBy(sequence As IEnumerable(Of Int32), offset As Int32) As IEnumerable(Of Int32)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Int32))() IsNot Nothing)
             Return From i In sequence Select i + offset
@@ -232,8 +232,8 @@ Namespace Collections
 
         '''<summary>Zips the elements of two sequences into a sequence of tuples.</summary>
         <Pure()> <Extension()>
-        Public Function Zip(Of T1, T2)(ByVal sequence As IEnumerable(Of T1),
-                                       ByVal sequence2 As IEnumerable(Of T2)) As IEnumerable(Of Tuple(Of T1, T2))
+        Public Function Zip(Of T1, T2)(sequence As IEnumerable(Of T1),
+                                       sequence2 As IEnumerable(Of T2)) As IEnumerable(Of Tuple(Of T1, T2))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(sequence2 IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of T1, T2)))() IsNot Nothing)
@@ -242,7 +242,7 @@ Namespace Collections
 
         '''<summary>Zips a sequence's elements with their positions in the sequence.</summary>
         <Pure()> <Extension()>
-        Public Function ZipWithIndexes(Of T)(ByVal sequence As IEnumerable(Of T)) As IEnumerable(Of Tuple(Of T, Integer))
+        Public Function ZipWithIndexes(Of T)(sequence As IEnumerable(Of T)) As IEnumerable(Of Tuple(Of T, Integer))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of T, Integer)))() IsNot Nothing)
             Return sequence.Select(Function(item, index) Tuple.Create(item, index))
@@ -251,7 +251,7 @@ Namespace Collections
         '''<summary>Returns a never-ending sequence consisting of a repeated value.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of TValue))() IsNot Nothing")>
-        Public Function RepeatForever(Of TValue)(ByVal value As TValue) As IEnumerable(Of TValue)
+        Public Function RepeatForever(Of TValue)(value As TValue) As IEnumerable(Of TValue)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TValue))() IsNot Nothing)
             Return Iterator Function()
                        Do
@@ -263,7 +263,7 @@ Namespace Collections
         '''<summary>Enumerates all contiguous subsequences of the given size from the given sequence.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of IRist(Of T)))() IsNot Nothing")>
-        Public Function Roll(Of T)(ByVal sequence As IEnumerable(Of T), ByVal windowSize As Integer) As IEnumerable(Of IRist(Of T))
+        Public Function Roll(Of T)(sequence As IEnumerable(Of T), windowSize As Integer) As IEnumerable(Of IRist(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(windowSize > 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of IRist(Of T)))() IsNot Nothing)
@@ -283,9 +283,9 @@ Namespace Collections
         '''<summary>Pads a sequence to a given minimum length.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of T))() IsNot Nothing")>
-        Public Function PaddedTo(Of T)(ByVal sequence As IEnumerable(Of T),
-                                       ByVal minimumCount As Integer,
-                                       Optional ByVal paddingValue As T = Nothing) As IEnumerable(Of T)
+        Public Function PaddedTo(Of T)(sequence As IEnumerable(Of T),
+                                       minimumCount As Integer,
+                                       Optional paddingValue As T = Nothing) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(minimumCount >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
@@ -305,7 +305,7 @@ Namespace Collections
 
         '''<summary>Determines the positions of items in the sequence equivalent to the given value.</summary>
         <Pure()> <Extension()>
-        Public Function IndexesOf(Of T)(ByVal sequence As IEnumerable(Of T), ByVal value As T) As IEnumerable(Of Integer)
+        Public Function IndexesOf(Of T)(sequence As IEnumerable(Of T), value As T) As IEnumerable(Of Integer)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(value IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Integer))() IsNot Nothing)
@@ -318,7 +318,7 @@ Namespace Collections
 
         '''<summary>Interleaves the items of multiple sequences into a single sequence.</summary>
         <Pure()> <Extension()>
-        Public Function Interleaved(Of T)(ByVal sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
+        Public Function Interleaved(Of T)(sequences As IEnumerable(Of IEnumerable(Of T))) As IEnumerable(Of T)
             Contract.Requires(sequences IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
 
@@ -348,7 +348,7 @@ Namespace Collections
 
         '''<summary>Groups a sequence based on the position of items (modulo the given sequence count).</summary>
         <Pure()> <Extension()>
-        Public Function Deinterleaved(Of T)(ByVal sequence As IEnumerable(Of T), ByVal sequenceCount As Integer) As IRist(Of IEnumerable(Of T))
+        Public Function Deinterleaved(Of T)(sequence As IEnumerable(Of T), sequenceCount As Integer) As IRist(Of IEnumerable(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(sequenceCount > 0)
             Contract.Ensures(Contract.Result(Of IRist(Of IEnumerable(Of T)))() IsNot Nothing)
@@ -360,7 +360,7 @@ Namespace Collections
         End Function
         '''<summary>Groups a sequence based on the position of items (modulo the given sequence count).</summary>
         <Pure()> <Extension()>
-        Public Function Deinterleaved(Of T)(ByVal sequence As IRist(Of T), ByVal sequenceCount As Integer) As IRist(Of IRist(Of T))
+        Public Function Deinterleaved(Of T)(sequence As IRist(Of T), sequenceCount As Integer) As IRist(Of IRist(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(sequenceCount > 0)
             Contract.Ensures(Contract.Result(Of IRist(Of IEnumerable(Of T)))() IsNot Nothing)
@@ -373,7 +373,7 @@ Namespace Collections
 
         '''<summary>Selects every nth item in a sequence, starting with the first item.</summary>
         <Pure()> <Extension()>
-        Public Function [Step](Of T)(ByVal sequence As IEnumerable(Of T), ByVal stepSize As Integer) As IEnumerable(Of T)
+        Public Function [Step](Of T)(sequence As IEnumerable(Of T), stepSize As Integer) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(stepSize > 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
@@ -392,7 +392,7 @@ Namespace Collections
         End Function
         '''<summary>Selects every nth item in a readable list, starting with the first item.</summary>
         <Pure()> <Extension()>
-        Public Function [Step](Of T)(ByVal sequence As IRist(Of T), ByVal stepSize As Integer) As IRist(Of T)
+        Public Function [Step](Of T)(sequence As IRist(Of T), stepSize As Integer) As IRist(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(stepSize > 0)
             Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
@@ -406,8 +406,8 @@ Namespace Collections
         '''<summary>Splits a sequence into continuous segments of a given size (with the last partition possibly being smaller).</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of IEnumerable(Of T)))() IsNot Nothing")>
-        Public Function Partitioned(Of T)(ByVal sequence As IEnumerable(Of T),
-                                          ByVal partitionSize As Integer) As IEnumerable(Of IEnumerable(Of T))
+        Public Function Partitioned(Of T)(sequence As IEnumerable(Of T),
+                                          partitionSize As Integer) As IEnumerable(Of IEnumerable(Of T))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(partitionSize > 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of IEnumerable(Of T)))() IsNot Nothing)
@@ -427,8 +427,8 @@ Namespace Collections
 
         '''<summary>Returns the last specified number of items in a sequence, or the entire sequence if there are fewer items than the specified number.</summary>
         <Extension()>
-        Public Function TakeLast(Of T)(ByVal sequence As IEnumerable(Of T),
-                                       ByVal count As Integer) As IEnumerable(Of T)
+        Public Function TakeLast(Of T)(sequence As IEnumerable(Of T),
+                                       count As Integer) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(count >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
@@ -443,8 +443,8 @@ Namespace Collections
         '''<summary>Returns all but the last specified number of items in a sequence, or no items if there are fewer items than the specified number.</summary>
         <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of T))() IsNot Nothing")>
-        Public Function SkipLast(Of T)(ByVal sequence As IEnumerable(Of T),
-                                       ByVal count As Integer) As IEnumerable(Of T)
+        Public Function SkipLast(Of T)(sequence As IEnumerable(Of T),
+                                       count As Integer) As IEnumerable(Of T)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(count >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of T))() IsNot Nothing)
@@ -466,9 +466,9 @@ Namespace Collections
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of TAccumulate))() IsNot Nothing")>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of TAccumulate))().Count = sequence.Count")>
-        Public Function PartialAggregates(Of TValue, TAccumulate)(ByVal sequence As IEnumerable(Of TValue),
-                                                                  ByVal seed As TAccumulate,
-                                                                  ByVal func As Func(Of TAccumulate, TValue, TAccumulate)) As IEnumerable(Of TAccumulate)
+        Public Function PartialAggregates(Of TValue, TAccumulate)(sequence As IEnumerable(Of TValue),
+                                                                  seed As TAccumulate,
+                                                                  func As Func(Of TAccumulate, TValue, TAccumulate)) As IEnumerable(Of TAccumulate)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TAccumulate))() IsNot Nothing)
@@ -487,9 +487,9 @@ Namespace Collections
         ''' The specified seed is used as the initial accumulator value, and is not included in the results.
         ''' </summary>
         <Extension()> <Pure()>
-        Public Function ZipWithPartialAggregates(Of TValue, TAggregate)(ByVal sequence As IEnumerable(Of TValue),
-                                                                        ByVal seed As TAggregate,
-                                                                        ByVal func As Func(Of TAggregate, TValue, TAggregate)) As IEnumerable(Of Tuple(Of TValue, TAggregate))
+        Public Function ZipWithPartialAggregates(Of TValue, TAggregate)(sequence As IEnumerable(Of TValue),
+                                                                        seed As TAggregate,
+                                                                        func As Func(Of TAggregate, TValue, TAggregate)) As IEnumerable(Of Tuple(Of TValue, TAggregate))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of TValue, TAggregate)))() IsNot Nothing)
@@ -499,22 +499,22 @@ Namespace Collections
 
         '''<summary>Returns the first element of a sequence, or a specified default value if the sequence contains no elements.</summary>
         <Pure()> <Extension()>
-        Public Function FirstOrDefault(Of T)(ByVal sequence As IEnumerable(Of T),
-                                             ByVal [default] As T) As T
+        Public Function FirstOrDefault(Of T)(sequence As IEnumerable(Of T),
+                                             [default] As T) As T
             Contract.Requires(sequence IsNot Nothing)
             Dim e = sequence.GetEnumerator
             Return If(e.MoveNext, e.Current, [default])
         End Function
         '''<summary>Returns a nullable containing the first element of a sequence, or an empty nullable if the sequence contains no elements.</summary>
         <Pure()> <Extension()>
-        Public Function FirstOrNullableDefault(Of T As Structure)(ByVal sequence As IEnumerable(Of T)) As T?
+        Public Function FirstOrNullableDefault(Of T As Structure)(sequence As IEnumerable(Of T)) As T?
             Contract.Requires(sequence IsNot Nothing)
             Dim e = sequence.GetEnumerator()
             Return If(e.MoveNext, e.Current, [Default](Of T?))
         End Function
 
         <Pure()>
-        Public Function MakeRist(Of T)(ByVal ParamArray values As T()) As IRist(Of T)
+        Public Function MakeRist(Of T)(ParamArray values As T()) As IRist(Of T)
             Contract.Requires(values IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of T))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of T))().Count = values.Length)

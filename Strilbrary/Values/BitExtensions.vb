@@ -4,28 +4,28 @@ Namespace Values
     Public Module BitExtensions
         '''<summary>Determines if a value's specified bit is set.</summary>
         <Extension()> <Pure()>
-        Public Function HasBitSet(ByVal value As Byte, ByVal bitPosition As Integer) As Boolean
+        Public Function HasBitSet(value As Byte, bitPosition As Integer) As Boolean
             Contract.Requires(bitPosition >= 0)
             Contract.Requires(bitPosition < 8)
             Return ((value >> bitPosition) And CByte(1)) <> 0
         End Function
         '''<summary>Determines if a value's specified bit is set.</summary>
         <Extension()> <Pure()>
-        Public Function HasBitSet(ByVal value As UInt16, ByVal bitPosition As Integer) As Boolean
+        Public Function HasBitSet(value As UInt16, bitPosition As Integer) As Boolean
             Contract.Requires(bitPosition >= 0)
             Contract.Requires(bitPosition < 16)
             Return ((value >> bitPosition) And 1US) <> 0
         End Function
         '''<summary>Determines if a value's specified bit is set.</summary>
         <Extension()> <Pure()>
-        Public Function HasBitSet(ByVal value As UInt32, ByVal bitPosition As Integer) As Boolean
+        Public Function HasBitSet(value As UInt32, bitPosition As Integer) As Boolean
             Contract.Requires(bitPosition >= 0)
             Contract.Requires(bitPosition < 32)
             Return ((value >> bitPosition) And 1UI) <> 0
         End Function
         '''<summary>Determines if a value's specified bit is set.</summary>
         <Extension()> <Pure()>
-        Public Function HasBitSet(ByVal value As UInt64, ByVal bitPosition As Integer) As Boolean
+        Public Function HasBitSet(value As UInt64, bitPosition As Integer) As Boolean
             Contract.Requires(bitPosition >= 0)
             Contract.Requires(bitPosition < 64)
             Return ((value >> bitPosition) And 1UL) <> 0
@@ -33,7 +33,7 @@ Namespace Values
 
         '''<summary>Determines the result of modifying one of a value's bits.</summary>
         <Extension()> <Pure()>
-        Public Function WithBitSetTo(ByVal value As Byte, ByVal bitPosition As Integer, ByVal bitValue As Boolean) As Byte
+        Public Function WithBitSetTo(value As Byte, bitPosition As Integer, bitValue As Boolean) As Byte
             Contract.Requires(bitPosition >= 0)
             Contract.Requires(bitPosition < 8)
             Dim bit = CByte(1) << bitPosition
@@ -41,7 +41,7 @@ Namespace Values
         End Function
         '''<summary>Determines the result of modifying one of a value's bits.</summary>
         <Extension()> <Pure()>
-        Public Function WithBitSetTo(ByVal value As UInt16, ByVal bitPosition As Integer, ByVal bitValue As Boolean) As UInt16
+        Public Function WithBitSetTo(value As UInt16, bitPosition As Integer, bitValue As Boolean) As UInt16
             Contract.Requires(bitPosition >= 0)
             Contract.Requires(bitPosition < 16)
             Dim bit = 1US << bitPosition
@@ -49,7 +49,7 @@ Namespace Values
         End Function
         '''<summary>Determines the result of modifying one of a value's bits.</summary>
         <Extension()> <Pure()>
-        Public Function WithBitSetTo(ByVal value As UInt32, ByVal bitPosition As Integer, ByVal bitValue As Boolean) As UInt32
+        Public Function WithBitSetTo(value As UInt32, bitPosition As Integer, bitValue As Boolean) As UInt32
             Contract.Requires(bitPosition >= 0)
             Contract.Requires(bitPosition < 32)
             Dim bit = 1UI << bitPosition
@@ -57,7 +57,7 @@ Namespace Values
         End Function
         '''<summary>Determines the result of modifying one of a value's bits.</summary>
         <Extension()> <Pure()>
-        Public Function WithBitSetTo(ByVal value As UInt64, ByVal bitPosition As Integer, ByVal bitValue As Boolean) As UInt64
+        Public Function WithBitSetTo(value As UInt64, bitPosition As Integer, bitValue As Boolean) As UInt64
             Contract.Requires(bitPosition >= 0)
             Contract.Requires(bitPosition < 64)
             Dim bit = 1UL << bitPosition
@@ -67,7 +67,7 @@ Namespace Values
         '''<summary>Enumerates the bits in a value, in little-endian order.</summary>
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of Boolean))().Count = 64")>
-        Public Function Bits(ByVal value As UInt64) As IEnumerable(Of Boolean)
+        Public Function Bits(value As UInt64) As IEnumerable(Of Boolean)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))().Count = 64)
             Return From i In 64.Range Select value.HasBitSet(i)
@@ -75,7 +75,7 @@ Namespace Values
         '''<summary>Enumerates the bits in a value, in little-endian order.</summary>
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of Boolean))().Count = 32")>
-        Public Function Bits(ByVal value As UInt32) As IEnumerable(Of Boolean)
+        Public Function Bits(value As UInt32) As IEnumerable(Of Boolean)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))().Count = 32)
             Return From i In 32.Range Select value.HasBitSet(i)
@@ -83,7 +83,7 @@ Namespace Values
         '''<summary>Enumerates the bits in a value, in little-endian order.</summary>
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of Boolean))().Count = 16")>
-        Public Function Bits(ByVal value As UInt16) As IEnumerable(Of Boolean)
+        Public Function Bits(value As UInt16) As IEnumerable(Of Boolean)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))().Count = 16)
             Return From i In 16.Range Select value.HasBitSet(i)
@@ -91,7 +91,7 @@ Namespace Values
         '''<summary>Enumerates the bits in a value, in little-endian order.</summary>
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of Boolean))().Count = 8")>
-        Public Function Bits(ByVal value As Byte) As IEnumerable(Of Boolean)
+        Public Function Bits(value As Byte) As IEnumerable(Of Boolean)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Boolean))().Count = 8)
             Return From i In 8.Range Select value.HasBitSet(i)
@@ -99,7 +99,7 @@ Namespace Values
 
         '''<summary>Determines the result of clearing all bits except the specified number of lowest bits.</summary>
         <Extension()> <Pure()>
-        Public Function LowMasked(ByVal value As Byte, ByVal bitsKept As Int32) As Byte
+        Public Function LowMasked(value As Byte, bitsKept As Int32) As Byte
             Contract.Requires(bitsKept >= 0)
             Contract.Requires(bitsKept <= 8)
             If bitsKept = 0 Then Return 0
@@ -108,7 +108,7 @@ Namespace Values
         End Function
         '''<summary>Determines the result of clearing all bits except the specified number of lowest bits.</summary>
         <Extension()> <Pure()>
-        Public Function LowMasked(ByVal value As UInt16, ByVal bitsKept As Int32) As UInt16
+        Public Function LowMasked(value As UInt16, bitsKept As Int32) As UInt16
             Contract.Requires(bitsKept >= 0)
             Contract.Requires(bitsKept <= 16)
             If bitsKept = 0 Then Return 0
@@ -117,7 +117,7 @@ Namespace Values
         End Function
         '''<summary>Determines the result of clearing all bits except the specified number of lowest bits.</summary>
         <Extension()> <Pure()>
-        Public Function LowMasked(ByVal value As UInt32, ByVal bitsKept As Int32) As UInt32
+        Public Function LowMasked(value As UInt32, bitsKept As Int32) As UInt32
             Contract.Requires(bitsKept >= 0)
             Contract.Requires(bitsKept <= 32)
             If bitsKept = 0 Then Return 0
@@ -126,7 +126,7 @@ Namespace Values
         End Function
         '''<summary>Determines the result of clearing all bits except the specified number of lowest bits.</summary>
         <Extension()> <Pure()>
-        Public Function LowMasked(ByVal value As UInt64, ByVal bitsKept As Int32) As UInt64
+        Public Function LowMasked(value As UInt64, bitsKept As Int32) As UInt64
             Contract.Requires(bitsKept >= 0)
             Contract.Requires(bitsKept <= 64)
             If bitsKept = 0 Then Return 0
@@ -136,35 +136,35 @@ Namespace Values
 
         '''<summary>Determines the result of clearing all bits except the specified number of highest bits.</summary>
         <Extension()> <Pure()>
-        Public Function HighMasked(ByVal value As Byte, ByVal bitsKept As Int32) As Byte
+        Public Function HighMasked(value As Byte, bitsKept As Int32) As Byte
             Contract.Requires(bitsKept >= 0)
             Contract.Requires(bitsKept <= 8)
             Return Not LowMasked(value, 8 - bitsKept)
         End Function
         '''<summary>Determines the result of clearing all bits except the specified number of highest bits.</summary>
         <Extension()> <Pure()>
-        Public Function HighMasked(ByVal value As UInt16, ByVal bitsKept As Int32) As UInt16
+        Public Function HighMasked(value As UInt16, bitsKept As Int32) As UInt16
             Contract.Requires(bitsKept >= 0)
             Contract.Requires(bitsKept <= 16)
             Return Not LowMasked(value, 16 - bitsKept)
         End Function
         '''<summary>Determines the result of clearing all bits except the specified number of highest bits.</summary>
         <Extension()> <Pure()>
-        Public Function HighMasked(ByVal value As UInt32, ByVal bitsKept As Int32) As UInt32
+        Public Function HighMasked(value As UInt32, bitsKept As Int32) As UInt32
             Contract.Requires(bitsKept >= 0)
             Contract.Requires(bitsKept <= 32)
             Return Not LowMasked(value, 32 - bitsKept)
         End Function
         '''<summary>Determines the result of clearing all bits except the specified number of highest bits.</summary>
         <Extension()> <Pure()>
-        Public Function HighMasked(ByVal value As UInt64, ByVal bitsKept As Int32) As UInt64
+        Public Function HighMasked(value As UInt64, bitsKept As Int32) As UInt64
             Contract.Requires(bitsKept >= 0)
             Contract.Requires(bitsKept <= 64)
             Return Not LowMasked(value, 64 - bitsKept)
         End Function
 
         <Extension()> <Pure()>
-        Public Function HasNoBitsSetAbovePosition(ByVal value As UInt64, ByVal position As Integer) As Boolean
+        Public Function HasNoBitsSetAbovePosition(value As UInt64, position As Integer) As Boolean
             Contract.Requires(position >= 0)
             Contract.Requires(position <= 64)
             Return position = 64 OrElse value >> position = 0

@@ -9,7 +9,7 @@ Namespace Time
         ''' Returns a task which completes once the given time has been reached by the clock.
         ''' The resulting task is instantly ready if the given time has already been reached.
         ''' </summary>
-        Function AsyncWaitUntil(ByVal time As TimeSpan) As Task
+        Function AsyncWaitUntil(time As TimeSpan) As Task
 
         ''' <summary>
         ''' Determines the time elapsed on the clock since it was started.
@@ -20,7 +20,7 @@ Namespace Time
         <ContractClassFor(GetType(IClock))>
         MustInherit Class ContractClass
             Implements IClock
-            Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
+            Public Function AsyncWaitUntil(time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
                 Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
                 Throw New NotSupportedException
             End Function

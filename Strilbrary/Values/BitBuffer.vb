@@ -20,7 +20,7 @@ Namespace Values
         End Property
 
 #Region "Base Operations"
-        Public Sub Queue(ByVal word As BitWord64)
+        Public Sub Queue(word As BitWord64)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + word.BitCount)
 
             Dim tail = word
@@ -31,7 +31,7 @@ Namespace Values
             _words.AddLast(tail)
             _bitCount += word.BitCount
         End Sub
-        Public Sub Stack(ByVal word As BitWord64)
+        Public Sub Stack(word As BitWord64)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + word.BitCount)
             Contract.Ensures(Me.Peek(word.BitCount) = word)
 
@@ -45,7 +45,7 @@ Namespace Values
             _bitCount += word.BitCount
             Contract.Assume(Me.Peek(word.BitCount) = word)
         End Sub
-        Public Sub Skip(ByVal skippedBitCount As Integer)
+        Public Sub Skip(skippedBitCount As Integer)
             Contract.Requires(skippedBitCount >= 0)
             Contract.Requires(skippedBitCount <= Me.BitCount)
             Contract.Requires(skippedBitCount <= BitWord64.MaxSize)
@@ -68,7 +68,7 @@ Namespace Values
 
             _bitCount -= skippedBitCount
         End Sub
-        Public Function Take(ByVal resultBitCount As Integer) As BitWord64
+        Public Function Take(resultBitCount As Integer) As BitWord64
             Contract.Requires(resultBitCount >= 0)
             Contract.Requires(resultBitCount <= Me.BitCount)
             Contract.Requires(resultBitCount <= BitWord64.MaxSize)
@@ -81,7 +81,7 @@ Namespace Values
             Return result
         End Function
         <Pure()>
-        Public Function Peek(ByVal resultBitCount As Integer) As BitWord64
+        Public Function Peek(resultBitCount As Integer) As BitWord64
             Contract.Requires(resultBitCount >= 0)
             Contract.Requires(resultBitCount <= Me.BitCount)
             Contract.Requires(resultBitCount <= BitWord64.MaxSize)
@@ -99,7 +99,7 @@ Namespace Values
                 n = n.Next
                 Contract.Assume(result.BitCount <= resultBitCount)
             End While
-            Contract.Assume(result.BitCount = resultBitCount)
+            'Contract.Assume(result.BitCount = resultBitCount)
             Return result
         End Function
 
@@ -112,53 +112,53 @@ Namespace Values
 
 #Region "Derived Operations"
         <SuppressMessage("Microsoft.Contracts", "Requires-39-39")>
-        Public Sub StackBit(ByVal value As Boolean)
+        Public Sub StackBit(value As Boolean)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 1)
             Stack(New BitWord64(If(value, 1UL, 0UL), 1))
         End Sub
         <SuppressMessage("Microsoft.Contracts", "Requires-39-32")>
-        Public Sub StackByte(ByVal value As Byte)
+        Public Sub StackByte(value As Byte)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 8)
             Stack(New BitWord64(value, 8))
         End Sub
         <SuppressMessage("Microsoft.Contracts", "Requires-39-34")>
-        Public Sub StackUInt16(ByVal value As UShort)
+        Public Sub StackUInt16(value As UShort)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 16)
             Stack(New BitWord64(value, 16))
         End Sub
         <SuppressMessage("Microsoft.Contracts", "Requires-39-34")>
-        Public Sub StackUInt32(ByVal value As UInteger)
+        Public Sub StackUInt32(value As UInteger)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 32)
             Stack(New BitWord64(value, 32))
         End Sub
         <SuppressMessage("Microsoft.Contracts", "Requires-39-33")>
-        Public Sub StackUInt64(ByVal value As UInt64)
+        Public Sub StackUInt64(value As UInt64)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 64)
             Stack(New BitWord64(value, 64))
         End Sub
 
         <SuppressMessage("Microsoft.Contracts", "Requires-39-39")>
-        Public Sub QueueBit(ByVal value As Boolean)
+        Public Sub QueueBit(value As Boolean)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 1)
             Queue(New BitWord64(If(value, 1UL, 0UL), 1))
         End Sub
         <SuppressMessage("Microsoft.Contracts", "Requires-39-32")>
-        Public Sub QueueByte(ByVal value As Byte)
+        Public Sub QueueByte(value As Byte)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 8)
             Queue(New BitWord64(value, 8))
         End Sub
         <SuppressMessage("Microsoft.Contracts", "Requires-39-34")>
-        Public Sub QueueUInt16(ByVal value As UInt16)
+        Public Sub QueueUInt16(value As UInt16)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 16)
             Queue(New BitWord64(value, 16))
         End Sub
         <SuppressMessage("Microsoft.Contracts", "Requires-39-34")>
-        Public Sub QueueUInt32(ByVal value As UInt32)
+        Public Sub QueueUInt32(value As UInt32)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 32)
             Queue(New BitWord64(value, 32))
         End Sub
         <SuppressMessage("Microsoft.Contracts", "Requires-39-33")>
-        Public Sub QueueUInt64(ByVal value As UInt64)
+        Public Sub QueueUInt64(value As UInt64)
             Contract.Ensures(Me.BitCount = Contract.OldValue(Me.BitCount) + 64)
             Queue(New BitWord64(value, 64))
         End Sub

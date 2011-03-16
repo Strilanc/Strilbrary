@@ -16,7 +16,7 @@ Namespace Threading
             Contract.Invariant(_cooldown.Ticks >= 0)
         End Sub
 
-        Public Sub New(ByVal cooldown As TimeSpan, ByVal clock As Time.IClock)
+        Public Sub New(cooldown As TimeSpan, clock As Time.IClock)
             Contract.Requires(cooldown.Ticks >= 0)
             Contract.Requires(clock IsNot Nothing)
             Me._cooldown = cooldown
@@ -24,7 +24,7 @@ Namespace Threading
         End Sub
 
         '''<summary>Sets the action to run when the cooldown finishes, or right away if not coolding down.</summary>
-        Public Sub SetActionToRun(ByVal action As Action)
+        Public Sub SetActionToRun(action As Action)
             inQueue.QueueAction(
                 Sub()
                     _nextAction = action

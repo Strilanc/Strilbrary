@@ -20,10 +20,9 @@ Namespace Time
         Public Sub New()
             Me._lastTick = Environment.TickCount
             Me._elapsedTime = New TimeSpan(0)
-            Contract.Assume(Me._elapsedTime.Ticks >= 0)
         End Sub
 
-        Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
+        Public Function AsyncWaitUntil(time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
             Dim dt = time - ElapsedTime
             If dt.Ticks <= 0 Then Return CompletedTask()
 

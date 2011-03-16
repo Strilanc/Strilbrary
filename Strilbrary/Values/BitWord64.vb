@@ -14,7 +14,7 @@
             Contract.Invariant(_bits.HasNoBitsSetAbovePosition(_bitCount))
         End Sub
 
-        Public Sub New(ByVal bits As UInt64, ByVal bitCount As Integer)
+        Public Sub New(bits As UInt64, bitCount As Integer)
             Contract.Requires(bitCount >= 0)
             Contract.Requires(bitCount <= MaxSize)
             Contract.Requires(bits.HasNoBitsSetAbovePosition(bitCount))
@@ -41,7 +41,7 @@
             End Get
         End Property
 
-        Public ReadOnly Property LowPart(ByVal splitIndex As Integer) As BitWord64
+        Public ReadOnly Property LowPart(splitIndex As Integer) As BitWord64
             Get
                 Contract.Requires(splitIndex >= 0)
                 Contract.Requires(splitIndex <= MaxSize)
@@ -53,7 +53,7 @@
                 Return New BitWord64(Bits, splitIndex)
             End Get
         End Property
-        Public ReadOnly Property HighPart(ByVal splitIndex As Integer) As BitWord64
+        Public ReadOnly Property HighPart(splitIndex As Integer) As BitWord64
             Get
                 Contract.Requires(splitIndex >= 0)
                 Contract.Requires(splitIndex <= MaxSize)
@@ -66,7 +66,7 @@
             End Get
         End Property
 
-        Public Shared Operator +(ByVal word1 As BitWord64, ByVal word2 As BitWord64) As BitWord64
+        Public Shared Operator +(word1 As BitWord64, word2 As BitWord64) As BitWord64
             Contract.Requires(word1.BitCount + word2.BitCount <= MaxSize)
             Contract.Ensures(Contract.Result(Of BitWord64)().BitCount = word1.BitCount + word2.BitCount)
             Dim bits = word1.Bits Or (word2.Bits << word1.BitCount)
@@ -75,18 +75,19 @@
             Return New BitWord64(bits, bitCount)
         End Operator
 
-        Public Shared Operator =(ByVal word1 As BitWord64, ByVal word2 As BitWord64) As Boolean
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Boolean)() = (word1.BitCount = word2.BitCount AndAlso word1.Bits = word2.Bits)")>
+        Public Shared Operator =(word1 As BitWord64, word2 As BitWord64) As Boolean
             Contract.Ensures(Contract.Result(Of Boolean)() = (word1.BitCount = word2.BitCount AndAlso word1.Bits = word2.Bits))
             Return word1.BitCount = word2.BitCount AndAlso word1.Bits = word2.Bits
         End Operator
-        Public Shared Operator <>(ByVal word1 As BitWord64, ByVal word2 As BitWord64) As Boolean
+        Public Shared Operator <>(word1 As BitWord64, word2 As BitWord64) As Boolean
             Contract.Ensures(Contract.Result(Of Boolean)() = Not word1 = word2)
             Return Not word1 = word2
         End Operator
-        Public Overloads Overrides Function Equals(ByVal obj As Object) As Boolean
+        Public Overloads Overrides Function Equals(obj As Object) As Boolean
             Return TypeOf obj Is BitWord64 AndAlso Me = DirectCast(obj, BitWord64)
         End Function
-        Public Overloads Function Equals(ByVal other As BitWord64) As Boolean Implements IEquatable(Of BitWord64).Equals
+        Public Overloads Function Equals(other As BitWord64) As Boolean Implements IEquatable(Of BitWord64).Equals
             Return Me = other
         End Function
         Public Overrides Function GetHashCode() As Integer

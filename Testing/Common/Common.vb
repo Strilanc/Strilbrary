@@ -1,6 +1,6 @@
 ﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Public Module Common
-    Public Sub ExpectException(Of E As Exception)(ByVal action As Action)
+    Public Sub ExpectException(Of E As Exception)(action As Action)
         Try
             Call action()
         Catch ex As E

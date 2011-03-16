@@ -13,7 +13,7 @@ Namespace Threading
             Contract.Invariant(_consumerQueue IsNot Nothing)
         End Sub
 
-        Public Sub New(ByVal context As SynchronizationContext)
+        Public Sub New(context As SynchronizationContext)
             Contract.Requires(context IsNot Nothing)
             Me._consumerQueue = New LockFreeConsumer(Of Task)(
                 context:=context,
@@ -26,15 +26,15 @@ Namespace Threading
         Protected Overrides Function GetScheduledTasks() As IEnumerable(Of Task)
             Return _consumerQueue
         End Function
-        Protected Overrides Sub QueueTask(ByVal task As Task)
+        Protected Overrides Sub QueueTask(task As Task)
             _consumerQueue.EnqueueConsume(task)
         End Sub
-        Protected Overrides Function TryExecuteTaskInline(ByVal task As Task, ByVal taskWasPreviouslyQueued As Boolean) As Boolean
+        Protected Overrides Function TryExecuteTaskInline(task As Task, taskWasPreviouslyQueued As Boolean) As Boolean
             Return False
         End Function
 
         '''<summary>Enqueues an action to be run and exposes it as a task.</summary>
-        Public Function QueueAction(ByVal action As Action) As Task
+        Public Function QueueAction(action As Action) As Task
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
             Dim task = New Task(action)
@@ -42,7 +42,7 @@ Namespace Threading
             Return task
         End Function
         '''<summary>Enqueues a function to be run and exposes it as a task.</summary>
-        Public Function QueueFunc(Of TReturn)(ByVal func As Func(Of TReturn)) As Task(Of TReturn)
+        Public Function QueueFunc(Of TReturn)(func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
             Dim task = New Task(Of TReturn)(func)

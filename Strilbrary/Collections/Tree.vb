@@ -32,7 +32,7 @@ Namespace Collections
             Contract.Invariant(_children IsNot Nothing)
         End Sub
 
-        Public Sub New(ByVal value As T, ByVal children As IRist(Of ITree(Of T)))
+        Public Sub New(value As T, children As IRist(Of ITree(Of T)))
             Contract.Requires(children IsNot Nothing)
             Contract.Ensures(Me._children Is children)
             Me._value = value
@@ -58,8 +58,8 @@ Namespace Collections
 
     Public Module TreeExtensions
         <Extension()> <Pure()>
-        Public Function [Select](Of TArg, TResult)(ByVal tree As ITree(Of TArg),
-                                                   ByVal projection As Func(Of TArg, TResult)) As ITree(Of TResult)
+        Public Function [Select](Of TArg, TResult)(tree As ITree(Of TArg),
+                                                   projection As Func(Of TArg, TResult)) As ITree(Of TResult)
             Contract.Requires(tree IsNot Nothing)
             Contract.Requires(projection IsNot Nothing)
             Contract.Ensures(Contract.Result(Of ITree(Of TResult))() IsNot Nothing)
@@ -70,9 +70,9 @@ Namespace Collections
         End Function
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "Nonnull-111-0")>
-        Public Function SelectMany(Of TArg, TMid, TResult)(ByVal tree As ITree(Of TArg),
-                                                           ByVal projection1 As Func(Of TArg, ITree(Of TMid)),
-                                                           ByVal projection2 As Func(Of TArg, TMid, TResult)) As ITree(Of TResult)
+        Public Function SelectMany(Of TArg, TMid, TResult)(tree As ITree(Of TArg),
+                                                           projection1 As Func(Of TArg, ITree(Of TMid)),
+                                                           projection2 As Func(Of TArg, TMid, TResult)) As ITree(Of TResult)
             Contract.Requires(tree IsNot Nothing)
             Contract.Requires(projection1 IsNot Nothing)
             Contract.Requires(projection2 IsNot Nothing)
@@ -83,8 +83,8 @@ Namespace Collections
                                                    ).ToRist)
         End Function
         <Extension()> <Pure()>
-        Public Function Where(Of TValue)(ByVal tree As ITree(Of TValue),
-                                         ByVal predicate As Func(Of TValue, Boolean)) As ITree(Of TValue)
+        Public Function Where(Of TValue)(tree As ITree(Of TValue),
+                                         predicate As Func(Of TValue, Boolean)) As ITree(Of TValue)
             Contract.Requires(tree IsNot Nothing)
             Contract.Requires(predicate IsNot Nothing)
             If Not predicate(tree.Value) Then Return Nothing

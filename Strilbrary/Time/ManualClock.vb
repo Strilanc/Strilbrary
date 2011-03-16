@@ -18,12 +18,8 @@ Namespace Time
             Contract.Invariant(_lock IsNot Nothing)
         End Sub
 
-        Public Sub New()
-            Contract.Assume(_time.Ticks = 0)
-        End Sub
-
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Me.ElapsedTime = Contract.OldValue(Me.ElapsedTime) + dt")>
-        Public Sub Advance(ByVal dt As TimeSpan)
+        Public Sub Advance(dt As TimeSpan)
             Contract.Requires(dt.Ticks >= 0)
             Contract.Ensures(Me.ElapsedTime = Contract.OldValue(Me.ElapsedTime) + dt)
             SyncLock _lock
@@ -48,7 +44,7 @@ Namespace Time
             End Get
         End Property
 
-        Public Function AsyncWaitUntil(ByVal time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
+        Public Function AsyncWaitUntil(time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
             SyncLock _lock
                 If time <= ElapsedTime Then Return CompletedTask()
 

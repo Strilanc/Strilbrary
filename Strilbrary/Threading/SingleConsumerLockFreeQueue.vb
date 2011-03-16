@@ -33,7 +33,7 @@ Namespace Threading
         Private Class Node
             Public ReadOnly value As T
             Public [next] As Node
-            Public Sub New(ByVal value As T)
+            Public Sub New(value As T)
                 Me.value = value
             End Sub
         End Class
@@ -74,7 +74,7 @@ Namespace Threading
         '''   head=prev1 -> node1=prev2 -> node2=insert -> null
         '''   [queue contains 2 elements]
         ''' </remarks>
-        Public Sub BeginEnqueue(ByVal items As IEnumerable(Of T))
+        Public Sub BeginEnqueue(items As IEnumerable(Of T))
             Contract.Requires(items IsNot Nothing)
 
             'Create new chain
@@ -104,7 +104,7 @@ Namespace Threading
         ''' <implementation>
         ''' Just an inlined and simplified version of BeginEnqueue(IEnumerable(Of T))
         ''' </implementation>
-        Public Sub BeginEnqueue(ByVal item As T)
+        Public Sub BeginEnqueue(item As T)
             Dim chainOfOne = New Node(item)
             Dim prevChainTail = Interlocked.Exchange(Me.insertionPoint, chainOfOne)
             Contract.Assume(Me.insertionPoint IsNot Nothing)

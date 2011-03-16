@@ -12,10 +12,10 @@ Public Class LinqExtensionsTest
     Private Shared ReadOnly L2 As IEnumerable(Of Int32) = From x In {1, 2}
     Private Shared ReadOnly LInf As IEnumerable(Of Int32) = Strilbrary.Collections.RepeatForever(0)
 
-    Private Function SequenceSequenceEqual(Of T)(ByVal s1 As IEnumerable(Of IEnumerable(Of T)), ByVal s2 As IEnumerable(Of IEnumerable(Of T))) As Boolean
+    Private Function SequenceSequenceEqual(Of T)(s1 As IEnumerable(Of IEnumerable(Of T)), s2 As IEnumerable(Of IEnumerable(Of T))) As Boolean
         Return Enumerable.Zip(s1, s2, Function(e1, e2) e1.SequenceEqual(e2)).All(Function(x) x)
     End Function
-    Private Function Array(Of T)(ByVal ParamArray vals() As T) As T()
+    Private Function Array(Of T)(ParamArray vals() As T) As T()
         Return vals
     End Function
 

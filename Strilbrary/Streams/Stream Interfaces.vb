@@ -3,12 +3,12 @@ Namespace Streams
     <ContractClass(GetType(IReadableStream.ContractClass))>
     Public Interface IReadableStream
         Inherits IDisposable
-        Function Read(ByVal maxCount As Integer) As IRist(Of Byte)
+        Function Read(maxCount As Integer) As IRist(Of Byte)
 
         <ContractClassFor(GetType(IReadableStream))>
         MustInherit Class ContractClass
             Implements IReadableStream
-            Public Function Read(ByVal maxCount As Integer) As IRist(Of Byte) Implements IReadableStream.Read
+            Public Function Read(maxCount As Integer) As IRist(Of Byte) Implements IReadableStream.Read
                 Contract.Requires(maxCount > 0)
                 Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
                 Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count <= maxCount)
@@ -23,13 +23,13 @@ Namespace Streams
     <ContractClass(GetType(IWritableStream.ContractClass))>
     Public Interface IWritableStream
         Inherits IDisposable
-        Sub Write(ByVal data As IRist(Of Byte))
+        Sub Write(data As IRist(Of Byte))
         Sub Flush()
 
         <ContractClassFor(GetType(IWritableStream))>
         MustInherit Class ContractClass
             Implements IWritableStream
-            Public Sub Write(ByVal data As IRist(Of Byte)) Implements IWritableStream.Write
+            Public Sub Write(data As IRist(Of Byte)) Implements IWritableStream.Write
                 Contract.Requires(data IsNot Nothing)
                 Throw New NotSupportedException
             End Sub
@@ -63,7 +63,7 @@ Namespace Streams
                     Contract.Ensures(Contract.Result(Of Long)() <= DirectCast(Me, ISeekableStream).Length)
                     Throw New NotSupportedException
                 End Get
-                Set(ByVal value As Long)
+                Set(value As Long)
                     Contract.Requires(value >= 0)
                     Contract.Requires(value <= DirectCast(Me, ISeekableStream).Length)
                     Throw New NotSupportedException
@@ -83,7 +83,7 @@ Namespace Streams
         <ContractClassFor(GetType(IRandomReadableStream))>
         MustInherit Shadows Class ContractClass
             Implements IRandomReadableStream
-            Public Function Read(ByVal maxCount As Integer) As IRist(Of Byte) Implements IReadableStream.Read
+            Public Function Read(maxCount As Integer) As IRist(Of Byte) Implements IReadableStream.Read
                 'Contract.Ensures(Me.Position = Contract.OldValue(DirectCast(Me, ISeekableStream).Position) + Contract.Result(Of IReadableList(Of Byte))().Count)
                 Throw New NotSupportedException
             End Function
@@ -96,7 +96,7 @@ Namespace Streams
                 Get
                     Throw New NotSupportedException
                 End Get
-                Set(ByVal value As Long)
+                Set(value As Long)
                     Throw New NotSupportedException
                 End Set
             End Property
@@ -114,7 +114,7 @@ Namespace Streams
         <ContractClassFor(GetType(IRandomWritableStream))>
         MustInherit Shadows Class ContractClass
             Implements IRandomWritableStream
-            Public Sub Write(ByVal data As IRist(Of Byte)) Implements IWritableStream.Write
+            Public Sub Write(data As IRist(Of Byte)) Implements IWritableStream.Write
                 'Contract.Ensures(Me.Position = Contract.OldValue(DirectCast(Me, ISeekableStream).Position) + data.Count)
                 Throw New NotSupportedException
             End Sub
@@ -130,7 +130,7 @@ Namespace Streams
                 Get
                     Throw New NotSupportedException
                 End Get
-                Set(ByVal value As Long)
+                Set(value As Long)
                     Throw New NotSupportedException
                 End Set
             End Property

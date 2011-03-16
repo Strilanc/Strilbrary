@@ -20,7 +20,7 @@
         ''' Creates a Rational equal to numerator/denominator.
         ''' The assigned numerator/denominator pair may not be the same, because common divisors are cancelled and negatives are moved to the numerator.
         ''' </summary>
-        Public Sub New(ByVal numerator As BigInteger, ByVal denominator As BigInteger)
+        Public Sub New(numerator As BigInteger, denominator As BigInteger)
             Contract.Requires(denominator <> 0)
             Dim gcd = BigInteger.GreatestCommonDivisor(numerator, denominator)
             If gcd.Sign <> denominator.Sign Then gcd = -gcd
@@ -44,13 +44,13 @@
             End Get
         End Property
 
-        Public Function CompareTo(ByVal other As Rational) As Integer Implements IComparable(Of Rational).CompareTo
+        Public Function CompareTo(other As Rational) As Integer Implements IComparable(Of Rational).CompareTo
             Return (Me.Numerator * other.Denominator - other.Numerator * Me.Denominator).Sign
         End Function
-        Public Overloads Function Equals(ByVal other As Rational) As Boolean Implements IEquatable(Of Rational).Equals
+        Public Overloads Function Equals(other As Rational) As Boolean Implements IEquatable(Of Rational).Equals
             Return Me.Numerator = other.Numerator AndAlso Me.Denominator = other.Denominator
         End Function
-        Public Overrides Function Equals(ByVal obj As Object) As Boolean
+        Public Overrides Function Equals(obj As Object) As Boolean
             Return TypeOf obj Is Rational AndAlso Me.Equals(DirectCast(obj, Rational))
         End Function
         Public Overrides Function GetHashCode() As Integer
@@ -61,87 +61,87 @@
             Return Numerator.ToString() + "/" + Denominator.ToString()
         End Function
 
-        Public Shared Operator +(ByVal value1 As Rational, ByVal value2 As Rational) As Rational
+        Public Shared Operator +(value1 As Rational, value2 As Rational) As Rational
             Contract.Assume(value1.Denominator * value2.Denominator <> 0)
             Return New Rational(value1.Numerator * value2.Denominator + value2.Numerator * value1.Denominator,
                                 value1.Denominator * value2.Denominator)
         End Operator
-        Public Shared Operator *(ByVal value1 As Rational, ByVal value2 As Rational) As Rational
+        Public Shared Operator *(value1 As Rational, value2 As Rational) As Rational
             Contract.Assume(value1.Denominator * value2.Denominator <> 0)
             Return New Rational(value1.Numerator * value2.Numerator,
                                 value1.Denominator * value2.Denominator)
         End Operator
-        Public Shared Operator /(ByVal value1 As Rational, ByVal value2 As Rational) As Rational
+        Public Shared Operator /(value1 As Rational, value2 As Rational) As Rational
             Contract.Requires(value2 <> 0)
             Contract.Assume(value1.Denominator * value2.Numerator <> 0)
             Return New Rational(value1.Numerator * value2.Denominator,
                                 value1.Denominator * value2.Numerator)
         End Operator
-        Public Shared Operator -(ByVal value As Rational) As Rational
+        Public Shared Operator -(value As Rational) As Rational
             Contract.Assume(value.Denominator <> 0)
             Return New Rational(-value.Numerator, value.Denominator)
         End Operator
-        Public Shared Operator Mod(ByVal value1 As Rational, ByVal value2 As Rational) As Rational
+        Public Shared Operator Mod(value1 As Rational, value2 As Rational) As Rational
             Contract.Assume(value1.Denominator * value2.Denominator <> 0)
             Return New Rational((value1.Numerator * value2.Denominator) Mod (value2.Numerator * value1.Denominator),
                                 value1.Denominator * value2.Denominator)
         End Operator
-        Public Shared Operator -(ByVal value1 As Rational, ByVal value2 As Rational) As Rational
+        Public Shared Operator -(value1 As Rational, value2 As Rational) As Rational
             Return value1 + -value2
         End Operator
 
-        Public Shared Operator =(ByVal value1 As Rational, ByVal value2 As Rational) As Boolean
+        Public Shared Operator =(value1 As Rational, value2 As Rational) As Boolean
             Return value1.Equals(value2)
         End Operator
-        Public Shared Operator <>(ByVal value1 As Rational, ByVal value2 As Rational) As Boolean
+        Public Shared Operator <>(value1 As Rational, value2 As Rational) As Boolean
             Return Not value1.Equals(value2)
         End Operator
-        Public Shared Operator >(ByVal value1 As Rational, ByVal value2 As Rational) As Boolean
+        Public Shared Operator >(value1 As Rational, value2 As Rational) As Boolean
             Return value1.CompareTo(value2) > 0
         End Operator
-        Public Shared Operator >=(ByVal value1 As Rational, ByVal value2 As Rational) As Boolean
+        Public Shared Operator >=(value1 As Rational, value2 As Rational) As Boolean
             Return value1.CompareTo(value2) >= 0
         End Operator
-        Public Shared Operator <=(ByVal value1 As Rational, ByVal value2 As Rational) As Boolean
+        Public Shared Operator <=(value1 As Rational, value2 As Rational) As Boolean
             Return value1.CompareTo(value2) <= 0
         End Operator
-        Public Shared Operator <(ByVal value1 As Rational, ByVal value2 As Rational) As Boolean
+        Public Shared Operator <(value1 As Rational, value2 As Rational) As Boolean
             Return value1.CompareTo(value2) < 0
         End Operator
 
-        Public Shared Widening Operator CType(ByVal value As Byte) As Rational
+        Public Shared Widening Operator CType(value As Byte) As Rational
             Contract.Assume(CType(1, BigInteger) <> 0)
             Return New Rational(value, 1)
         End Operator
-        Public Shared Widening Operator CType(ByVal value As SByte) As Rational
+        Public Shared Widening Operator CType(value As SByte) As Rational
             Contract.Assume(CType(1, BigInteger) <> 0)
             Return New Rational(value, 1)
         End Operator
-        Public Shared Widening Operator CType(ByVal value As Int16) As Rational
+        Public Shared Widening Operator CType(value As Int16) As Rational
             Contract.Assume(CType(1, BigInteger) <> 0)
             Return New Rational(value, 1)
         End Operator
-        Public Shared Widening Operator CType(ByVal value As UInt16) As Rational
+        Public Shared Widening Operator CType(value As UInt16) As Rational
             Contract.Assume(CType(1, BigInteger) <> 0)
             Return New Rational(value, 1)
         End Operator
-        Public Shared Widening Operator CType(ByVal value As Int32) As Rational
+        Public Shared Widening Operator CType(value As Int32) As Rational
             Contract.Assume(CType(1, BigInteger) <> 0)
             Return New Rational(value, 1)
         End Operator
-        Public Shared Widening Operator CType(ByVal value As UInt32) As Rational
+        Public Shared Widening Operator CType(value As UInt32) As Rational
             Contract.Assume(CType(1, BigInteger) <> 0)
             Return New Rational(value, 1)
         End Operator
-        Public Shared Widening Operator CType(ByVal value As Int64) As Rational
+        Public Shared Widening Operator CType(value As Int64) As Rational
             Contract.Assume(CType(1, BigInteger) <> 0)
             Return New Rational(value, 1)
         End Operator
-        Public Shared Widening Operator CType(ByVal value As UInt64) As Rational
+        Public Shared Widening Operator CType(value As UInt64) As Rational
             Contract.Assume(CType(1, BigInteger) <> 0)
             Return New Rational(value, 1)
         End Operator
-        Public Shared Widening Operator CType(ByVal value As BigInteger) As Rational
+        Public Shared Widening Operator CType(value As BigInteger) As Rational
             Contract.Assume(CType(1, BigInteger) <> 0)
             Return New Rational(value, 1)
         End Operator
@@ -149,19 +149,19 @@
     Public Module RationalExtensions
         '''<summary>Determines the integral result of rounding the rational towards 0.</summary>
         <Pure()> <Extension()>
-        Public Function Truncate(ByVal value As Rational) As BigInteger
+        Public Function Truncate(value As Rational) As BigInteger
             Return value.Numerator / value.Denominator 'BigInteger division truncates
         End Function
         '''<summary>Determines the integral result of rounding the rational towards negative infinity.</summary>
         <Pure()> <Extension()>
-        Public Function Floor(ByVal value As Rational) As BigInteger
+        Public Function Floor(value As Rational) As BigInteger
             Dim r = value.Numerator / value.Denominator
             If r > value Then r -= 1
             Return r
         End Function
         '''<summary>Determines the integral result of rounding the rational towards positive infinity.</summary>
         <Pure()> <Extension()>
-        Public Function Ceiling(ByVal value As Rational) As BigInteger
+        Public Function Ceiling(value As Rational) As BigInteger
             Dim r = value.Numerator / value.Denominator
             If r < value Then r += 1
             Return r
@@ -169,12 +169,12 @@
 
         '''<summary>Gets a number that indicates the sign (negative, positive, or zero) of the rational.</summary>
         <Pure()> <Extension()>
-        Public Function Sign(ByVal value As Rational) As Int32
+        Public Function Sign(value As Rational) As Int32
             Return value.Numerator.Sign()
         End Function
         '''<summary>Returns the absolute value of the rational.</summary>
         <Pure()> <Extension()>
-        Public Function Abs(ByVal value As Rational) As Rational
+        Public Function Abs(value As Rational) As Rational
             Contract.Ensures(Contract.Result(Of Rational)() >= 0)
             Dim r = If(value.Sign() < 0, -value, value)
             Contract.Assume(r >= 0)

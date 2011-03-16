@@ -11,7 +11,7 @@ Namespace Values
 
     Public Module NumericExtensions
         <Extension()> <Pure()>
-        Public Function ReversedByteOrder(ByVal value As UInt16) As UInt16
+        Public Function ReversedByteOrder(value As UInt16) As UInt16
             Dim reversedValue = 0US
             For i = 0 To 2 - 1
                 reversedValue <<= 8
@@ -21,7 +21,7 @@ Namespace Values
             Return reversedValue
         End Function
         <Extension()> <Pure()>
-        Public Function ReversedByteOrder(ByVal value As UInt32) As UInt32
+        Public Function ReversedByteOrder(value As UInt32) As UInt32
             Dim reversedValue = 0UI
             For i = 0 To 4 - 1
                 reversedValue <<= 8
@@ -31,7 +31,7 @@ Namespace Values
             Return reversedValue
         End Function
         <Extension()> <Pure()>
-        Public Function ReversedByteOrder(ByVal value As UInt64) As UInt64
+        Public Function ReversedByteOrder(value As UInt64) As UInt64
             Dim reversedValue = 0UL
             For i = 0 To 8 - 1
                 reversedValue <<= 8
@@ -43,7 +43,7 @@ Namespace Values
 
         '''<summary>Determines if a double is not positive infinity, negative infinity, or NaN.</summary>
         <Extension()> <Pure()>
-        Public Function IsFinite(ByVal value As Double) As Boolean
+        Public Function IsFinite(value As Double) As Boolean
             Contract.Ensures(Contract.Result(Of Boolean)() = (Not Double.IsInfinity(value) AndAlso Not Double.IsNaN(value)))
             Return Not Double.IsInfinity(value) AndAlso Not Double.IsNaN(value)
         End Function
@@ -51,7 +51,7 @@ Namespace Values
 #Region "Mod/Multiple"
         '''<summary>Determines the smallest non-negative remainder of the division of the value by the given divisor.</summary>
         <Extension()> <Pure()>
-        Public Function ProperMod(ByVal value As BigInteger, ByVal divisor As BigInteger) As BigInteger
+        Public Function ProperMod(value As BigInteger, divisor As BigInteger) As BigInteger
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of BigInteger)() >= 0)
             Contract.Ensures(Contract.Result(Of BigInteger)() < divisor)
@@ -65,7 +65,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest non-negative remainder of the division of the value by the given divisor.</summary>
         <Extension()> <Pure()>
-        Public Function ProperMod(ByVal value As Int64, ByVal divisor As Int64) As Int64
+        Public Function ProperMod(value As Int64, divisor As Int64) As Int64
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Int64)() >= 0)
             Contract.Ensures(Contract.Result(Of Int64)() < divisor)
@@ -76,7 +76,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest non-negative remainder of the division of the value by the given divisor.</summary>
         <Extension()> <Pure()>
-        Public Function ProperMod(ByVal value As Int32, ByVal divisor As Int32) As Int32
+        Public Function ProperMod(value As Int32, divisor As Int32) As Int32
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Int32)() >= 0)
             Contract.Ensures(Contract.Result(Of Int32)() < divisor)
@@ -88,7 +88,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest non-negative remainder of the division of the value by the given divisor.</summary>
         <Extension()> <Pure()>
-        Public Function ProperMod(ByVal value As Int16, ByVal divisor As Int16) As Int16
+        Public Function ProperMod(value As Int16, divisor As Int16) As Int16
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Int16)() >= 0)
             Contract.Ensures(Contract.Result(Of Int16)() < divisor)
@@ -102,7 +102,7 @@ Namespace Values
 
         '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
         <Extension()> <Pure()>
-        Public Function PositiveMod(ByVal value As BigInteger, ByVal divisor As BigInteger) As BigInteger
+        Public Function PositiveMod(value As BigInteger, divisor As BigInteger) As BigInteger
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of BigInteger)() > 0)
             Contract.Ensures(Contract.Result(Of BigInteger)() <= divisor)
@@ -116,7 +116,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
         <Extension()> <Pure()>
-        Public Function PositiveMod(ByVal value As Int64, ByVal divisor As Int64) As Int64
+        Public Function PositiveMod(value As Int64, divisor As Int64) As Int64
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Int64)() > 0)
             Contract.Ensures(Contract.Result(Of Int64)() <= divisor)
@@ -128,7 +128,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
         <Extension()> <Pure()>
-        Public Function PositiveMod(ByVal value As Int32, ByVal divisor As Int32) As Int32
+        Public Function PositiveMod(value As Int32, divisor As Int32) As Int32
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Int32)() > 0)
             Contract.Ensures(Contract.Result(Of Int32)() <= divisor)
@@ -141,7 +141,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
         <Extension()> <Pure()>
-        Public Function PositiveMod(ByVal value As Int16, ByVal divisor As Int16) As Int16
+        Public Function PositiveMod(value As Int16, divisor As Int16) As Int16
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Int16)() > 0)
             Contract.Ensures(Contract.Result(Of Int16)() <= divisor)
@@ -156,7 +156,7 @@ Namespace Values
         '''<remarks>Verification is disabled because the verifier is really bad with UInt64.</remarks>
         <Extension()> <Pure()>
         <ContractVerification(False)>
-        Public Function PositiveMod(ByVal value As UInt64, ByVal divisor As UInt64) As UInt64
+        Public Function PositiveMod(value As UInt64, divisor As UInt64) As UInt64
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of UInt64)() > 0)
             Contract.Ensures(Contract.Result(Of UInt64)() <= divisor)
@@ -168,7 +168,7 @@ Namespace Values
         '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-(value - Contract.Result(Of UInt32)()) Mod divisor = 0")>
-        Public Function PositiveMod(ByVal value As UInt32, ByVal divisor As UInt32) As UInt32
+        Public Function PositiveMod(value As UInt32, divisor As UInt32) As UInt32
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of UInt32)() > 0)
             Contract.Ensures(Contract.Result(Of UInt32)() <= divisor)
@@ -179,7 +179,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest positive remainder of the division of the value by the given divisor.</summary>
         <Extension()> <Pure()>
-        Public Function PositiveMod(ByVal value As UInt16, ByVal divisor As UInt16) As UInt16
+        Public Function PositiveMod(value As UInt16, divisor As UInt16) As UInt16
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of UInt16)() > 0)
             Contract.Ensures(Contract.Result(Of UInt16)() <= divisor)
@@ -193,7 +193,7 @@ Namespace Values
 
         '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        Public Function CeilingMultiple(ByVal value As BigInteger, ByVal divisor As BigInteger) As BigInteger
+        Public Function CeilingMultiple(value As BigInteger, divisor As BigInteger) As BigInteger
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of BigInteger)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of BigInteger)() >= value)
@@ -206,7 +206,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        Public Function CeilingMultiple(ByVal value As Int64, ByVal divisor As Int64) As Int64
+        Public Function CeilingMultiple(value As Int64, divisor As Int64) As Int64
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Int64)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of Int64)() >= value)
@@ -217,7 +217,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        Public Function CeilingMultiple(ByVal value As Int32, ByVal divisor As Int32) As Int32
+        Public Function CeilingMultiple(value As Int32, divisor As Int32) As Int32
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Int32)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of Int32)() >= value)
@@ -228,7 +228,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        Public Function CeilingMultiple(ByVal value As Int16, ByVal divisor As Int16) As Int16
+        Public Function CeilingMultiple(value As Int16, divisor As Int16) As Int16
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Int16)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of Int16)() >= value)
@@ -242,7 +242,7 @@ Namespace Values
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of UInt64)() Mod divisor = 0")>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of UInt64)() < value + divisor")>
         <SuppressMessage("Microsoft.Contracts", "Requires-19-90")>
-        Public Function CeilingMultiple(ByVal value As UInt64, ByVal divisor As UInt64) As UInt64
+        Public Function CeilingMultiple(value As UInt64, divisor As UInt64) As UInt64
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of UInt64)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of UInt64)() >= value)
@@ -251,7 +251,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        Public Function CeilingMultiple(ByVal value As UInt32, ByVal divisor As UInt32) As UInt32
+        Public Function CeilingMultiple(value As UInt32, divisor As UInt32) As UInt32
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of UInt32)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of UInt32)() >= value)
@@ -260,7 +260,7 @@ Namespace Values
         End Function
         '''<summary>Determines the smallest multiple of the divisor greater than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        Public Function CeilingMultiple(ByVal value As UInt16, ByVal divisor As UInt16) As UInt16
+        Public Function CeilingMultiple(value As UInt16, divisor As UInt16) As UInt16
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of UInt16)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of UInt16)() >= value)
@@ -276,7 +276,7 @@ Namespace Values
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of BigInteger)() Mod divisor = 0")>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of BigInteger)() <= value")>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of BigInteger)() > value - divisor")>
-        Public Function FloorMultiple(ByVal value As BigInteger, ByVal divisor As BigInteger) As BigInteger
+        Public Function FloorMultiple(value As BigInteger, divisor As BigInteger) As BigInteger
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of BigInteger)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of BigInteger)() <= value)
@@ -285,7 +285,7 @@ Namespace Values
         End Function
         '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        Public Function FloorMultiple(ByVal value As Int64, ByVal divisor As Int64) As Int64
+        Public Function FloorMultiple(value As Int64, divisor As Int64) As Int64
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Int64)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of Int64)() <= value)
@@ -294,7 +294,7 @@ Namespace Values
         End Function
         '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        Public Function FloorMultiple(ByVal value As Int32, ByVal divisor As Int32) As Int32
+        Public Function FloorMultiple(value As Int32, divisor As Int32) As Int32
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Int32)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of Int32)() <= value)
@@ -303,7 +303,7 @@ Namespace Values
         End Function
         '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        Public Function FloorMultiple(ByVal value As Int16, ByVal divisor As Int16) As Int16
+        Public Function FloorMultiple(value As Int16, divisor As Int16) As Int16
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of Int16)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of Int16)() <= value)
@@ -314,7 +314,7 @@ Namespace Values
         '''<remarks>Verification is disabled because the verifier is really bad with UInt64.</remarks>
         <Extension()> <Pure()>
         <ContractVerification(False)>
-        Public Function FloorMultiple(ByVal value As UInt64, ByVal divisor As UInt64) As UInt64
+        Public Function FloorMultiple(value As UInt64, divisor As UInt64) As UInt64
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of UInt64)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of UInt64)() <= value)
@@ -323,7 +323,7 @@ Namespace Values
         End Function
         '''<summary>Determines the largest multiple of the divisor less than or equal to the given value.</summary>
         <Extension()> <Pure()>
-        Public Function FloorMultiple(ByVal value As UInt32, ByVal divisor As UInt32) As UInt32
+        Public Function FloorMultiple(value As UInt32, divisor As UInt32) As UInt32
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of UInt32)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of UInt32)() <= value)
@@ -334,7 +334,7 @@ Namespace Values
         '''<remarks>Verification is disabled because the verifier suggests a tautological precondition.</remarks>
         <Extension()> <Pure()>
         <ContractVerification(False)>
-        Public Function FloorMultiple(ByVal value As UInt16, ByVal divisor As UInt16) As UInt16
+        Public Function FloorMultiple(value As UInt16, divisor As UInt16) As UInt16
             Contract.Requires(divisor > 0)
             Contract.Ensures(Contract.Result(Of UInt16)() Mod divisor = 0)
             Contract.Ensures(Contract.Result(Of UInt16)() <= value)
@@ -345,8 +345,8 @@ Namespace Values
 
 #Region "Bytes"
         <Extension()> <Pure()>
-        Public Function Bytes(ByVal value As UInt16,
-                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As IRist(Of Byte)
+        Public Function Bytes(value As UInt16,
+                              Optional byteOrder As ByteOrder = ByteOrder.LittleEndian) As IRist(Of Byte)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count = 2)
 
@@ -360,8 +360,8 @@ Namespace Values
             Return result
         End Function
         <Extension()> <Pure()>
-        Public Function Bytes(ByVal value As UInt32,
-                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As IRist(Of Byte)
+        Public Function Bytes(value As UInt32,
+                              Optional byteOrder As ByteOrder = ByteOrder.LittleEndian) As IRist(Of Byte)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count = 4)
 
@@ -375,8 +375,8 @@ Namespace Values
             Return result
         End Function
         <Extension()> <Pure()>
-        Public Function Bytes(ByVal value As UInt64,
-                              Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As IRist(Of Byte)
+        Public Function Bytes(value As UInt64,
+                              Optional byteOrder As ByteOrder = ByteOrder.LittleEndian) As IRist(Of Byte)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of Byte))().Count = 8)
 
@@ -394,8 +394,8 @@ Namespace Values
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "ArrayLowerBound-138-0")>
         <SuppressMessage("Microsoft.Contracts", "ArrayUpperBound-138-0")>
-        Public Function ToUInt16(ByVal data As IEnumerable(Of Byte),
-                                 Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
+        Public Function ToUInt16(data As IEnumerable(Of Byte),
+                                 Optional byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
             Const size As Integer = 2
             Contract.Requires(data IsNot Nothing)
             If data.LazyCount <> size Then Throw New ArgumentOutOfRangeException("data", "Incorrect number of bytes.")
@@ -422,8 +422,8 @@ Namespace Values
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "ArrayLowerBound-138-0")>
         <SuppressMessage("Microsoft.Contracts", "ArrayUpperBound-138-0")>
-        Public Function ToUInt32(ByVal data As IEnumerable(Of Byte),
-                                 Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt32
+        Public Function ToUInt32(data As IEnumerable(Of Byte),
+                                 Optional byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt32
             Const size As Integer = 4
             Contract.Requires(data IsNot Nothing)
             If data.LazyCount <> size Then Throw New ArgumentOutOfRangeException("data", "Incorrect number of bytes.")
@@ -450,8 +450,8 @@ Namespace Values
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "ArrayLowerBound-138-0")>
         <SuppressMessage("Microsoft.Contracts", "ArrayUpperBound-138-0")>
-        Public Function ToUInt64(ByVal data As IEnumerable(Of Byte),
-                                 Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt64
+        Public Function ToUInt64(data As IEnumerable(Of Byte),
+                                 Optional byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt64
             Const size As Integer = 8
             Contract.Requires(data IsNot Nothing)
             If data.LazyCount <> size Then Throw New ArgumentOutOfRangeException("data", "Incorrect number of bytes.")
@@ -479,8 +479,8 @@ Namespace Values
         ''' Determines the value of a list of 2 bytes treated as base-256 digits.
         ''' </summary>
         <Extension()> <Pure()>
-        Public Function ToUInt16(ByVal data As IRist(Of Byte),
-                                 Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
+        Public Function ToUInt16(data As IRist(Of Byte),
+                                 Optional byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt16
             Const size As Integer = 2
             Contract.Requires(data IsNot Nothing)
             Contract.Requires(data.Count = size)
@@ -505,8 +505,8 @@ Namespace Values
         ''' Determines the value of a list of 4 bytes treated as base-256 digits.
         ''' </summary>
         <Extension()> <Pure()>
-        Public Function ToUInt32(ByVal data As IRist(Of Byte),
-                                 Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt32
+        Public Function ToUInt32(data As IRist(Of Byte),
+                                 Optional byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt32
             Const size As Integer = 4
             Contract.Requires(data IsNot Nothing)
             Contract.Requires(data.Count = size)
@@ -531,8 +531,8 @@ Namespace Values
         ''' Determines the value of a list of 8 bytes treated as base-256 digits.
         ''' </summary>
         <Extension()> <Pure()>
-        Public Function ToUInt64(ByVal data As IRist(Of Byte),
-                                 Optional ByVal byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt64
+        Public Function ToUInt64(data As IRist(Of Byte),
+                                 Optional byteOrder As ByteOrder = ByteOrder.LittleEndian) As UInt64
             Const size As Integer = 8
             Contract.Requires(data IsNot Nothing)
             Contract.Requires(data.Count = size)
@@ -557,7 +557,7 @@ Namespace Values
 
 #Region "Bitwise Conversions"
         <Pure()> <Extension()>
-        Public Function BitwiseToSByte(ByVal value As Byte) As SByte
+        Public Function BitwiseToSByte(value As Byte) As SByte
             Dim sign = value And (CByte(1) << 7)
             If CBool(sign) Then
                 Return CSByte(value And Not sign) Or (CSByte(1) << 7)
@@ -566,7 +566,7 @@ Namespace Values
             End If
         End Function
         <Pure()> <Extension()>
-        Public Function BitwiseToInt16(ByVal value As UInt16) As Int16
+        Public Function BitwiseToInt16(value As UInt16) As Int16
             Dim sign = value And (1US << 15)
             If CBool(sign) Then
                 Return CShort(value And Not sign) Or (1S << 15)
@@ -575,7 +575,7 @@ Namespace Values
             End If
         End Function
         <Pure()> <Extension()>
-        Public Function BitwiseToInt32(ByVal value As UInt32) As Int32
+        Public Function BitwiseToInt32(value As UInt32) As Int32
             Dim sign = value And (1UI << 31)
             If CBool(sign) Then
                 Return CInt(value And Not sign) Or (1 << 31)
@@ -584,7 +584,7 @@ Namespace Values
             End If
         End Function
         <Pure()> <Extension()>
-        Public Function BitwiseToInt64(ByVal value As UInt64) As Int64
+        Public Function BitwiseToInt64(value As UInt64) As Int64
             Dim sign = value And (1UL << 63)
             If CBool(sign) Then
                 Return CLng(value And Not sign) Or (1L << 63)
@@ -594,7 +594,7 @@ Namespace Values
         End Function
 
         <Pure()> <Extension()>
-        Public Function BitwiseToByte(ByVal value As SByte) As Byte
+        Public Function BitwiseToByte(value As SByte) As Byte
             Dim sign = value And (CSByte(1) << 7)
             If CBool(sign) Then
                 Return CByte(value And Not sign) Or (CByte(1) << 7)
@@ -603,7 +603,7 @@ Namespace Values
             End If
         End Function
         <Pure()> <Extension()>
-        Public Function BitwiseToUInt16(ByVal value As Int16) As UInt16
+        Public Function BitwiseToUInt16(value As Int16) As UInt16
             Dim sign = value And (1S << 15)
             If CBool(sign) Then
                 Return CUShort(value And Not sign) Or (1US << 15)
@@ -612,7 +612,7 @@ Namespace Values
             End If
         End Function
         <Pure()> <Extension()>
-        Public Function BitwiseToUInt32(ByVal value As Int32) As UInt32
+        Public Function BitwiseToUInt32(value As Int32) As UInt32
             Dim sign = value And (1 << 31)
             If CBool(sign) Then
                 Return CUInt(value And Not sign) Or (1UI << 31)
@@ -621,7 +621,7 @@ Namespace Values
             End If
         End Function
         <Pure()> <Extension()>
-        Public Function BitwiseToUInt64(ByVal value As Int64) As UInt64
+        Public Function BitwiseToUInt64(value As Int64) As UInt64
             Dim sign = value And (1L << 63)
             If CBool(sign) Then
                 Return CULng(value And Not sign) Or (1UL << 63)
@@ -633,43 +633,43 @@ Namespace Values
 
 #Region "ShiftRotate"
         <Pure()> <Extension()>
-        Public Function ShiftRotateLeft(ByVal value As Byte, ByVal offset As Integer) As Byte
+        Public Function ShiftRotateLeft(value As Byte, offset As Integer) As Byte
             offset = offset.ProperMod(8)
             Return (value << offset) Or (value >> (8 - offset))
         End Function
         <Pure()> <Extension()>
-        Public Function ShiftRotateLeft(ByVal value As UInt16, ByVal offset As Integer) As UInt16
+        Public Function ShiftRotateLeft(value As UInt16, offset As Integer) As UInt16
             offset = offset.ProperMod(16)
             Return (value << offset) Or (value >> (16 - offset))
         End Function
         <Pure()> <Extension()>
-        Public Function ShiftRotateLeft(ByVal value As UInt32, ByVal offset As Integer) As UInt32
+        Public Function ShiftRotateLeft(value As UInt32, offset As Integer) As UInt32
             offset = offset.ProperMod(32)
             Return (value << offset) Or (value >> (32 - offset))
         End Function
         <Pure()> <Extension()>
-        Public Function ShiftRotateLeft(ByVal value As UInt64, ByVal offset As Integer) As UInt64
+        Public Function ShiftRotateLeft(value As UInt64, offset As Integer) As UInt64
             offset = offset.ProperMod(64)
             Return (value << offset) Or (value >> (64 - offset))
         End Function
 
         <Pure()> <Extension()>
-        Public Function ShiftRotateRight(ByVal value As Byte, ByVal offset As Integer) As Byte
+        Public Function ShiftRotateRight(value As Byte, offset As Integer) As Byte
             offset = offset.ProperMod(8)
             Return (value >> offset) Or (value << (8 - offset))
         End Function
         <Pure()> <Extension()>
-        Public Function ShiftRotateRight(ByVal value As UInt16, ByVal offset As Integer) As UInt16
+        Public Function ShiftRotateRight(value As UInt16, offset As Integer) As UInt16
             offset = offset.ProperMod(16)
             Return (value >> offset) Or (value << (16 - offset))
         End Function
         <Pure()> <Extension()>
-        Public Function ShiftRotateRight(ByVal value As UInt32, ByVal offset As Integer) As UInt32
+        Public Function ShiftRotateRight(value As UInt32, offset As Integer) As UInt32
             offset = offset.ProperMod(32)
             Return (value >> offset) Or (value << (32 - offset))
         End Function
         <Pure()> <Extension()>
-        Public Function ShiftRotateRight(ByVal value As UInt64, ByVal offset As Integer) As UInt64
+        Public Function ShiftRotateRight(value As UInt64, offset As Integer) As UInt64
             offset = offset.ProperMod(64)
             Return (value >> offset) Or (value << (64 - offset))
         End Function
@@ -678,7 +678,7 @@ Namespace Values
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of T)().CompareTo(value1) >= 0")>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of T)().CompareTo(value2) >= 0")>
-        Public Function ClampAtOrAbove(Of T As IComparable(Of T))(ByVal value1 As T, ByVal value2 As T) As T
+        Public Function ClampAtOrAbove(Of T As IComparable(Of T))(value1 As T, value2 As T) As T
             Contract.Requires(value1 IsNot Nothing)
             Contract.Requires(value2 IsNot Nothing)
             Contract.Ensures(Contract.Result(Of T)() IsNot Nothing)
@@ -689,7 +689,7 @@ Namespace Values
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of T)().CompareTo(value1) <= 0")>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of T)().CompareTo(value2) <= 0")>
-        Public Function ClampAtOrBelow(Of T As IComparable(Of T))(ByVal value1 As T, ByVal value2 As T) As T
+        Public Function ClampAtOrBelow(Of T As IComparable(Of T))(value1 As T, value2 As T) As T
             Contract.Requires(value1 IsNot Nothing)
             Contract.Requires(value2 IsNot Nothing)
             Contract.Ensures(Contract.Result(Of T)() IsNot Nothing)
@@ -698,9 +698,9 @@ Namespace Values
             Return If(value1.CompareTo(value2) <= 0, value1, value2)
         End Function
         <Pure()> <Extension()>
-        Public Function Between(Of T As IComparable(Of T))(ByVal value1 As T,
-                                                           ByVal value2 As T,
-                                                           ByVal value3 As T) As T
+        Public Function Between(Of T As IComparable(Of T))(value1 As T,
+                                                           value2 As T,
+                                                           value3 As T) As T
             Contract.Requires(value1 IsNot Nothing)
             Contract.Requires(value2 IsNot Nothing)
             Contract.Requires(value3 IsNot Nothing)

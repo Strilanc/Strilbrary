@@ -6,9 +6,9 @@ Namespace Values
         ''' Determines a string created by extending the given string up to the given minimum length using the given padding character.
         ''' </summary>
         <Pure()> <Extension()>
-        Public Function Padded(ByVal text As String,
-                               ByVal minimumLength As Integer,
-                               Optional ByVal paddingCharacter As Char = " "c) As String
+        Public Function Padded(text As String,
+                               minimumLength As Integer,
+                               Optional paddingCharacter As Char = " "c) As String
             Contract.Requires(text IsNot Nothing)
             Contract.Requires(minimumLength >= 0)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
@@ -22,8 +22,8 @@ Namespace Values
         ''' Determines a string created by prefixing every line of the given string with the given prefix.
         ''' </summary>
         <Pure()> <Extension()>
-        Public Function Indent(ByVal paragraph As String,
-                               ByVal prefix As String) As String
+        Public Function Indent(paragraph As String,
+                               prefix As String) As String
             Contract.Requires(paragraph IsNot Nothing)
             Contract.Requires(prefix IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
@@ -34,7 +34,7 @@ Namespace Values
         ''' Determines a string created by replacing format items in the string with a representation of the corresponding arguments.
         ''' </summary>
         <Pure()> <Extension()>
-        Public Function Frmt(ByVal format As String, ByVal ParamArray args() As Object) As String
+        Public Function Frmt(format As String, ParamArray args() As Object) As String
             Contract.Requires(format IsNot Nothing)
             Contract.Requires(args IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
@@ -45,7 +45,7 @@ Namespace Values
         ''' Concatenates a separator string between the representations of elements in a specified sequence, yielding a single concatenated string.
         ''' </summary>
         <Extension()> <Pure()>
-        Public Function StringJoin(Of T)(ByVal this As IEnumerable(Of T), ByVal separator As String) As String
+        Public Function StringJoin(Of T)(this As IEnumerable(Of T), separator As String) As String
             Contract.Requires(this IsNot Nothing)
             Contract.Requires(separator IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
@@ -56,21 +56,21 @@ Namespace Values
         End Function
 
         <Extension()> <Pure()>
-        Public Function ToInvariant(ByVal value As String) As InvariantString
+        Public Function ToInvariant(value As String) As InvariantString
             Contract.Requires(value IsNot Nothing)
             Return value
         End Function
 
 #Region "String <-> Number"
         <Extension()> <Pure()>
-        Public Function ToAsciiBytes(ByVal chars As IEnumerable(Of Char)) As IEnumerable(Of Byte)
+        Public Function ToAsciiBytes(chars As IEnumerable(Of Char)) As IEnumerable(Of Byte)
             Contract.Requires(chars IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Byte))() IsNot Nothing)
             Return From c In chars
                    Select CByte(Microsoft.VisualBasic.Asc(c))
         End Function
         <Extension()> <Pure()>
-        Public Function ToAsciiChars(ByVal data As IEnumerable(Of Byte)) As IEnumerable(Of Char)
+        Public Function ToAsciiChars(data As IEnumerable(Of Byte)) As IEnumerable(Of Char)
             Contract.Requires(data IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Char))() IsNot Nothing)
             Return From b In data
@@ -78,9 +78,9 @@ Namespace Values
         End Function
 
         <Extension()> <Pure()>
-        Public Function ToHexString(ByVal data As IEnumerable(Of Byte),
-                                    Optional ByVal minWordLength As Byte = 2,
-                                    Optional ByVal separator As String = " ") As String
+        Public Function ToHexString(data As IEnumerable(Of Byte),
+                                    Optional minWordLength As Byte = 2,
+                                    Optional separator As String = " ") As String
             Contract.Requires(data IsNot Nothing)
             Contract.Requires(separator IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
@@ -89,7 +89,7 @@ Namespace Values
                     ).StringJoin(separator)
         End Function
         <Extension()> <Pure()>
-        Public Function FromHexStringToBytes(ByVal data As String) As Byte()
+        Public Function FromHexStringToBytes(data As String) As Byte()
             Contract.Requires(data IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Byte())() IsNot Nothing)
 
@@ -105,8 +105,8 @@ Namespace Values
         End Function
 
         <Extension()> <Pure()>
-        Public Function ToBinary(ByVal value As ULong,
-                                 Optional ByVal minLength As Integer = 8) As String
+        Public Function ToBinary(value As ULong,
+                                 Optional minLength As Integer = 8) As String
             Contract.Requires(minLength >= 0)
             Contract.Requires(minLength <= 64)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
@@ -129,8 +129,8 @@ Namespace Values
                     {"e"c, 14}, {"E"c, 14},
                     {"f"c, 15}, {"F"c, 15}}
         <Extension()> <Pure()>
-        Public Function FromHexToUInt64(ByVal chars As IEnumerable(Of Char),
-                                        ByVal byteOrder As ByteOrder) As ULong
+        Public Function FromHexToUInt64(chars As IEnumerable(Of Char),
+                                        byteOrder As ByteOrder) As ULong
             Contract.Requires(chars IsNot Nothing)
 
             Select Case byteOrder

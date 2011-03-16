@@ -16,7 +16,7 @@ Namespace Threading
         '''<summary>Wraps a value in an instantly completed task.</summary>
         <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TValue))().Status = TaskStatus.RanToCompletion")>
-        Public Function AsTask(Of TValue)(ByVal value As TValue) As Task(Of TValue)
+        Public Function AsTask(Of TValue)(value As TValue) As Task(Of TValue)
             Contract.Ensures(Contract.Result(Of Task(Of TValue))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TValue))().Status = TaskStatus.RanToCompletion)
             Dim result = New TaskCompletionSource(Of TValue)
@@ -29,7 +29,7 @@ Namespace Threading
         ''' The result faults if any of the sequence tasks fault.
         '''</summary>
         <Extension()>
-        Public Function AsAggregateTask(ByVal sequence As IEnumerable(Of Task)) As Task
+        Public Function AsAggregateTask(sequence As IEnumerable(Of Task)) As Task
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
 
@@ -67,7 +67,7 @@ Namespace Threading
         ''' The result faults if any of the sequence's tasks fault.
         '''</summary>
         <Extension()>
-        Public Function AsAggregateTask(Of TValue)(ByVal sequence As IEnumerable(Of Task(Of TValue))) As Task(Of IEnumerable(Of TValue))
+        Public Function AsAggregateTask(Of TValue)(sequence As IEnumerable(Of Task(Of TValue))) As Task(Of IEnumerable(Of TValue))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of IEnumerable(Of TValue)))() IsNot Nothing)
             Dim tasks = sequence.ToList
@@ -76,14 +76,14 @@ Namespace Threading
 
         '''<summary>Causes a task completion source to succeed with the result of a function, or to fault if the function throws an exception.</summary>
         <Extension()>
-        Public Sub SetByEvaluating(Of T)(ByVal taskSource As TaskCompletionSource(Of T), ByVal func As Func(Of T))
+        Public Sub SetByEvaluating(Of T)(taskSource As TaskCompletionSource(Of T), func As Func(Of T))
             Contract.Requires(taskSource IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             taskSource.DependentCall(Sub() taskSource.SetResult(func()))
         End Sub
         '''<summary>Causes a task completion source to succeed if an action runs, or to fault if the action throws an exception.</summary>
         <Extension()>
-        Public Sub SetByCalling(ByVal taskSource As TaskCompletionSource(Of NoValue), ByVal action As action)
+        Public Sub SetByCalling(taskSource As TaskCompletionSource(Of NoValue), action As action)
             Contract.Requires(taskSource IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             taskSource.DependentCall(Sub()
@@ -94,7 +94,7 @@ Namespace Threading
         '''<summary>Causes a task completion source to fault if running an action throws an exception.</summary>
         <Extension()>
         <SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")>
-        Public Sub DependentCall(Of T)(ByVal taskSource As TaskCompletionSource(Of T), ByVal action As action)
+        Public Sub DependentCall(Of T)(taskSource As TaskCompletionSource(Of T), action As action)
             Contract.Requires(taskSource IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Try
@@ -104,7 +104,7 @@ Namespace Threading
             End Try
         End Sub
         <Extension()>
-        Private Function PropagateFaultsFrom(Of T)(ByVal taskSource As TaskCompletionSource(Of T), ByVal task As Task) As Boolean
+        Private Function PropagateFaultsFrom(Of T)(taskSource As TaskCompletionSource(Of T), task As Task) As Boolean
             Contract.Requires(taskSource IsNot Nothing)
             Contract.Requires(task IsNot Nothing)
             Select Case task.Status
@@ -124,8 +124,8 @@ Namespace Threading
 
         '''<summary>Creates a continuation which executes if a task succeeds, and propagates exceptions if it faults.</summary>
         <Extension()> <Pure()>
-        Public Function ContinueWithAction(ByVal task As Task,
-                                           ByVal action As action) As Task
+        Public Function ContinueWithAction(task As Task,
+                                           action As action) As Task
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of task)() IsNot Nothing)
@@ -136,8 +136,8 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes if a task succeeds, and propagates exceptions if it faults.</summary>
         <Extension()> <Pure()>
-        Public Function ContinueWithAction(Of TInput)(ByVal task As Task(Of TInput),
-                                                      ByVal action As Action(Of TInput)) As Task
+        Public Function ContinueWithAction(Of TInput)(task As Task(Of TInput),
+                                                      action As Action(Of TInput)) As Task
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of task)() IsNot Nothing)
@@ -145,8 +145,8 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes if a task succeeds, and propagates exceptions if it faults.</summary>
         <Extension()> <Pure()>
-        Public Function ContinueWithFunc(Of TResult)(ByVal task As Task,
-                                                     ByVal func As Func(Of TResult)) As Task(Of TResult)
+        Public Function ContinueWithFunc(Of TResult)(task As Task,
+                                                     func As Func(Of TResult)) As Task(Of TResult)
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TResult))() IsNot Nothing)
@@ -157,8 +157,8 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes if a task succeeds, and propagates exceptions if it faults.</summary>
         <Extension()> <Pure()>
-        Public Function ContinueWithFunc(Of TInput, TResult)(ByVal task As Task(Of TInput),
-                                                             ByVal func As Func(Of TInput, TResult)) As Task(Of TResult)
+        Public Function ContinueWithFunc(Of TInput, TResult)(task As Task(Of TInput),
+                                                             func As Func(Of TInput, TResult)) As Task(Of TResult)
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TResult))() IsNot Nothing)
@@ -166,21 +166,19 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes if a task faults, and propagates success if it succeeds.</summary>
         <Extension()> <Pure()>
-        Public Function [Catch](ByVal task As Task,
-                                ByVal action As Action(Of AggregateException)) As Task
+        Public Function [Catch](task As Task,
+                                action As Action(Of AggregateException)) As Task
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Dim result = task.ContinueWith(Sub(t) If t.Status = TaskStatus.Faulted Then action(t.Exception), TaskContinuationOptions.NotOnCanceled)
-            Contract.Assume(result IsNot Nothing)
-            Return result
+            Return task.ContinueWith(Sub(t) If t.Status = TaskStatus.Faulted Then action(t.Exception), TaskContinuationOptions.NotOnCanceled)
         End Function
 
         '''<summary>Creates a continuation which executes if a task succeeds, and propagates exceptions if it faults.</summary>
         '''<remarks>Linq provider for tasks.</remarks>
         <Extension()>
-        Public Function [Select](Of TArg, TResult)(ByVal task As Task(Of TArg),
-                                                   ByVal func As Func(Of TArg, TResult)) As Task(Of TResult)
+        Public Function [Select](Of TArg, TResult)(task As Task(Of TArg),
+                                                   func As Func(Of TArg, TResult)) As Task(Of TResult)
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TResult))() IsNot Nothing)
@@ -189,9 +187,9 @@ Namespace Threading
         '''<summary>Creates a chain of continuations which execute if a task succeeds, and propagates exceptions if it faults.</summary>
         '''<remarks>Linq provider for tasks.</remarks>
         <Extension()>
-        Public Function SelectMany(Of TArg, TMid, TReturn)(ByVal task As Task(Of TArg),
-                                                           ByVal projection1 As Func(Of TArg, Task(Of TMid)),
-                                                           ByVal projection2 As Func(Of TArg, TMid, TReturn)) As Task(Of TReturn)
+        Public Function SelectMany(Of TArg, TMid, TReturn)(task As Task(Of TArg),
+                                                           projection1 As Func(Of TArg, Task(Of TMid)),
+                                                           projection2 As Func(Of TArg, TMid, TReturn)) As Task(Of TReturn)
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(projection1 IsNot Nothing)
             Contract.Requires(projection2 IsNot Nothing)

@@ -41,7 +41,7 @@ Public Class CallQueueTest
         WaitForTaskToFault(result)
     End Sub
 
-    Private Sub TestCallQueue(ByVal q As CallQueue)
+    Private Sub TestCallQueue(q As CallQueue)
         Dim t = 0
         Dim flag = True
         For i = 0 To 1000 - 1

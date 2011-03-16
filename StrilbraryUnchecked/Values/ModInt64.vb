@@ -6,10 +6,10 @@
         Private Const BitCount As Int32 = 64
         Private ReadOnly _value As UInt64
 
-        Public Sub New(ByVal value As UInt64)
+        Public Sub New(value As UInt64)
             Me._value = value
         End Sub
-        Public Sub New(ByVal value As Int64)
+        Public Sub New(value As Int64)
             Me._value = CULng(value)
         End Sub
 
@@ -24,44 +24,44 @@
             End Get
         End Property
 
-        Public Shared Operator *(ByVal value1 As ModInt64, ByVal value2 As ModInt64) As ModInt64
+        Public Shared Operator *(value1 As ModInt64, value2 As ModInt64) As ModInt64
             Return value1._value * value2._value
         End Operator
-        Public Shared Operator +(ByVal value1 As ModInt64, ByVal value2 As ModInt64) As ModInt64
+        Public Shared Operator +(value1 As ModInt64, value2 As ModInt64) As ModInt64
             Return value1._value + value2._value
         End Operator
-        Public Shared Operator -(ByVal value1 As ModInt64, ByVal value2 As ModInt64) As ModInt64
+        Public Shared Operator -(value1 As ModInt64, value2 As ModInt64) As ModInt64
             Return value1._value - value2._value
         End Operator
-        Public Shared Operator And(ByVal value1 As ModInt64, ByVal value2 As ModInt64) As ModInt64
+        Public Shared Operator And(value1 As ModInt64, value2 As ModInt64) As ModInt64
             Return value1._value And value2._value
         End Operator
-        Public Shared Operator Xor(ByVal value1 As ModInt64, ByVal value2 As ModInt64) As ModInt64
+        Public Shared Operator Xor(value1 As ModInt64, value2 As ModInt64) As ModInt64
             Return value1._value Xor value2._value
         End Operator
-        Public Shared Operator Or(ByVal value1 As ModInt64, ByVal value2 As ModInt64) As ModInt64
+        Public Shared Operator Or(value1 As ModInt64, value2 As ModInt64) As ModInt64
             Return value1._value Or value2._value
         End Operator
-        Public Shared Operator Not(ByVal value As ModInt64) As ModInt64
+        Public Shared Operator Not(value As ModInt64) As ModInt64
             Return Not value._value
         End Operator
-        Public Shared Operator >>(ByVal value As ModInt64, ByVal offset As Integer) As ModInt64
+        Public Shared Operator >>(value As ModInt64, offset As Integer) As ModInt64
             Return value._value >> offset
         End Operator
-        Public Shared Operator <<(ByVal value As ModInt64, ByVal offset As Integer) As ModInt64
+        Public Shared Operator <<(value As ModInt64, offset As Integer) As ModInt64
             Return value._value << offset
         End Operator
-        Public Shared Operator =(ByVal value1 As ModInt64, ByVal value2 As ModInt64) As Boolean
+        Public Shared Operator =(value1 As ModInt64, value2 As ModInt64) As Boolean
             Return value1._value = value2._value
         End Operator
-        Public Shared Operator <>(ByVal value1 As ModInt64, ByVal value2 As ModInt64) As Boolean
+        Public Shared Operator <>(value1 As ModInt64, value2 As ModInt64) As Boolean
             Return value1._value <> value2._value
         End Operator
-        Public Function ShiftRotateLeft(ByVal offset As Integer) As ModInt64
+        Public Function ShiftRotateLeft(offset As Integer) As ModInt64
             offset = offset And (BitCount - 1)
             Return (_value << offset) Or (_value >> (BitCount - offset))
         End Function
-        Public Function ShiftRotateRight(ByVal offset As Integer) As ModInt64
+        Public Function ShiftRotateRight(offset As Integer) As ModInt64
             offset = offset And (BitCount - 1)
             Return (_value >> offset) Or (_value << (BitCount - offset))
         End Function
@@ -69,20 +69,20 @@
         Public Overrides Function GetHashCode() As Integer
             Return _value.GetHashCode
         End Function
-        Public Overrides Function Equals(ByVal obj As Object) As Boolean
+        Public Overrides Function Equals(obj As Object) As Boolean
             Return TypeOf obj Is ModInt64 AndAlso Me._value = DirectCast(obj, ModInt64)._value
         End Function
-        Public Overloads Function Equals(ByVal other As ModInt64) As Boolean Implements IEquatable(Of ModInt64).Equals
+        Public Overloads Function Equals(other As ModInt64) As Boolean Implements IEquatable(Of ModInt64).Equals
             Return Me._value = other._value
         End Function
         Public Overrides Function ToString() As String
             Return _value.ToString(Globalization.CultureInfo.InvariantCulture)
         End Function
 
-        Public Shared Widening Operator CType(ByVal value As UInt64) As ModInt64
+        Public Shared Widening Operator CType(value As UInt64) As ModInt64
             Return New ModInt64(value)
         End Operator
-        Public Shared Widening Operator CType(ByVal value As Int64) As ModInt64
+        Public Shared Widening Operator CType(value As Int64) As ModInt64
             Return New ModInt64(value)
         End Operator
     End Structure

@@ -4,14 +4,14 @@ Namespace Values
     Public Module EnumExtensions
         '''<summary>Parses a string as an Enum type. Throws an ArgumentException if the string does match a defined value.</summary>
         <Pure()> <Extension()>
-        Public Function EnumParse(Of TEnum As Structure)(ByVal value As String, ByVal ignoreCase As Boolean) As TEnum
+        Public Function EnumParse(Of TEnum As Structure)(value As String, ignoreCase As Boolean) As TEnum
             Dim result = value.EnumTryParse(Of TEnum)(ignoreCase)
             If Not result.HasValue Then Throw New ArgumentException("""{0}"" can't be parsed to an enum of type {1}.".Frmt(value, GetType(TEnum).ToString))
             Return result.Value
         End Function
         '''<summary>Parses a string as an Enum type. Returns nothing if the string does match a defined value.</summary>
         <Pure()> <Extension()>
-        Public Function EnumTryParse(Of TEnum As Structure)(ByVal value As String, ByVal ignoreCase As Boolean) As TEnum?
+        Public Function EnumTryParse(Of TEnum As Structure)(value As String, ignoreCase As Boolean) As TEnum?
             Dim result As TEnum
             If Not [Enum].TryParse(Of TEnum)(value, ignoreCase, result) Then Return Nothing
             Return result
@@ -27,7 +27,7 @@ Namespace Values
         '''<summary>Determines the binary flags included in the enum value (including flags which may not be defined), including the power of each flag.</summary>
         <SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
         <Extension()> <Pure()>
-        Public Function EnumFlagsIndexed(Of TEnum)(ByVal value As TEnum) As IEnumerable(Of Tuple(Of TEnum, Int32))
+        Public Function EnumFlagsIndexed(Of TEnum)(value As TEnum) As IEnumerable(Of Tuple(Of TEnum, Int32))
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of TEnum, Int32)))() IsNot Nothing)
             Select Case [Enum].GetUnderlyingType(GetType(TEnum))
                 Case GetType(SByte) : Return value.EnumFlagsHelper((From i In 8.Range Select CSByte(1) << i), Function(e1, e2) (e1 And e2) <> 0)
@@ -43,9 +43,9 @@ Namespace Values
             End Select
         End Function
         <Extension()> <Pure()>
-        Private Function EnumFlagsHelper(Of TEnum, TUnderlying)(ByVal value As TEnum,
-                                                                ByVal allFlags As IEnumerable(Of TUnderlying),
-                                                                ByVal hasFlag As Func(Of TUnderlying, TUnderlying, Boolean)) As IEnumerable(Of Tuple(Of TEnum, Int32))
+        Private Function EnumFlagsHelper(Of TEnum, TUnderlying)(value As TEnum,
+                                                                allFlags As IEnumerable(Of TUnderlying),
+                                                                hasFlag As Func(Of TUnderlying, TUnderlying, Boolean)) As IEnumerable(Of Tuple(Of TEnum, Int32))
             Contract.Requires(allFlags IsNot Nothing)
             Contract.Requires(hasFlag IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of TEnum, Int32)))() IsNot Nothing)
@@ -57,14 +57,14 @@ Namespace Values
         '''<summary>Determines the binary flags included in the enum value (including flags which may not be defined).</summary>
         <SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
         <Extension()> <Pure()>
-        Public Function EnumFlags(Of TEnum)(ByVal value As TEnum) As IEnumerable(Of TEnum)
+        Public Function EnumFlags(Of TEnum)(value As TEnum) As IEnumerable(Of TEnum)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TEnum))() IsNot Nothing)
             Return From pair In value.EnumFlagsIndexed() Select pair.Item1
         End Function
 
         <SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
         <Pure()>
-        Public Function EnumAllFlags(Of TEnum)(ByVal onlyDefined As Boolean) As IEnumerable(Of TEnum)
+        Public Function EnumAllFlags(Of TEnum)(onlyDefined As Boolean) As IEnumerable(Of TEnum)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TEnum))() IsNot Nothing)
             Dim allFlags As IEnumerable(Of TEnum)
             Select Case [Enum].GetUnderlyingType(GetType(TEnum))
@@ -86,20 +86,20 @@ Namespace Values
 
         '''<summary>Determines if an Enum value is defined or not.</summary>
         <Pure()> <Extension()>
-        Public Function EnumValueIsDefined(Of TEnum)(ByVal value As TEnum) As Boolean
+        Public Function EnumValueIsDefined(Of TEnum)(value As TEnum) As Boolean
             Return [Enum].IsDefined(GetType(TEnum), value)
         End Function
         '''<summary>Determines if all the binary flags included in the Enum value are defined.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
-        Public Function EnumFlagsAreDefined(Of TEnum)(ByVal value As TEnum) As Boolean
+        Public Function EnumFlagsAreDefined(Of TEnum)(value As TEnum) As Boolean
             Return value.EnumFlags().All(Function(flag) flag.EnumValueIsDefined())
         End Function
 
         '''<summary>Returns a string representation of the binary flags included in the enum value.</summary>
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId:="Flags")>
-        Public Function EnumFlagsToString(Of TEnum)(ByVal value As TEnum) As String
+        Public Function EnumFlagsToString(Of TEnum)(value As TEnum) As String
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
             Dim indexedFlags = value.EnumFlagsIndexed()
             If indexedFlags.None Then Return value.ToString

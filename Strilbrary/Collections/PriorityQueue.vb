@@ -13,13 +13,13 @@ Namespace Collections
             Contract.Invariant(_comparer IsNot Nothing)
         End Sub
 
-        Public Sub New(ByVal comparer As Func(Of TValue, TValue, Integer))
+        Public Sub New(comparer As Func(Of TValue, TValue, Integer))
             Contract.Requires(comparer IsNot Nothing)
             Me._comparer = comparer
             Me._items = New List(Of TValue)()
         End Sub
-        Public Sub New(ByVal comparer As Func(Of TValue, TValue, Integer),
-                       ByVal capacity As Integer)
+        Public Sub New(comparer As Func(Of TValue, TValue, Integer),
+                       capacity As Integer)
             Contract.Requires(comparer IsNot Nothing)
             Contract.Requires(capacity >= 0)
             Me._comparer = comparer
@@ -27,7 +27,7 @@ Namespace Collections
         End Sub
 
         '''<summary>Adds an item to the priority queue.</summary>
-        Public Sub Enqueue(ByVal item As TValue)
+        Public Sub Enqueue(item As TValue)
             Dim curIndex = _items.Count
             _items.Add(item)
             While curIndex > 0
