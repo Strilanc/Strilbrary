@@ -132,6 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="CustomDictionary.xml" />
+    <Compile Include="Collections\Link.vb" />
     <Compile Include="Collections\LazyCounter.vb" />
     <Compile Include="Collections\PriorityQueue.vb" />
     <Compile Include="Collections\LinqExtensions.vb" />
