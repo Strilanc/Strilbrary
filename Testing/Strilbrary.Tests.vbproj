@@ -113,7 +113,6 @@
     <Compile Include="LinqExtensionsTest.vb" />
     <Compile Include="MiscTest.vb" />
     <Compile Include="PriorityQueueTest.vb" />
-    <Compile Include="RationalTest.vb" />
     <Compile Include="TimeTest.vb" />
     <Compile Include="InvariantStringTest.vb" />
     <Compile Include="ValueExtensionTest.vb" />

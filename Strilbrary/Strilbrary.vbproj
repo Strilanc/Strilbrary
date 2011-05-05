@@ -155,7 +155,6 @@
     <Compile Include="Values\BitExtensions.vb" />
     <Compile Include="Values\Maybe.vb" />
     <Compile Include="Values\NoValue.vb" />
-    <Compile Include="Mathematics\Rational.vb" />
     <Compile Include="Values\ValueExtensions.vb" />
     <Compile Include="Values\NonNull.vb" />
     <Compile Include="Values\TextExtensions.vb" />
