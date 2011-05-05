@@ -80,7 +80,7 @@
     <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
     <CodeContractsLibPaths />
     <CodeContractsPlatformPath />
-    <CodeContractsExtraAnalysisOptions>-show:progress -outputwarnmasks -maxWarnings 10000</CodeContractsExtraAnalysisOptions>
+    <CodeContractsExtraAnalysisOptions>-show:progress -outputwarnmasks -maxWarnings 10000 -sortwarns=false</CodeContractsExtraAnalysisOptions>
     <CodeContractsBaseLineFile />
     <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
     <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
@@ -93,8 +93,14 @@
     <CodeContractsContainerAnalysis>True</CodeContractsContainerAnalysis>
     <CodeContractsExtraRewriteOptions />
     <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
+    <CodeContractsRuntimeSkipQuantifiers>True</CodeContractsRuntimeSkipQuantifiers>
+    <CodeContractsEnumObligations>False</CodeContractsEnumObligations>
+    <CodeContractsAnalysisWarningLevel>2</CodeContractsAnalysisWarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AsyncCtpLibrary">
+      <HintPath>..\..\..\..\..\Documents\Microsoft Visual Studio Async CTP\Samples\AsyncCtpLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="LinqToLists">
       <HintPath>..\..\..\..\..\Documents\Visual Studio 2010\Projects\LinqToLists\LinqToLists\bin\Debug\LinqToLists.dll</HintPath>
     </Reference>

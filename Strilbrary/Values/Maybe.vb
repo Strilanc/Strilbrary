@@ -19,8 +19,10 @@
         Public Sub New(value As T)
             Contract.Requires(value IsNot Nothing)
             Contract.Ensures(Me.HasValue)
+            Contract.Ensures(Me.Value.Equals(value))
             Me._hasValue = True
             Me._value = value
+            Contract.Assume(Me.Value.Equals(value))
         End Sub
 
         Public ReadOnly Property HasValue As Boolean
@@ -30,7 +32,7 @@
         End Property
         Public ReadOnly Property Value As T
             Get
-                Contract.Requires(HasValue)
+                Contract.Requires(Me.HasValue)
                 Contract.Ensures(Contract.Result(Of T)() IsNot Nothing)
                 Contract.Assume(_value IsNot Nothing)
                 Return _value
@@ -39,7 +41,11 @@
 
         Public Shared Widening Operator CType(value As T) As Maybe(Of T)
             Contract.Requires(value IsNot Nothing)
-            Return New Maybe(Of T)(value)
+            Contract.Ensures(Contract.Result(Of Maybe(Of T))().HasValue)
+            Contract.Ensures(Contract.Result(Of Maybe(Of T))().Value.Equals(value))
+            Dim r = New Maybe(Of T)(value)
+            Contract.Assume(r.Value.Equals(value))
+            Return r
         End Operator
 
         Public Overloads Function Equals(other As Maybe(Of T)) As Boolean Implements IEquatable(Of Maybe(Of T)).Equals

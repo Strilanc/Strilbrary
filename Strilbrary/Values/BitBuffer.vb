@@ -45,6 +45,8 @@ Namespace Values
             _bitCount += word.BitCount
             Contract.Assume(Me.Peek(word.BitCount) = word)
         End Sub
+        'verification disabled because it causes the verifier to loop
+        <ContractVerification(False)>
         Public Sub Skip(skippedBitCount As Integer)
             Contract.Requires(skippedBitCount >= 0)
             Contract.Requires(skippedBitCount <= Me.BitCount)
@@ -92,14 +94,15 @@ Namespace Values
             While result.BitCount < resultBitCount
                 Contract.Assume(n IsNot Nothing)
                 If result.BitCount + n.Value.BitCount > resultBitCount Then
-                    result += n.Value.LowPart(splitIndex:=resultBitCount - result.BitCount)
+                    Dim v = n.Value.LowPart(splitIndex:=resultBitCount - result.BitCount)
+                    Contract.Assume(v.BitCount + result.BitCount <= BitWord64.MaxSize)
+                    result += v
                 Else
                     result += n.Value
                 End If
                 n = n.Next
                 Contract.Assume(result.BitCount <= resultBitCount)
             End While
-            'Contract.Assume(result.BitCount = resultBitCount)
             Return result
         End Function
 
