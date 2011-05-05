@@ -424,6 +424,23 @@ Namespace Collections
                        If r.Count > 0 Then Yield r
                    End Function()
         End Function
+        '''<summary>Partitions a list into continuous segments of a given size (with the last partition possibly being smaller).</summary>
+        <Pure()> <Extension()>
+        Public Function Partitioned(Of T)(list As IRist(Of T),
+                                          partitionSize As Integer) As IRist(Of IRist(Of T))
+            Contract.Requires(list IsNot Nothing)
+            Contract.Requires(partitionSize > 0)
+            Contract.Ensures(Contract.Result(Of IRist(Of IRist(Of T)))() IsNot Nothing)
+
+            Dim fullCount = list.Count \ partitionSize
+            Dim tailSize = list.Count Mod partitionSize
+            Dim count = fullCount + If(tailSize > 0, 1, 0)
+            Return New Rist(Of IRist(Of T))(
+                counter:=Function() count,
+                getter:=Function(i) New Rist(Of T)(
+                    counter:=Function() If(i < fullCount, partitionSize, tailSize),
+                    getter:=Function(j) list(i * partitionSize + j)))
+        End Function
 
         '''<summary>Returns the last specified number of items in a sequence, or the entire sequence if there are fewer items than the specified number.</summary>
         <Extension()>
