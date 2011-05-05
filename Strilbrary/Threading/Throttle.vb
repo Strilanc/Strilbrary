@@ -23,7 +23,7 @@ Namespace Threading
             Me._clock = clock
         End Sub
 
-        '''<summary>Sets the action to run when the cooldown finishes, or right away if not coolding down.</summary>
+        '''<summary>Sets the action to run when the cooldown finishes, or right away if not cooling down.</summary>
         Public Sub SetActionToRun(action As Action)
             inQueue.QueueAction(
                 Sub()
