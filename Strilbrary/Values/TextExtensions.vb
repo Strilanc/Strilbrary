@@ -50,9 +50,7 @@ Namespace Values
             Contract.Requires(separator IsNot Nothing)
             Contract.Ensures(Contract.Result(Of String)() IsNot Nothing)
             Dim words = From arg In this Select String.Concat(arg)
-            Dim result = String.Join(separator, words)
-            Contract.Assume(result IsNot Nothing)
-            Return result
+            Return String.Join(separator, words)
         End Function
 
         <Extension()> <Pure()>

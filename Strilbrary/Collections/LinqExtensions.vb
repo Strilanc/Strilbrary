@@ -200,7 +200,6 @@ Namespace Collections
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of UInt32))() IsNot Nothing")>
         Public Function Range(limit As UInt32) As IEnumerable(Of UInt32)
-            Contract.Requires(limit >= 0)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of UInt32))() IsNot Nothing)
             Return Iterator Function()
                        Dim e = 0UI
@@ -214,7 +213,6 @@ Namespace Collections
         <Pure()> <Extension()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of UInt16))() IsNot Nothing")>
         Public Function Range(limit As UInt16) As IRist(Of UInt16)
-            Contract.Requires(limit >= 0)
             Contract.Ensures(Contract.Result(Of IRist(Of UInt16))() IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IRist(Of UInt16))().Count = limit)
             Dim r = New Rist(Of UInt16)(getter:=Function(i) CUShort(i), counter:=Function() CInt(limit))

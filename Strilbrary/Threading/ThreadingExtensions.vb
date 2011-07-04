@@ -3,9 +3,9 @@ Imports Strilbrary.Values
 
 Namespace Threading
     '''<remarks>Verification disabled due to missing task contracts</remarks>
-    <ContractVerification(False)>
     Public Module ThreadingExtensions
         '''<summary>Determines a task for running an action in a new thread.</summary>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task)() IsNot Nothing")>
         Public Function ThreadedAction(action As Action) As Task
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
@@ -14,6 +14,7 @@ Namespace Threading
             Return result.Task
         End Function
         '''<summary>Determines a task value for running a function in a new thread.</summary>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TReturn))() IsNot Nothing")>
         Public Function ThreadedFunc(Of TReturn)(func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
@@ -29,16 +30,17 @@ Namespace Threading
             Return Task.Factory.StartNew(action)
         End Function
         '''<summary>Determines a task value for running a function as a task.</summary>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TReturn))() IsNot Nothing")>
         Public Function TaskedFunc(Of TReturn)(func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
             Dim result = New TaskCompletionSource(Of TReturn)
-            Contract.Assume(Tasks.Task.Factory IsNot Nothing)
-            Tasks.Task.Factory.StartNew(Sub() result.SetByEvaluating(func))
+            Task.Factory.StartNew(Sub() result.SetByEvaluating(func))
             Return result.Task
         End Function
 
         '''<summary>Determines a task for running an action in the thread pool.</summary>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task)() IsNot Nothing")>
         Public Function ThreadPooledAction(action As Action) As Task
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
@@ -47,6 +49,7 @@ Namespace Threading
             Return result.Task
         End Function
         '''<summary>Determines a task value for running a function in the thread pool.</summary>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TReturn))() IsNot Nothing")>
         Public Function ThreadPooledFunc(Of TReturn)(func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
@@ -57,6 +60,7 @@ Namespace Threading
 
         '''<summary>Determines a task for invoking an action on a control's thread.</summary>
         <Extension()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task)() IsNot Nothing")>
         Public Function AsyncInvokedAction(control As Control, action As Action) As Task
             Contract.Requires(control IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
@@ -67,6 +71,7 @@ Namespace Threading
         End Function
         '''<summary>Determines a task value for invoking a function on a control's thread.</summary>
         <Extension()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TReturn))() IsNot Nothing")>
         Public Function AsyncInvokedFunc(Of TReturn)(control As Control, func As Func(Of TReturn)) As Task(Of TReturn)
             Contract.Requires(control IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
@@ -78,6 +83,7 @@ Namespace Threading
 
         '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
         <Extension()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task)() IsNot Nothing")>
         Public Function QueueContinueWithAction(task As Task,
                                                 queue As CallQueue,
                                                 action As Action) As Task
@@ -89,6 +95,7 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
         <Extension()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task)() IsNot Nothing")>
         Public Function QueueContinueWithAction(Of TArg)(task As Task(Of TArg),
                                                          queue As CallQueue,
                                                          action As Action(Of TArg)) As Task
@@ -100,6 +107,7 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
         <Extension()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TReturn))() IsNot Nothing")>
         Public Function QueueContinueWithFunc(Of TReturn)(task As Task,
                                                           queue As CallQueue,
                                                           func As Func(Of TReturn)) As Task(Of TReturn)
@@ -111,6 +119,7 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
         <Extension()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TReturn))() IsNot Nothing")>
         Public Function QueueContinueWithFunc(Of TArg, TReturn)(task As Task(Of TArg),
                                                                 queue As CallQueue,
                                                                 func As Func(Of TArg, TReturn)) As Task(Of TReturn)
@@ -122,6 +131,7 @@ Namespace Threading
         End Function
         '''<summary>Creates a continuation which executes on a queue if a task faults.</summary>
         <Extension()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task)() IsNot Nothing")>
         Public Function QueueCatch(task As Task,
                                    queue As CallQueue,
                                    action As Action(Of AggregateException)) As Task

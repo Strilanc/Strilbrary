@@ -45,8 +45,6 @@ Namespace Values
             _bitCount += word.BitCount
             Contract.Assume(Me.Peek(word.BitCount) = word)
         End Sub
-        'verification disabled because it causes the verifier to loop
-        <ContractVerification(False)>
         Public Sub Skip(skippedBitCount As Integer)
             Contract.Requires(skippedBitCount >= 0)
             Contract.Requires(skippedBitCount <= Me.BitCount)
