@@ -3,11 +3,11 @@ Imports Strilbrary.Values
 
 Namespace Time
     '''<summary>A clock that advances while the program is running, but does not advance while execution is halted (eg. at debugger breakpoints).</summary>
-    Public Class ProgramClock
+    Public NotInheritable Class ProgramClock
         Implements IClock
 
         '''<summary>Used to check for pauses. Shared because it uses a single periodic callback instead of one-per-instance.</summary>
-        Private Class SharedBackingClock
+        Private NotInheritable Class SharedBackingClock
             Private Shared ReadOnly PausePeriod As TimeSpan = 5.Seconds
             Private Shared ReadOnly TickPeriod As TimeSpan = 3.Seconds
 
@@ -21,38 +21,45 @@ Namespace Time
             Private Sub New()
             End Sub
 
-            Public Shared Function GetElapsedTime() As TimeSpan
-                Dim t = PokeElapsedTime(scheduleNextPoke:=False)
-                If Not t.HasValue Then Throw New Exceptions.InvalidStateException("Attempted to get elapsed time without a backing clock.")
-                Return t.Value
-            End Function
-            Private Shared Function PokeElapsedTime(scheduleNextPoke As Boolean) As TimeSpan?
+            Private Shared Function PeekPokeElapsedTime(clock As IClock) As TimeSpan
+                Contract.Requires(clock IsNot Nothing)
                 SyncLock _lock
-                    Dim clock = DirectCast(_backClock.Target, IClock)
-                    If clock Is Nothing Then Return Nothing
-
                     Dim t = clock.ElapsedTime
                     Dim dt = t - _lastElapsedTime
                     _lastElapsedTime = t
-
                     If dt > PausePeriod Then _lostTime += dt
-                    If scheduleNextPoke Then
-                        clock.AsyncWait(TickPeriod).ContinueWithAction(Sub() PokeElapsedTime(scheduleNextPoke:=True))
-                    End If
-
                     Return t - _lostTime
                 End SyncLock
             End Function
 
-            Public Shared Function AsyncWaitUntil(t As TimeSpan) As Task
-                Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-                SyncLock _lock
-                    Dim clock = DirectCast(_backClock.Target, IClock)
-                    If clock Is Nothing Then Throw New Exceptions.InvalidStateException("Attempted to wait without a backing clock.")
-                    Return clock.AsyncWaitUntil(t)
-                End SyncLock
+            Public Shared Function GetElapsedTime() As TimeSpan
+                Dim clock = DirectCast(_backClock.Target, IClock)
+                If clock Is Nothing Then Throw New Exceptions.InvalidStateException("Attempted to get elapsed time without a backing clock.")
+                Return PeekPokeElapsedTime(clock)
             End Function
 
+            Public Shared Async Function AsyncWaitUntil(t As TimeSpan) As Task
+                Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
+                Dim clock = DirectCast(_backClock.Target, IClock)
+                If clock Is Nothing Then Throw New Exceptions.InvalidStateException("Attempted to wait without a backing clock.")
+                Do
+                    Dim lostTime As TimeSpan
+                    SyncLock _lock
+                        If PeekPokeElapsedTime(clock) < t Then Exit Do
+                        lostTime = _lostTime
+                    End SyncLock
+                    Await clock.AsyncWaitUntil(t + lostTime)
+                Loop
+            End Function
+
+            Private Shared Async Sub PeriodicPokeElapsedTime()
+                Do
+                    Dim clock = DirectCast(_backClock.Target, IClock)
+                    If clock Is Nothing Then Return
+                    PeekPokeElapsedTime(clock)
+                    Await clock.AsyncWait(TickPeriod)
+                Loop
+            End Sub
             Public Shared Function GetBackingClockReferenceToHold() As Object
                 Contract.Ensures(Contract.Result(Of Object)() IsNot Nothing)
                 SyncLock _lock
@@ -62,7 +69,7 @@ Namespace Time
                         _lastElapsedTime = 0.Seconds
                         clock = New SystemClock()
                         _backClock = New WeakReference(clock)
-                        PokeElapsedTime(scheduleNextPoke:=True)
+                        PeriodicPokeElapsedTime()
                     End If
                     Return clock
                 End SyncLock

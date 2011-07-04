@@ -5,7 +5,7 @@ Namespace Time
     ''' <summary>
     ''' A clock which advances relative to another clock.
     ''' </summary>
-    Public Class RelativeClock
+    Public NotInheritable Class RelativeClock
         Implements IClock
         Private ReadOnly _baseClock As IClock
         Private ReadOnly _timeOffsetFromBase As TimeSpan

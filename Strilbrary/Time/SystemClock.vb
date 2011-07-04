@@ -6,7 +6,7 @@ Namespace Time
     ''' A clock which advances relative to the system tick count.
     ''' </summary>
     ''' <remarks>Assumes TickCount has not cycled between calls. Thus loses time if left alone for ~50 days.</remarks>
-    Public Class SystemClock
+    Public NotInheritable Class SystemClock
         Implements IClock
         Private _elapsedTime As TimeSpan
         Private _lastTick As ModInt32

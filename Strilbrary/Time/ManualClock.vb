@@ -6,7 +6,7 @@ Namespace Time
     ''' <summary>
     ''' A clock which advances manually.
     ''' </summary>
-    Public Class ManualClock
+    Public NotInheritable Class ManualClock
         Implements IClock
         Private _time As New TimeSpan(ticks:=0)
         Private ReadOnly _waitQueue As New PriorityQueue(Of Tuple(Of TimeSpan, TaskCompletionSource(Of NoValue)))(Function(x, y) y.Item1.CompareTo(x.Item1))
