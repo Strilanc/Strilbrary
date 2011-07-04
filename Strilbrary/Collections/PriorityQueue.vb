@@ -5,6 +5,8 @@ Namespace Collections
     ''' A queue which returns higher-priority items first.
     ''' </summary>
     Public Class PriorityQueue(Of TValue)
+        Implements IEnumerable(Of TValue)
+
         Private ReadOnly _items As List(Of TValue)
         Private ReadOnly _comparer As Func(Of TValue, TValue, Integer)
 
@@ -13,6 +15,12 @@ Namespace Collections
             Contract.Invariant(_comparer IsNot Nothing)
         End Sub
 
+        Private Sub New(items As List(Of TValue), comparer As Func(Of TValue, TValue, Integer))
+            Contract.Requires(items IsNot Nothing)
+            Contract.Requires(comparer IsNot Nothing)
+            Me._items = items
+            Me._comparer = comparer
+        End Sub
         Public Sub New(comparer As Func(Of TValue, TValue, Integer))
             Contract.Requires(comparer IsNot Nothing)
             Me._comparer = comparer
@@ -79,5 +87,15 @@ Namespace Collections
                 Return _items.Count
             End Get
         End Property
+
+        Public Iterator Function GetEnumerator() As IEnumerator(Of TValue) Implements IEnumerable(Of TValue).GetEnumerator
+            Dim c = New PriorityQueue(Of TValue)(_items, _comparer)
+            While c.Count > 0
+                Yield c.Dequeue()
+            End While
+        End Function
+        Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+            Return GetEnumerator()
+        End Function
     End Class
 End Namespace
