@@ -3,23 +3,18 @@ Imports Strilbrary.Values
 
 Namespace Time
     ''' <summary>
-    ''' A clock which advances relative to the system tick count.
+    ''' A clock which advances relative to the system time.
     ''' </summary>
-    ''' <remarks>Assumes TickCount has not cycled between calls. Thus loses time if left alone for ~50 days.</remarks>
     Public NotInheritable Class SystemClock
         Implements IClock
-        Private _elapsedTime As TimeSpan
-        Private _lastTick As ModInt32
-        Private ReadOnly _lock As New Object()
+        Private ReadOnly _timer As Stopwatch
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
-            Contract.Invariant(_lock IsNot Nothing)
-            Contract.Invariant(_elapsedTime.Ticks >= 0)
+            Contract.Invariant(_timer IsNot Nothing)
         End Sub
 
         Public Sub New()
-            Me._lastTick = Environment.TickCount
-            Me._elapsedTime = New TimeSpan(0)
+            Me._timer = Stopwatch.StartNew()
         End Sub
 
         Public Function AsyncWaitUntil(time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
@@ -40,13 +35,7 @@ Namespace Time
 
         Public ReadOnly Property ElapsedTime As TimeSpan Implements IClock.ElapsedTime
             Get
-                SyncLock _lock
-                    Dim tick = Environment.TickCount
-                    _elapsedTime += (tick - _lastTick).UnsignedValue.Milliseconds
-                    _lastTick = tick
-                    Contract.Assume(_elapsedTime.Ticks >= 0)
-                    Return _elapsedTime
-                End SyncLock
+                Return _timer.Elapsed
             End Get
         End Property
     End Class

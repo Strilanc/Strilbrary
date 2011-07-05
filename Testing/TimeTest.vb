@@ -158,7 +158,7 @@ Public Class TimeTest
         Dim c = New SystemClock()
         Threading.Thread.Sleep(50)
         Dim m = c.ElapsedTime
-        Assert.IsTrue(m > 0.Milliseconds)
+        Assert.IsTrue(m > 25.Milliseconds) '[safety margin of 25ms for poor accuracy of sleep]
     End Sub
 
     <TestMethod()>
