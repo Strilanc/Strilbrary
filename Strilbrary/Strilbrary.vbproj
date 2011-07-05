@@ -154,7 +154,7 @@
     <Compile Include="Time\ProgramClock.vb" />
     <Compile Include="Time\IClock.vb" />
     <Compile Include="Time\RelativeClock.vb" />
-    <Compile Include="Time\SystemClock.vb" />
+    <Compile Include="Time\PhysicalClock.vb" />
     <Compile Include="Time\ManualClock.vb" />
     <Compile Include="Time\Time Extensions.vb" />
     <Compile Include="Values\BitBuffer.vb" />

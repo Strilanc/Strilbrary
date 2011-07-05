@@ -3,9 +3,9 @@ Imports Strilbrary.Values
 
 Namespace Time
     ''' <summary>
-    ''' A clock which advances relative to the system time.
+    ''' A clock which advances relative to actual real physical time.
     ''' </summary>
-    Public NotInheritable Class SystemClock
+    Public NotInheritable Class PhysicalClock
         Implements IClock
         Private ReadOnly _timer As Stopwatch
 

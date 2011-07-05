@@ -141,21 +141,21 @@ Public Class TimeTest
     End Sub
 
     <TestMethod()>
-    Public Sub SystemAsyncWaitUntilTest_Positive()
-        Dim c = New SystemClock()
+    Public Sub PhysicalClockAsyncWaitUntilTest_Positive()
+        Dim c = New PhysicalClock()
         Dim f = c.AsyncWaitUntil(100.Milliseconds)
         ExpectTaskToIdle(f, timeoutMilliseconds:=50) '[safety margin of 50ms; might still fail sometimes due to bad luck]
         WaitForTaskToSucceed(f)
     End Sub
     <TestMethod()>
-    Public Sub SystemAsyncWaitUntilTest_Instant()
-        Dim c = New SystemClock()
+    Public Sub PhysicalClockAsyncWaitUntilTest_Instant()
+        Dim c = New PhysicalClock()
         Dim f = c.AsyncWaitUntil(-1.Seconds)
         Assert.IsTrue(f.Status = TaskStatus.RanToCompletion)
     End Sub
     <TestMethod()>
-    Public Sub SystemTimeTest()
-        Dim c = New SystemClock()
+    Public Sub PhysicalClockTimeTest()
+        Dim c = New PhysicalClock()
         Threading.Thread.Sleep(50)
         Dim m = c.ElapsedTime
         Assert.IsTrue(m > 25.Milliseconds) '[safety margin of 25ms for poor accuracy of sleep]

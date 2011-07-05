@@ -3,7 +3,7 @@ Imports Strilbrary.Values
 
 Namespace Time
     '''<summary>
-    ''' A clock that advances while the program is running, but does not advance while execution is halted (eg. at debugger breakpoints).
+    ''' A clock that advances while the program is running, but does not advance while execution is halted (eg. at debugger breakpoints or during system hibernation).
     ''' </summary>
     ''' <remarks>
     ''' Instances share a cached PauseSkippingClock to prevent unexpected high overhead if many are allocated.
@@ -25,7 +25,7 @@ Namespace Time
             SyncLock _backingClockLock
                 clock = DirectCast(_backingClock.Target, IClock)
                 If clock Is Nothing Then
-                    clock = New PauseSkippingClock(New SystemClock())
+                    clock = New PauseSkippingClock(New PhysicalClock())
                     _backingClock.Target = clock
                 End If
             End SyncLock

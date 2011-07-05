@@ -3,8 +3,8 @@ Imports Strilbrary.Values
 
 Namespace Time
     '''<summary>
-    ''' A clock that advances relative to a backing clock, but drops any large period skips it detects
-    ''' (such as the skip on a clock advancing in real time due to a debugger pause).
+    ''' A clock that advances relative to a backing clock, but drops any unexpectedly large jumps in the elapsed time.
+    ''' For example, if the system hibernates or the program is paused in a debugger and the backing clock advances in real time, those periods will not be counted in the elapsed time.
     ''' </summary>
     ''' <remarks>
     ''' Uses a periodic callback to detect skips.
@@ -81,7 +81,8 @@ Namespace Time
 
         <SuppressMessage("Microsoft.Contracts", "Ensures-Contract.Result(Of Task)() IsNot Nothing")>
         Public Async Function AsyncWaitUntil(time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
-            '_lostTime can increase during waits, necessitating more waiting, so repeatedly wait until we reach the target time
+            'There may be a skipped pause on the backing clock during the wait, meaning we have to wait longer
+            'It might happen again and again, thus we need to loop-wait until the target time is actually reached
             While PeekPokeElapsedTime() < time
                 'atomic read
                 Dim lostTime As TimeSpan
