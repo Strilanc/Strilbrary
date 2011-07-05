@@ -210,4 +210,50 @@ Public Class TimeTest
         c.Advance(2.Seconds)
         WaitForTaskToSucceed(t)
     End Sub
+
+    <TestMethod()>
+    Public Sub PauseSkippingClockElapsedTimeTest()
+        Dim m = New ManualClock()
+        Dim c = New PauseSkippingClock(m)
+
+        'test normal operation
+        Assert.IsTrue(c.GetElapsedTime = 0.Seconds)
+        Assert.IsTrue(c.GetElapsedTime = 0.Seconds)
+        m.Advance(1.Seconds)
+        Assert.IsTrue(c.GetElapsedTime = 1.Seconds)
+        m.Advance(0.Seconds)
+        Assert.IsTrue(c.GetElapsedTime = 1.Seconds)
+        m.Advance(1.Seconds)
+        Assert.IsTrue(c.GetElapsedTime = 2.Seconds)
+
+        'test pause detection
+        m.Advance(100.Seconds)
+        Assert.IsTrue(c.GetElapsedTime = 2.Seconds)
+    End Sub
+
+    <TestMethod()>
+    Public Sub PauseSkippingClockWaitTest()
+        Dim m = New ManualClock()
+        Dim c = New PauseSkippingClock(m)
+
+        Assert.IsTrue(c.AsyncWaitUntil(0.Seconds).Status = TaskStatus.RanToCompletion)
+        Dim t1 = c.AsyncWaitUntil(1.Seconds)
+        Dim t5 = c.AsyncWaitUntil(5.Seconds)
+
+        ExpectTaskToIdle(t1)
+        ExpectTaskToIdle(t5)
+
+        m.Advance(2.Seconds)
+        WaitForTaskToSucceed(t1)
+        ExpectTaskToIdle(t5)
+
+        'simulate a pause
+        m.Advance(100.Seconds)
+        ExpectTaskToIdle(t5)
+
+        m.Advance(2.Seconds)
+        ExpectTaskToIdle(t5)
+        m.Advance(2.Seconds)
+        WaitForTaskToSucceed(t5)
+    End Sub
 End Class
