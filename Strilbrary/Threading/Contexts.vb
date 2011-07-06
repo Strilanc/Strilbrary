@@ -45,7 +45,9 @@ Namespace Threading
             c.Post(d, state)
         End Sub
         Public Overrides Sub Send(d As SendOrPostCallback, state As Object)
-            _eventualContext.Result.Send(d, state)
+            Dim c = _eventualContext.Result
+            Contract.Assume(c IsNot Nothing)
+            c.Send(d, state)
         End Sub
         Public Overrides Function CreateCopy() As System.Threading.SynchronizationContext
             Return New EventualSynchronizationContext(_eventualContext.ContinueWithFunc(Function(c) c.CreateCopy()))
@@ -58,10 +60,12 @@ Namespace Threading
             Dim c = Await _eventualContext
             c.OperationStarted()
         End Sub
-        <SuppressMessage("Microsoft.Contracts", "Requires-13-64")>
         Public Overrides Function Wait(waitHandles() As IntPtr, waitAll As Boolean, millisecondsTimeout As Integer) As Integer
+            If millisecondsTimeout < -1 Then Throw New ArgumentException("millisecondsTimeout < -1")
             If Not _eventualContext.Wait(millisecondsTimeout) Then Return -1
-            Return _eventualContext.Result.Wait(waitHandles, waitAll, millisecondsTimeout)
+            Dim c = _eventualContext.Result
+            Contract.Assume(c IsNot Nothing)
+            Return c.Wait(waitHandles, waitAll, millisecondsTimeout)
         End Function
     End Class
 End Namespace
