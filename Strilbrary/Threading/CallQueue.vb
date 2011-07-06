@@ -35,10 +35,7 @@ Namespace Threading
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
             Dim r = New TaskCompletionSource(Of NoValue)
-            Post(Sub()
-                     action()
-                     r.SetResult(Nothing)
-                 End Sub, Nothing)
+            Post(Sub() r.SetByCalling(action), Nothing)
             Contract.Assume(r.Task IsNot Nothing)
             Return r.Task
         End Function
@@ -47,9 +44,7 @@ Namespace Threading
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
             Dim r = New TaskCompletionSource(Of TReturn)
-            Post(Sub()
-                     r.SetResult(func())
-                 End Sub, Nothing)
+            Post(Sub() r.SetByEvaluating(func), Nothing)
             Contract.Assume(r.Task IsNot Nothing)
             Return r.Task
         End Function
