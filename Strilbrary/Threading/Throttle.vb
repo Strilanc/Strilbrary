@@ -19,6 +19,7 @@ Namespace Threading
         Public Sub New(cooldown As TimeSpan, clock As Time.IClock, context As SynchronizationContext)
             Contract.Requires(cooldown.Ticks >= 0)
             Contract.Requires(clock IsNot Nothing)
+            Contract.Requires(context IsNot Nothing)
             Me._cooldown = cooldown
             Me._clock = clock
             Me.inQueue = New CallQueue(context)

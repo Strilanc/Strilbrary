@@ -83,6 +83,7 @@ Namespace Threading
 
         <Pure()>
         Public Function MakeThreadPoolSynchronizationContext() As SynchronizationContext
+            Contract.Ensures(Contract.Result(Of SynchronizationContext)() IsNot Nothing)
             Return New RunnerSynchronizationContext(Sub(e) ThreadPooledAction(e))
         End Function
 
