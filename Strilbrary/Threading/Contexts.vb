@@ -40,28 +40,28 @@ Namespace Threading
             Me._eventualContext = eventualContext
         End Sub
 
-        Public Overrides Sub Post(d As SendOrPostCallback, state As Object)
-            _eventualContext.ContinueWithAction(Sub(c) c.Post(d, state))
+        Public Overrides Async Sub Post(d As SendOrPostCallback, state As Object)
+            Dim c = Await _eventualContext
+            c.Post(d, state)
         End Sub
         Public Overrides Sub Send(d As SendOrPostCallback, state As Object)
-            _eventualContext.ContinueWithAction(Sub(c) c.Send(d, state)).Wait()
+            _eventualContext.Result.Send(d, state)
         End Sub
         Public Overrides Function CreateCopy() As System.Threading.SynchronizationContext
             Return New EventualSynchronizationContext(_eventualContext.ContinueWithFunc(Function(c) c.CreateCopy()))
         End Function
-        Public Overrides Sub OperationCompleted()
-            _eventualContext.ContinueWithAction(Sub(c) c.OperationCompleted())
+        Public Overrides Async Sub OperationCompleted()
+            Dim c = Await _eventualContext
+            c.OperationCompleted()
         End Sub
-        Public Overrides Sub OperationStarted()
-            _eventualContext.ContinueWithAction(Sub(c) c.OperationStarted())
+        Public Overrides Async Sub OperationStarted()
+            Dim c = Await _eventualContext
+            c.OperationStarted()
         End Sub
         <SuppressMessage("Microsoft.Contracts", "Requires-13-64")>
         Public Overrides Function Wait(waitHandles() As IntPtr, waitAll As Boolean, millisecondsTimeout As Integer) As Integer
-            Dim result = -1
-            _eventualContext.ContinueWithAction(
-                    Sub(c) result = c.Wait(waitHandles, waitAll, millisecondsTimeout)
-                ).Wait(millisecondsTimeout)
-            Return result
+            If Not _eventualContext.Wait(millisecondsTimeout) Then Return -1
+            Return _eventualContext.Result.Wait(waitHandles, waitAll, millisecondsTimeout)
         End Function
     End Class
 End Namespace
