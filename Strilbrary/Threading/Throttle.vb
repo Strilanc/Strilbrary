@@ -6,7 +6,7 @@ Namespace Threading
         Private ReadOnly _cooldown As TimeSpan
         Private _nextAction As Action
         Private _running As Boolean
-        Private ReadOnly inQueue As CallQueue = MakeTaskedCallQueue()
+        Private ReadOnly inQueue As CallQueue
         Private ReadOnly _clock As Time.IClock
 
         <ContractInvariantMethod()>
@@ -16,37 +16,32 @@ Namespace Threading
             Contract.Invariant(_cooldown.Ticks >= 0)
         End Sub
 
-        Public Sub New(cooldown As TimeSpan, clock As Time.IClock)
+        Public Sub New(cooldown As TimeSpan, clock As Time.IClock, context As SynchronizationContext)
             Contract.Requires(cooldown.Ticks >= 0)
             Contract.Requires(clock IsNot Nothing)
             Me._cooldown = cooldown
             Me._clock = clock
+            Me.inQueue = New CallQueue(context)
         End Sub
 
         '''<summary>Sets the action to run when the cooldown finishes, or right away if not cooling down.</summary>
         Public Sub SetActionToRun(action As Action)
             inQueue.QueueAction(
-                Sub()
+                Async Sub()
                     _nextAction = action
-                    If Not _running Then
-                        _running = True
-                        OnReadyToRun()
-                    End If
-                End Sub)
-        End Sub
-
-        '''<summary>Runs the next action and resets the cooldown.</summary>
-        Private Sub OnReadyToRun()
-            inQueue.QueueAction(
-                Sub()
-                    Dim actionToRun = _nextAction
-                    _nextAction = Nothing
-                    If actionToRun IsNot Nothing Then
-                        Call ThreadPooledAction(actionToRun)
-                        _clock.AsyncWait(_cooldown).ContinueWithAction(AddressOf OnReadyToRun)
-                    Else
+                    If _running Then Return
+                    _running = True
+                    Try
+                        While _nextAction IsNot Nothing
+                            Dim actionToRun = _nextAction
+                            _nextAction = Nothing
+                            Dim t = _clock.AsyncWait(_cooldown)
+                            Call actionToRun()
+                            Await t
+                        End While
+                    Finally
                         _running = False
-                    End If
+                    End Try
                 End Sub)
         End Sub
     End Class
