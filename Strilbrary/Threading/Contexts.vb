@@ -16,7 +16,10 @@ Namespace Threading
         End Sub
 
         Public Overrides Sub Post(d As SendOrPostCallback, state As Object)
-            _runner(Sub() d(state))
+            _runner(Sub()
+                        SynchronizationContext.SetSynchronizationContext(Me)
+                        d(state)
+                    End Sub)
         End Sub
         Public Overrides Function CreateCopy() As SynchronizationContext
             Return Me
