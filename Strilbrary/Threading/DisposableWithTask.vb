@@ -55,15 +55,12 @@ Namespace Threading
             End Get
         End Property
 
-        Private Sub Dispose(finalizing As Boolean)
+        Private Async Sub Dispose(finalizing As Boolean)
             If Not _disposeLock.TryAcquire Then Return
 
             Dim result = PerformDispose(finalizing)
-            If result Is Nothing Then
-                _disposalTask.SetResult(Nothing)
-            Else
-                result.ContinueWithAction(Sub() _disposalTask.SetResult(Nothing))
-            End If
+            If result IsNot Nothing Then Await result
+            _disposalTask.SetResult(Nothing)
         End Sub
         Public Sub Dispose() Implements IDisposable.Dispose
             Dispose(finalizing:=False)
