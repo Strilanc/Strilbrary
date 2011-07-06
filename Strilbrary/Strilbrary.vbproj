@@ -132,6 +132,7 @@
     <Import Include="System.Linq" />
     <Import Include="System.Numerics" />
     <Import Include="System.Runtime.CompilerServices" />
+    <Import Include="System.Threading" />
     <Import Include="System.Threading.Tasks" />
     <Import Include="System.Windows.Forms" />
     <Import Include="System.Xml.Linq" />

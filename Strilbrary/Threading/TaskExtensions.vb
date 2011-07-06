@@ -4,6 +4,11 @@ Imports System.Threading
 
 Namespace Threading
     Public Module TaskExtensions
+        <Pure()>
+        Public Function MakeThreadPoolSynchronizationContext() As SynchronizationContext
+            Return New RunnerSynchronizationContext(Sub(e) ThreadPooledAction(e))
+        End Function
+
         '''<summary>Returns a Task object which has already RanToCompletion.</summary>
         <Pure()>
         Public Function CompletedTask() As Task
