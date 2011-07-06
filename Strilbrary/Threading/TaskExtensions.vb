@@ -60,9 +60,9 @@ Namespace Threading
         <Extension()>
         Public Async Function [Select](Of TArg, TResult)(task As Task(Of TArg),
                                                          func As Func(Of TArg, TResult)) As Task(Of TResult)
-            Contract.Requires(task IsNot Nothing)
-            Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task(Of TResult))() IsNot Nothing)
+            Contract.Assume(task IsNot Nothing)
+            Contract.Assume(func IsNot Nothing)
+            'Contract.Ensures(Contract.Result(Of Task(Of TResult))() IsNot Nothing)
             Dim arg = Await task
             Return func(arg)
         End Function
@@ -72,10 +72,10 @@ Namespace Threading
         Public Async Function SelectMany(Of TArg, TMid, TReturn)(task As Task(Of TArg),
                                                                  projection1 As Func(Of TArg, Task(Of TMid)),
                                                                  projection2 As Func(Of TArg, TMid, TReturn)) As Task(Of TReturn)
-            Contract.Requires(task IsNot Nothing)
-            Contract.Requires(projection1 IsNot Nothing)
-            Contract.Requires(projection2 IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
+            Contract.Assume(task IsNot Nothing)
+            Contract.Assume(projection1 IsNot Nothing)
+            Contract.Assume(projection2 IsNot Nothing)
+            'Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
             Dim arg1 = Await task
             Dim arg2 = Await projection1(arg1)
             Return projection2(arg1, arg2)
