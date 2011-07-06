@@ -37,18 +37,16 @@ Namespace Time
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IDisposable)() IsNot Nothing)
 
-            Dim stopFlag = False
-            Dim callback As Action
+            Dim cts = New System.Threading.CancellationTokenSource()
             Dim t = clock.ElapsedTime
-            callback = Sub()
-                           If stopFlag Then Return
-                           t += period
-                           clock.AsyncWaitUntil(t).ContinueWithAction(callback)
-                           Call action()
-                       End Sub
-            t += period
-            clock.AsyncWaitUntil(t).ContinueWithAction(callback)
-            Return New DelegatedDisposable(Sub() stopFlag = True)
+            Call Async Sub()
+                     While Not cts.Token.IsCancellationRequested
+                         t += period
+                         Await clock.AsyncWaitUntil(t)
+                         Call action()
+                     End While
+                 End Sub
+            Return New DelegatedDisposable(Sub() cts.Cancel())
         End Function
 
 #Region "Time Spans"
