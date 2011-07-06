@@ -49,8 +49,12 @@ Namespace Threading
             Contract.Assume(c IsNot Nothing)
             c.Send(d, state)
         End Sub
-        Public Overrides Function CreateCopy() As System.Threading.SynchronizationContext
-            Return New EventualSynchronizationContext(_eventualContext.ContinueWithFunc(Function(c) c.CreateCopy()))
+        Public Overrides Function CreateCopy() As SynchronizationContext
+            Return New EventualSynchronizationContext(
+                Async Function() As Task(Of SynchronizationContext)
+                    Dim c = Await _eventualContext
+                    Return c.CreateCopy()
+                End Function())
         End Function
         Public Overrides Async Sub OperationCompleted()
             Dim c = Await _eventualContext

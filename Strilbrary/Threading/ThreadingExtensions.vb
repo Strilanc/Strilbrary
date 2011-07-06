@@ -81,66 +81,9 @@ Namespace Threading
             Return result.Task
         End Function
 
-        '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
-        <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task)() IsNot Nothing")>
-        Public Function QueueContinueWithAction(task As Task,
-                                                queue As CallQueue,
-                                                action As Action) As Task
-            Contract.Requires(task IsNot Nothing)
-            Contract.Requires(queue IsNot Nothing)
-            Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Return task.ContinueWithFunc(Function() queue.QueueAction(action)).Unwrap
-        End Function
-        '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
-        <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task)() IsNot Nothing")>
-        Public Function QueueContinueWithAction(Of TArg)(task As Task(Of TArg),
-                                                         queue As CallQueue,
-                                                         action As Action(Of TArg)) As Task
-            Contract.Requires(task IsNot Nothing)
-            Contract.Requires(queue IsNot Nothing)
-            Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Return task.ContinueWithFunc(Function(result) queue.QueueAction(Sub() action(result))).Unwrap
-        End Function
-        '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
-        <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TReturn))() IsNot Nothing")>
-        Public Function QueueContinueWithFunc(Of TReturn)(task As Task,
-                                                          queue As CallQueue,
-                                                          func As Func(Of TReturn)) As Task(Of TReturn)
-            Contract.Requires(task IsNot Nothing)
-            Contract.Requires(queue IsNot Nothing)
-            Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
-            Return task.ContinueWithFunc(Function() queue.QueueFunc(func)).Unwrap
-        End Function
-        '''<summary>Creates a continuation which executes on a queue if a task succeeds.</summary>
-        <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TReturn))() IsNot Nothing")>
-        Public Function QueueContinueWithFunc(Of TArg, TReturn)(task As Task(Of TArg),
-                                                                queue As CallQueue,
-                                                                func As Func(Of TArg, TReturn)) As Task(Of TReturn)
-            Contract.Requires(task IsNot Nothing)
-            Contract.Requires(queue IsNot Nothing)
-            Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
-            Return task.ContinueWithFunc(Function(result) queue.QueueFunc(Function() func(result))).Unwrap
-        End Function
-        '''<summary>Creates a continuation which executes on a queue if a task faults.</summary>
-        <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task)() IsNot Nothing")>
-        Public Function QueueCatch(task As Task,
-                                   queue As CallQueue,
-                                   action As Action(Of AggregateException)) As Task
-            Contract.Requires(task IsNot Nothing)
-            Contract.Requires(queue IsNot Nothing)
-            Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Return task.ContinueWith(Function(t) queue.QueueAction(Sub() If t.Status = TaskStatus.Faulted Then action(t.Exception)),
-                                     TaskContinuationOptions.NotOnCanceled).Unwrap
+        <Pure()>
+        Public Function MakeThreadPoolSynchronizationContext() As SynchronizationContext
+            Return New RunnerSynchronizationContext(Sub(e) ThreadPooledAction(e))
         End Function
 
         ''' <summary>

@@ -4,11 +4,6 @@ Imports System.Threading
 
 Namespace Threading
     Public Module TaskExtensions
-        <Pure()>
-        Public Function MakeThreadPoolSynchronizationContext() As SynchronizationContext
-            Return New RunnerSynchronizationContext(Sub(e) ThreadPooledAction(e))
-        End Function
-
         '''<summary>Returns a Task object which has already RanToCompletion.</summary>
         <Pure()>
         Public Function CompletedTask() As Task
@@ -28,55 +23,6 @@ Namespace Threading
             result.SetResult(value)
             Contract.Assume(result.Task IsNot Nothing)
             Return result.Task
-        End Function
-        '''<summary>
-        ''' Returns a task which completes once all tasks in a sequence have completed.
-        ''' The result faults if any of the sequence tasks fault.
-        '''</summary>
-        <Extension()>
-        Public Function AsAggregateTask(sequence As IEnumerable(Of Task)) As Task
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-
-            Dim tasks = sequence.ToList
-            Dim result = New TaskCompletionSource(Of NoValue)
-            Dim readyCount = 0
-
-            'Become ready once all input futures are ready
-            Dim notify = Sub(task As task)
-                             If Interlocked.Increment(readyCount) < tasks.Count Then Return
-
-                             Dim faults = (From t In tasks
-                                           Where t.Status = TaskStatus.Faulted
-                                           From e In t.Exception.InnerExceptions
-                                           Select e
-                                           ).ToList
-                             If faults.Count > 0 Then
-                                 result.SetException(faults)
-                             Else
-                                 result.SetResult(Nothing)
-                             End If
-                         End Sub
-
-            For Each task In tasks
-                Contract.Assume(task IsNot Nothing)
-                task.ContinueWith(notify)
-            Next task
-            If tasks.Count = 0 Then result.SetResult(Nothing)
-
-            Contract.Assume(result.Task IsNot Nothing)
-            Return result.Task
-        End Function
-        '''<summary>
-        ''' Converts a sequence of tasks into a task for the eventual complete sequence.
-        ''' The result faults if any of the sequence's tasks fault.
-        '''</summary>
-        <Extension()>
-        Public Function AsAggregateTask(Of TValue)(sequence As IEnumerable(Of Task(Of TValue))) As Task(Of IEnumerable(Of TValue))
-            Contract.Requires(sequence IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task(Of IEnumerable(Of TValue)))() IsNot Nothing)
-            Dim tasks = sequence.ToList
-            Return DirectCast(tasks, IEnumerable(Of Task)).AsAggregateTask.ContinueWithFunc(Function() (From task In tasks Select task.Result).ToList.AsEnumerable)
         End Function
 
         '''<summary>Causes a task completion source to succeed with the result of a function, or to fault if the function throws an exception.</summary>
@@ -108,101 +54,31 @@ Namespace Threading
                 taskSource.SetException(ex)
             End Try
         End Sub
-        <Extension()>
-        Private Function PropagateFaultsFrom(Of T)(taskSource As TaskCompletionSource(Of T), task As Task) As Boolean
-            Contract.Requires(taskSource IsNot Nothing)
-            Contract.Requires(task IsNot Nothing)
-            Select Case task.Status
-                Case TaskStatus.Canceled
-                    taskSource.SetCanceled()
-                    Return True
-                Case TaskStatus.Faulted
-                    Contract.Assume(task.Exception IsNot Nothing)
-                    taskSource.SetException(task.Exception.InnerExceptions)
-                    Return True
-                Case TaskStatus.RanToCompletion
-                    Return False
-                Case Else
-                    Throw task.Status.MakeImpossibleValueException()
-            End Select
-        End Function
-
-        '''<summary>Creates a continuation which executes if a task succeeds, and propagates exceptions if it faults.</summary>
-        <Extension()> <Pure()>
-        Public Function ContinueWithAction(task As Task,
-                                           action As action) As Task
-            Contract.Requires(task IsNot Nothing)
-            Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of task)() IsNot Nothing)
-            Dim result = New TaskCompletionSource(Of NoValue)
-            task.ContinueWith(Sub(t) If Not result.PropagateFaultsFrom(t) Then result.SetByCalling(action))
-            Contract.Assume(result.Task IsNot Nothing)
-            Return result.Task
-        End Function
-        '''<summary>Creates a continuation which executes if a task succeeds, and propagates exceptions if it faults.</summary>
-        <Extension()> <Pure()>
-        Public Function ContinueWithAction(Of TInput)(task As Task(Of TInput),
-                                                      action As Action(Of TInput)) As Task
-            Contract.Requires(task IsNot Nothing)
-            Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of task)() IsNot Nothing)
-            Return task.ContinueWithAction(Sub() action(task.Result))
-        End Function
-        '''<summary>Creates a continuation which executes if a task succeeds, and propagates exceptions if it faults.</summary>
-        <Extension()> <Pure()>
-        Public Function ContinueWithFunc(Of TResult)(task As Task,
-                                                     func As Func(Of TResult)) As Task(Of TResult)
-            Contract.Requires(task IsNot Nothing)
-            Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task(Of TResult))() IsNot Nothing)
-            Dim result = New TaskCompletionSource(Of TResult)
-            task.ContinueWith(Sub(t) If Not result.PropagateFaultsFrom(t) Then result.SetByEvaluating(func))
-            Contract.Assume(result.Task IsNot Nothing)
-            Return result.Task
-        End Function
-        '''<summary>Creates a continuation which executes if a task succeeds, and propagates exceptions if it faults.</summary>
-        <Extension()> <Pure()>
-        Public Function ContinueWithFunc(Of TInput, TResult)(task As Task(Of TInput),
-                                                             func As Func(Of TInput, TResult)) As Task(Of TResult)
-            Contract.Requires(task IsNot Nothing)
-            Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task(Of TResult))() IsNot Nothing)
-            Return task.ContinueWithFunc(Function() func(task.Result))
-        End Function
-        '''<summary>Creates a continuation which executes if a task faults, and propagates success if it succeeds.</summary>
-        <Extension()> <Pure()>
-        Public Function [Catch](task As Task,
-                                action As Action(Of AggregateException)) As Task
-            Contract.Requires(task IsNot Nothing)
-            Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Return task.ContinueWith(Sub(t) If t.Status = TaskStatus.Faulted Then action(t.Exception), TaskContinuationOptions.NotOnCanceled)
-        End Function
 
         '''<summary>Creates a continuation which executes if a task succeeds, and propagates exceptions if it faults.</summary>
         '''<remarks>Linq provider for tasks.</remarks>
         <Extension()>
-        Public Function [Select](Of TArg, TResult)(task As Task(Of TArg),
-                                                   func As Func(Of TArg, TResult)) As Task(Of TResult)
+        Public Async Function [Select](Of TArg, TResult)(task As Task(Of TArg),
+                                                         func As Func(Of TArg, TResult)) As Task(Of TResult)
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TResult))() IsNot Nothing)
-            Return task.ContinueWithFunc(func)
+            Dim arg = Await task
+            Return func(arg)
         End Function
         '''<summary>Creates a chain of continuations which execute if a task succeeds, and propagates exceptions if it faults.</summary>
         '''<remarks>Linq provider for tasks.</remarks>
         <Extension()>
-        Public Function SelectMany(Of TArg, TMid, TReturn)(task As Task(Of TArg),
-                                                           projection1 As Func(Of TArg, Task(Of TMid)),
-                                                           projection2 As Func(Of TArg, TMid, TReturn)) As Task(Of TReturn)
+        Public Async Function SelectMany(Of TArg, TMid, TReturn)(task As Task(Of TArg),
+                                                                 projection1 As Func(Of TArg, Task(Of TMid)),
+                                                                 projection2 As Func(Of TArg, TMid, TReturn)) As Task(Of TReturn)
             Contract.Requires(task IsNot Nothing)
             Contract.Requires(projection1 IsNot Nothing)
             Contract.Requires(projection2 IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
-            Dim result = task.Select(Function(value1) projection1(value1).
-                              Select(Function(value2) projection2(value1, value2))).Unwrap
-            Contract.Assume(result IsNot Nothing)
-            Return result
+            Dim arg1 = Await task
+            Dim arg2 = Await projection1(arg1)
+            Return projection2(arg1, arg2)
         End Function
     End Module
 End Namespace
