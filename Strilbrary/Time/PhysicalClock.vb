@@ -15,6 +15,7 @@ Namespace Time
 
         Public Sub New()
             Me._timer = Stopwatch.StartNew()
+            Contract.Assume(Me._timer IsNot Nothing)
         End Sub
 
         Public Function AsyncWaitUntil(time As TimeSpan) As Task Implements IClock.AsyncWaitUntil
@@ -35,7 +36,9 @@ Namespace Time
 
         Public ReadOnly Property ElapsedTime As TimeSpan Implements IClock.ElapsedTime
             Get
-                Return _timer.Elapsed
+                Dim r = _timer.Elapsed
+                Contract.Assume(r.Ticks >= 0)
+                Return r
             End Get
         End Property
     End Class
