@@ -2,6 +2,8 @@
 <Dictionary>
   <Words>
     <Recognized>
+      <Word>Awaitable</Word>
+      <Word>Awaiter</Word>
       <Word>Asc</Word>
       <Word>Chr</Word>
       <Word>Combinator</Word>
