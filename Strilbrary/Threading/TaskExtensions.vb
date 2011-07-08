@@ -80,5 +80,40 @@ Namespace Threading
             Dim arg2 = Await projection1(arg1)
             Return projection2(arg1, arg2)
         End Function
+
+        Public Structure ContextAwaiter
+            Private ReadOnly _context As SynchronizationContext
+            Private ReadOnly _forceReentry As Boolean
+            <ContractInvariantMethod()> Private Sub ObjectInvariant()
+                Contract.Invariant(_context IsNot Nothing)
+            End Sub
+            Public Sub New(context As SynchronizationContext, forceReentry As Boolean)
+                Contract.Requires(context IsNot Nothing)
+                Me._context = context
+                Me._forceReentry = forceReentry
+            End Sub
+            <SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification:="Required to be an awaitable type.")>
+            Public Function GetAwaiter() As ContextAwaiter
+                Return Me
+            End Function
+            Public ReadOnly Property IsCompleted As Boolean
+                Get
+                    Return Not _forceReentry AndAlso SynchronizationContext.Current Is _context
+                End Get
+            End Property
+            Public Sub OnCompleted(action As Action)
+                _context.Post(Sub() action(), Nothing)
+            End Sub
+            <SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification:="Required to be an awaiter type.")>
+            Public Sub GetResult()
+            End Sub
+        End Structure
+        '''<summary>Returns an awaitable object that, when await-ed, resumes execution within the given context.</summary>        
+        '''<param name="forceReentry">Determines if awaiting the result completes immediately when within the desired context.</param>
+        <Extension()> <Pure()>
+        Public Function AwaitableEntrance(context As SynchronizationContext, Optional forceReentry As Boolean = True) As ContextAwaiter
+            Contract.Requires(context IsNot Nothing)
+            Return New ContextAwaiter(context, forceReentry)
+        End Function
     End Module
 End Namespace
