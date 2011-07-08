@@ -56,5 +56,23 @@ Namespace Values
             Contract.Ensures(Contract.Result(Of Maybe(Of T))().HasValue)
             Return New Maybe(Of T)(value)
         End Function
+        <Extension()> <Pure()>
+        Public Function [Else](Of T)(this As Maybe(Of T), other As T) As T
+            If this.HasValue Then Return this.Value
+            Return other
+        End Function
+        <Extension()> <Pure()>
+        Public Function [Else](Of T)(this As Maybe(Of T), other As Maybe(Of T)) As Maybe(Of T)
+            If this.HasValue Then Return this
+            Return other
+        End Function
+
+        '''<summary>Compares two generic values, handling the null case.</summary>
+        <Extension()> <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Boolean)() = If(value1 Is Nothing, value2 Is Nothing, value1.Equals(value2))")>
+        Public Function SafeEquals(Of T)(value1 As T, value2 As T) As Boolean
+            Contract.Ensures(Contract.Result(Of Boolean)() = If(value1 Is Nothing, value2 Is Nothing, value1.Equals(value2)))
+            Return If(value1 Is Nothing, value2 Is Nothing, value1.Equals(value2))
+        End Function
     End Module
 End Namespace

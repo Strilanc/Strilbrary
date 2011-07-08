@@ -5,11 +5,11 @@
         Public ReadOnly [Next] As Link(Of T)
 
         Public Sub New(value As T, Optional [next] As Link(Of T) = Nothing)
-            Contract.Ensures(Strilbrary.Values.GenericEquals(Me.Value, value))
+            Contract.Ensures(Strilbrary.Values.SafeEquals(Me.Value, value))
             Contract.Ensures(Me.Next Is [next])
             Me.Value = value
             Me.Next = [next]
-            Contract.Assume(Strilbrary.Values.GenericEquals(Me.Value, value))
+            Contract.Assume(Strilbrary.Values.SafeEquals(Me.Value, value))
         End Sub
     End Class
     Public Module LinkExtensions
