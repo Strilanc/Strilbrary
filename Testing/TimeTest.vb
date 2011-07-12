@@ -2,7 +2,7 @@
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports Strilbrary.Time
 Imports Strilbrary.Threading
-Imports StrilbraryTests.TaskExtensionsTest
+Imports StrilbraryTests.ThreadingExtensionsTest
 Imports System.Collections.Generic
 
 <TestClass()>

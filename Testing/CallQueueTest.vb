@@ -1,6 +1,6 @@
 ﻿Imports Strilbrary.Threading
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-Imports StrilbraryTests.TaskExtensionsTest
+Imports StrilbraryTests.ThreadingExtensionsTest
 Imports Strilbrary.Time
 
 <TestClass()>
