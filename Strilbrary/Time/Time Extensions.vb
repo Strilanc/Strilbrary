@@ -40,11 +40,12 @@ Namespace Time
             Dim cts = New System.Threading.CancellationTokenSource()
             Dim t = clock.ElapsedTime
             Call Async Sub()
-                     While Not cts.Token.IsCancellationRequested
+                     Do
                          t += period
                          Await clock.AsyncWaitUntil(t)
+                         If cts.Token.IsCancellationRequested Then Return
                          Call action()
-                     End While
+                     Loop
                  End Sub
             Return New DelegatedDisposable(Sub() cts.Cancel())
         End Function
