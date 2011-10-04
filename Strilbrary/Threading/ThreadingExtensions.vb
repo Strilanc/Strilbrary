@@ -179,6 +179,16 @@ Namespace Threading
             Contract.Requires(action IsNot Nothing)
             Try
                 Call action()
+            Catch ex As AggregateException
+                If ex.InnerExceptions.Count <> 1 Then
+                    taskSource.SetException(ex.InnerExceptions)
+                ElseIf TypeOf ex.InnerExceptions(0) Is TaskCanceledException Then
+                    taskSource.SetCanceled()
+                Else
+                    taskSource.SetException(ex.InnerExceptions(0))
+                End If
+            Catch ex As TaskCanceledException
+                taskSource.SetCanceled()
             Catch ex As Exception
                 taskSource.SetException(ex)
             End Try
