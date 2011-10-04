@@ -95,12 +95,12 @@ Public NotInheritable Class LazyCounter
         Contract.Ensures(Me.CurrentCount >= Contract.OldValue(Me.CurrentCount))
         Contract.Ensures(other.CurrentCount >= Contract.OldValue(other.CurrentCount))
 
-        While Not other.Finished AndAlso Not Me.Finished
+        Do
             other.CountPast(Me.CurrentCount)
+            If Me.Finished Then Exit Do
             Me.CountPast(other.CurrentCount)
-        End While
-        Me.CountPast(other.CurrentCount)
-        other.CountPast(Me.CurrentCount)
+            If other.Finished Then Exit Do
+        Loop
 
         Return Me.CurrentCount.CompareTo(other.CurrentCount)
     End Function
@@ -112,12 +112,12 @@ Public NotInheritable Class LazyCounter
         Contract.Ensures(Me.CurrentCount >= Contract.OldValue(Me.CurrentCount))
         Contract.Ensures(other.CurrentCount >= Contract.OldValue(other.CurrentCount))
 
-        While Not other.Finished AndAlso Not Me.Finished
+        Do
             other.CountPast(Me.CurrentCount)
+            If Me.Finished Then Exit Do
             Me.CountTo(other.CurrentCount)
-        End While
-        other.CountPast(Me.CurrentCount)
-        Me.CountTo(other.CurrentCount)
+            If other.Finished Then Exit Do
+        Loop
 
         Return Me.CurrentCount < other.CurrentCount
     End Function
