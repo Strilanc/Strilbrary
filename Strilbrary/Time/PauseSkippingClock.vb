@@ -35,7 +35,7 @@ Namespace Time
             Me._lostTime = 0.Seconds
             PeriodicPokeElapsedTime(New WeakReference(Me))
         End Sub
-        ''' <summary>Periodically pokes the clock, allowing pauses to be detected by the lake of pokes.</summary>
+        ''' <summary>Periodically pokes the clock, allowing pauses to be detected by the lack of pokes.</summary>
         Private Shared Async Sub PeriodicPokeElapsedTime(weakMe As WeakReference)
             Do
                 'check if we've been collected
