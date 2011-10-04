@@ -561,12 +561,6 @@ Public Class ValueExtensionTest
     End Sub
 
     <TestMethod()>
-    Public Sub KeyValueTest()
-        Assert.IsTrue(5.KeyValue(4US).Equals(New Collections.Generic.KeyValuePair(Of Int32, UInt16)(5, 4)))
-        Assert.IsTrue(6.KeyValue(3US).Equals(New Collections.Generic.KeyValuePair(Of Int32, UInt16)(6, 3)))
-    End Sub
-
-    <TestMethod()>
     Public Sub AsStringTest()
         Assert.IsTrue(New Char() {}.AsString = "")
         Assert.IsTrue({"5"c, "4"c}.AsString = "54")

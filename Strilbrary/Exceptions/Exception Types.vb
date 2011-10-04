@@ -58,7 +58,7 @@ Namespace Exceptions
                        parameterName As String)
             MyBase.new(ParamName:=parameterName,
                        Message:="The {0} value ""{1}"" is not a valid argument.".Frmt(GetType(T).Name, String.Concat(value)))
-            Contract.Requires(parameterName IsNot Nothing)
+            Contract.Assume(parameterName IsNot Nothing)
             Me.Value = value
         End Sub
     End Class

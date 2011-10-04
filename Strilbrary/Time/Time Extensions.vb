@@ -3,7 +3,9 @@ Imports Strilbrary.Misc
 
 Namespace Time
     Public Module TimeExtensions
-        '''<summary>Returns a clock which advances relative to the given clock, starting at the current time.</summary>
+        '''<summary>
+        ''' Returns a clock which advances relative to the given clock.
+        ''' The new clock's time zero occurs at the given clock's current time.</summary>
         <Extension()> <Pure()>
         Public Function Restarted(this As IClock) As RelativeClock
             Contract.Requires(this IsNot Nothing)
@@ -25,10 +27,11 @@ Namespace Time
         ''' <summary>
         ''' Begins periodically calling an action, and returns an IDisposable to end the repetition.
         ''' The first call happens after the period has elapsed (instead of immediately).
-        ''' The period is from start time to start time, not end time to start time.
-        ''' The action may be started again while it is running.
-        ''' Beware repeating an action faster than the time it takes to complete.
+        ''' The start times will not drift relative to the clock over time.
+        ''' The duration of the action does not affect the period or start times.
+        ''' The action may be started again while it is still running if it fails to complete within the period.
         ''' </summary>
+        ''' <remarks>Beware repeating an action faster than the time it takes to complete.</remarks>
         <Extension()>
         Public Function AsyncRepeat(clock As IClock,
                                     period As TimeSpan,
@@ -37,7 +40,7 @@ Namespace Time
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IDisposable)() IsNot Nothing)
 
-            Dim cts = New System.Threading.CancellationTokenSource()
+            Dim cts = New CancellationTokenSource()
             Dim t = clock.ElapsedTime
             Call Async Sub()
                      Do

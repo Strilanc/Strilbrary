@@ -30,13 +30,6 @@ Namespace Values
             Return From e In sequence Select e.Value
         End Function
 
-        '''<summary>Combines a key and value into a KeyValuePair.</summary>
-        <Pure()> <Extension()>
-        Public Function KeyValue(Of TKey, TValue)(key As TKey, value As TValue) As KeyValuePair(Of TKey, TValue)
-            Contract.Requires(key IsNot Nothing)
-            Return New KeyValuePair(Of TKey, TValue)(key, value)
-        End Function
-
         '''<summary>Returns a type's default value.</summary>
         <Pure()>
         Public Function [Default](Of T)() As T
