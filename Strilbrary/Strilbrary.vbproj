@@ -151,7 +151,10 @@
     <Compile Include="Streams\EnumeratorStream.vb" />
     <Compile Include="Streams\Stream Interface Converters.vb" />
     <Compile Include="Streams\Stream Interfaces.vb" />
-    <Compile Include="Threading\Contexts.vb" />
+    <Compile Include="Threading\TaskedSynchronizationContext.vb" />
+    <Compile Include="Threading\ThreadPooledSynchronizationContext.vb" />
+    <Compile Include="Threading\ThreadedSynchronizationContext.vb" />
+    <Compile Include="Threading\EventualSynchronizationContext.vb" />
     <Compile Include="Time\PauseSkippingClock.vb" />
     <Compile Include="Time\ProgramClock.vb" />
     <Compile Include="Time\IClock.vb" />
@@ -174,7 +177,6 @@
     <Compile Include="Values\EnumExtensions.vb" />
     <Compile Include="Values\InvariantString.vb" />
     <Compile Include="Streams\StreamExtensions.vb" />
-    <Compile Include="Threading\LockFreeConsumer.vb" />
     <Compile Include="Threading\SingleConsumerLockFreeQueue.vb" />
     <Compile Include="Threading\OneTimeLock.vb" />
     <Compile Include="Threading\ThreadingExtensions.vb" />

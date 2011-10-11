@@ -54,21 +54,18 @@ Namespace Time
         End Function
 
 #Region "Time Spans"
-        'verification disabled due to lack of TimeSpan contracts
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of TimeSpan)().Ticks = quantity * TimeSpan.TicksPerMinute")>
         Public Function Minutes(quantity As Long) As TimeSpan
             Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks = quantity * TimeSpan.TicksPerMinute)
             Return New TimeSpan(ticks:=quantity * TimeSpan.TicksPerMinute)
         End Function
-        'verification disabled due to lack of TimeSpan contracts
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of TimeSpan)().Ticks = quantity * TimeSpan.TicksPerSecond")>
         Public Function Seconds(quantity As Long) As TimeSpan
             Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks = quantity * TimeSpan.TicksPerSecond)
             Return New TimeSpan(ticks:=quantity * TimeSpan.TicksPerSecond)
         End Function
-        'verification disabled due to lack of TimeSpan contracts
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of TimeSpan)().Ticks = quantity * TimeSpan.TicksPerMillisecond")>
         Public Function Milliseconds(quantity As Long) As TimeSpan

@@ -4,89 +4,6 @@ Imports Strilbrary.Values
 Namespace Threading
     '''<remarks>Verification disabled due to missing task contracts</remarks>
     Public Module ThreadingExtensions
-        '''<summary>Determines a task for running an action in a new thread.</summary>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task)() IsNot Nothing")>
-        Public Function ThreadedAction(action As Action) As Task
-            Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Dim result = New TaskCompletionSource(Of NoValue)
-            Call New Thread(Sub() result.SetByCalling(action)).Start()
-            Return result.Task
-        End Function
-        '''<summary>Determines a task value for running a function in a new thread.</summary>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TReturn))() IsNot Nothing")>
-        Public Function ThreadedFunc(Of TReturn)(func As Func(Of TReturn)) As Task(Of TReturn)
-            Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
-            Dim result = New TaskCompletionSource(Of TReturn)
-            Call New Thread(Sub() result.SetByEvaluating(func)).Start()
-            Return result.Task
-        End Function
-
-        '''<summary>Determines a task for running an action as a task.</summary>
-        Public Function TaskedAction(action As Action) As Task
-            Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Return Task.Factory.StartNew(action)
-        End Function
-        '''<summary>Determines a task value for running a function as a task.</summary>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TReturn))() IsNot Nothing")>
-        Public Function TaskedFunc(Of TReturn)(func As Func(Of TReturn)) As Task(Of TReturn)
-            Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
-            Dim result = New TaskCompletionSource(Of TReturn)
-            Task.Factory.StartNew(Sub() result.SetByEvaluating(func))
-            Return result.Task
-        End Function
-
-        '''<summary>Determines a task for running an action in the thread pool.</summary>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task)() IsNot Nothing")>
-        Public Function ThreadPooledAction(action As Action) As Task
-            Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Dim result = New TaskCompletionSource(Of NoValue)
-            ThreadPool.QueueUserWorkItem(Sub() result.SetByCalling(action))
-            Return result.Task
-        End Function
-        '''<summary>Determines a task value for running a function in the thread pool.</summary>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TReturn))() IsNot Nothing")>
-        Public Function ThreadPooledFunc(Of TReturn)(func As Func(Of TReturn)) As Task(Of TReturn)
-            Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
-            Dim result = New TaskCompletionSource(Of TReturn)
-            ThreadPool.QueueUserWorkItem(Sub() result.SetByEvaluating(func))
-            Return result.Task
-        End Function
-
-        '''<summary>Determines a task for invoking an action on a control's thread.</summary>
-        <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task)() IsNot Nothing")>
-        Public Function AsyncInvokedAction(control As Control, action As Action) As Task
-            Contract.Requires(control IsNot Nothing)
-            Contract.Requires(action IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Dim result = New TaskCompletionSource(Of NoValue)
-            result.DependentCall(Sub() control.BeginInvoke(Sub() result.SetByCalling(action)))
-            Return result.Task
-        End Function
-        '''<summary>Determines a task value for invoking a function on a control's thread.</summary>
-        <Extension()>
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of Task(Of TReturn))() IsNot Nothing")>
-        Public Function AsyncInvokedFunc(Of TReturn)(control As Control, func As Func(Of TReturn)) As Task(Of TReturn)
-            Contract.Requires(control IsNot Nothing)
-            Contract.Requires(func IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
-            Dim result = New TaskCompletionSource(Of TReturn)
-            result.DependentCall(Sub() control.BeginInvoke(Sub() result.SetByEvaluating(func)))
-            Return result.Task
-        End Function
-
-        <Pure()>
-        Public Function MakeThreadPoolSynchronizationContext() As SynchronizationContext
-            Contract.Ensures(Contract.Result(Of SynchronizationContext)() IsNot Nothing)
-            Return New RunnerSynchronizationContext(Sub(e) ThreadPooledAction(e))
-        End Function
-
         ''' <summary>
         ''' Returns the eventual synchronization context of a control.
         ''' The context is available once the control has a handle.
@@ -120,17 +37,20 @@ Namespace Threading
             Contract.Ensures(Contract.Result(Of CallQueue)() IsNot Nothing)
             Return New CallQueue(control.EventualSynchronizationContext())
         End Function
+        <Pure()>
         Public Function MakeThreadedCallQueue() As CallQueue
             Contract.Ensures(Contract.Result(Of CallQueue)() IsNot Nothing)
-            Return New CallQueue(New RunnerSynchronizationContext(AddressOf ThreadedAction))
+            Return New CallQueue(New ThreadedSynchronizationContext())
         End Function
-        Public Function MakeThreadPooledCallQueue() As CallQueue
-            Contract.Ensures(Contract.Result(Of CallQueue)() IsNot Nothing)
-            Return New CallQueue(New RunnerSynchronizationContext(AddressOf ThreadPooledAction))
-        End Function
+        <Pure()>
         Public Function MakeTaskedCallQueue() As CallQueue
             Contract.Ensures(Contract.Result(Of CallQueue)() IsNot Nothing)
-            Return New CallQueue(New RunnerSynchronizationContext(AddressOf TaskedAction))
+            Return New CallQueue(New TaskedSynchronizationContext())
+        End Function
+        <Pure()>
+        Public Function MakeThreadPooledCallQueue() As CallQueue
+            Contract.Ensures(Contract.Result(Of CallQueue)() IsNot Nothing)
+            Return New CallQueue(New ThreadPooledSynchronizationContext())
         End Function
 
         '''<summary>Returns a Task object which has already RanToCompletion.</summary>
@@ -193,6 +113,29 @@ Namespace Threading
                 taskSource.SetException(ex)
             End Try
         End Sub
+
+        '''<summary>Enqueues an action to be run and exposes it as a task.</summary>
+        <Extension()>
+        Public Function QueueAction(this As CallQueue, action As Action) As Task
+            Contract.Requires(this IsNot Nothing)
+            Contract.Requires(action IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
+            Dim r = New TaskCompletionSource(Of NoValue)
+            this.Post(Sub() r.SetByCalling(action), Nothing)
+            Contract.Assume(r.Task IsNot Nothing)
+            Return r.Task
+        End Function
+        '''<summary>Enqueues a function to be run and exposes it as a task.</summary>
+        <Extension()>
+        Public Function QueueFunc(Of TReturn)(this As CallQueue, func As Func(Of TReturn)) As Task(Of TReturn)
+            Contract.Requires(this IsNot Nothing)
+            Contract.Requires(func IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of Task(Of TReturn))() IsNot Nothing)
+            Dim r = New TaskCompletionSource(Of TReturn)
+            this.Post(Sub() r.SetByEvaluating(func), Nothing)
+            Contract.Assume(r.Task IsNot Nothing)
+            Return r.Task
+        End Function
 
         Public Structure ContextAwaiter
             Private ReadOnly _context As SynchronizationContext

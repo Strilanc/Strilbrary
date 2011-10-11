@@ -1,7 +1,7 @@
 ﻿Namespace Values
     '''<summary>
     ''' A reference type that stores a non-null value, effectively augmenting value types with a null value.
-    ''' Note that a null reference type is equivalent to a null Nullable, not a Nullable storing a null.
+    ''' Note that a null reference type is equivalent to a null RefNullable, not a RefNullable storing a null.
     '''</summary>
     '''<remarks>Useful for ensuring a generic value is nullable when it may be a struct or a class.</remarks>
     <DebuggerDisplay("{ToString()}")>
