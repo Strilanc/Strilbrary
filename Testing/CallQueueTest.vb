@@ -53,6 +53,7 @@ Public Class CallQueueTest
         Next i
         WaitForTaskToSucceed(q.QueueAction(Sub()
                                            End Sub))
+        Assert.IsTrue(flag)
         Assert.IsTrue(t = 1000)
     End Sub
     <TestMethod()>

@@ -1,6 +1,4 @@
-﻿Imports System.Threading
-
-Namespace Threading
+﻿Namespace Threading
     '''<summary>Passes posted asynchronous calls to a new thread.</summary>
     <DebuggerDisplay("{ToString()}")>
     Public NotInheritable Class ThreadedSynchronizationContext

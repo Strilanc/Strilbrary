@@ -1,6 +1,4 @@
-﻿Imports System.Threading
-
-Namespace Threading
+﻿Namespace Threading
     '''<summary>Delegates calls to a synchronization context which may not be available when this class is constructed.</summary>
     <DebuggerDisplay("{ToString()}")>
     Public NotInheritable Class EventualSynchronizationContext

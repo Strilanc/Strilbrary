@@ -18,20 +18,20 @@ Namespace Time
 
         Private ReadOnly _lock As New Object()
         Private ReadOnly _backingClock As IClock
-        Private _lastElapsedTime As TimeSpan
+        Private _lastBackingElapsedTime As TimeSpan
         Private _lostTime As TimeSpan
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(_lock IsNot Nothing)
             Contract.Invariant(_backingClock IsNot Nothing)
             Contract.Invariant(_lostTime.Ticks >= 0)
-            Contract.Invariant(_lastElapsedTime.Ticks >= _lostTime.Ticks)
+            Contract.Invariant(_lastBackingElapsedTime.Ticks >= _lostTime.Ticks)
         End Sub
 
         Public Sub New(backingClock As IClock)
             Contract.Requires(backingClock IsNot Nothing)
             Me._backingClock = backingClock
-            Me._lastElapsedTime = backingClock.ElapsedTime
+            Me._lastBackingElapsedTime = backingClock.ElapsedTime
             Me._lostTime = 0.Seconds
             PeriodicPokeElapsedTime(New WeakReference(Me))
         End Sub
@@ -61,13 +61,13 @@ Namespace Time
             Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks >= 0)
             SyncLock _lock
                 Dim t = _backingClock.ElapsedTime
-                Dim dt = t - _lastElapsedTime
+                Dim dt = t - _lastBackingElapsedTime
 
-                _lastElapsedTime += dt
+                _lastBackingElapsedTime += dt
                 If dt > PausePeriod Then _lostTime += dt
 
                 Contract.Assume(_lostTime.Ticks >= 0)
-                Contract.Assume(_lastElapsedTime.Ticks >= _lostTime.Ticks)
+                Contract.Assume(_lastBackingElapsedTime.Ticks >= _lostTime.Ticks)
                 Contract.Assume((t - _lostTime).Ticks >= 0)
                 Return t - _lostTime
             End SyncLock

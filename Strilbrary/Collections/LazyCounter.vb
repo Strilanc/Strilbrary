@@ -8,9 +8,11 @@ Public NotInheritable Class LazyCounter
     Private _currentCount As Integer
     Public Property CurrentCount As Integer
         Get
+            Contract.Ensures(Contract.Result(Of Integer)() >= 0)
             Return _currentCount
         End Get
         Private Set(value As Integer)
+            Contract.Requires(value >= _currentCount)
             _currentCount = value
         End Set
     End Property
@@ -20,9 +22,8 @@ Public NotInheritable Class LazyCounter
         End Get
     End Property
 
-    <ContractInvariantMethod()>
-    Private Sub ObjectInvariant()
-        Contract.Invariant(CurrentCount >= 0)
+    <ContractInvariantMethod()> Private Sub ObjectInvariant()
+        Contract.Invariant(_currentCount >= 0)
     End Sub
 
     '''<summary>Trivial constructor.</summary>
@@ -94,6 +95,7 @@ Public NotInheritable Class LazyCounter
     Public Function CompareTo(other As LazyCounter) As Integer Implements IComparable(Of LazyCounter).CompareTo
         Contract.Ensures(Me.CurrentCount >= Contract.OldValue(Me.CurrentCount))
         Contract.Ensures(other.CurrentCount >= Contract.OldValue(other.CurrentCount))
+        If Me Is other Then Return 0
 
         Do
             other.CountPast(Me.CurrentCount)
@@ -111,6 +113,7 @@ Public NotInheritable Class LazyCounter
     Private Function IsLessThan(other As LazyCounter) As Boolean
         Contract.Ensures(Me.CurrentCount >= Contract.OldValue(Me.CurrentCount))
         Contract.Ensures(other.CurrentCount >= Contract.OldValue(other.CurrentCount))
+        If Me Is other Then Return False
 
         Do
             other.CountPast(Me.CurrentCount)

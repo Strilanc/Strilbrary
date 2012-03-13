@@ -1,18 +1,16 @@
-﻿Imports System.Threading
-
-Namespace Threading
+﻿Namespace Threading
     ''' <summary>
     ''' A multiple-producer, single-consumer lock-free queue.
+    ''' Guarantees an item will EVENTUALLY be queued after BeginEnqueue finishes.
     ''' Does NOT guarantee an item has been queued when BeginEnqueue finishes.
-    ''' Guarantees an item will eventually be queued after BeginEnqueue finishes.
     ''' Guarantees linearizability of enqueues w.r.t. calls to BeginEnqueue.
     ''' </summary>
     ''' <remarks>
     ''' Performance characteristics:
-    ''' - All operations are guaranteed constant time.
+    ''' - Basic operations (BeginEnqueue(T), HasItems, Peek, Dequeue) are guaranteed constant time.
     ''' - Delay between BeginEnqueue and availability-for-dequeue can be extended by slowing the producer holding the main chain's tail.
-    ''' - (How does this compare to CAS-based implementations in terms of average throughput? It should be higher?)
     ''' </remarks>
+    <DebuggerDisplay("{ToString()}")>
     Public NotInheritable Class SingleConsumerLockFreeQueue(Of T)
         Implements IEnumerable(Of T)
 
@@ -155,6 +153,14 @@ Namespace Threading
         End Function
         Private Function GetEnumeratorObj() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
             Return GetEnumerator()
+        End Function
+
+        Public Overrides Function ToString() As String
+            Const previewLength As Integer = 5
+            Dim items = Me.Take(previewLength + 1).ToArray()
+            Dim itemRep = String.Join(", ", items.Take(previewLength))
+            Dim extendedItemRep = items.Length > previewLength
+            Return "[" + itemRep + If(extendedItemRep, ", ...", "]")
         End Function
     End Class
 End Namespace

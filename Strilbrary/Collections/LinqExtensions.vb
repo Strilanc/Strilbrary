@@ -188,6 +188,56 @@ Namespace Collections
             Return values.AsRist().Concat(list)
         End Function
 
+        '''<summary>Returns the same sequence but with items omitted when they have the same projection as a previous item.</summary>
+        <Extension()> <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of TItem))() IsNot Nothing")>
+        Public Function DistinctBy(Of TItem, TProjectionOut)(sequence As IEnumerable(Of TItem), projection As Func(Of TItem, TProjectionOut)) As IEnumerable(Of TItem)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(projection IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of TItem))() IsNot Nothing)
+
+            Return Iterator Function()
+                       Dim seen = New HashSet(Of TProjectionOut)()
+                       For Each item In sequence
+                           If seen.Add(projection(item)) Then
+                               Yield item
+                           End If
+                       Next
+                   End Function()
+        End Function
+        '''<summary>Returns the same sequence but with items omitted unless they have the same projection as a previous item.</summary>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of TItem))() IsNot Nothing")>
+        <Extension()> <Pure()>
+        Public Function DuplicatesBy(Of TItem, TProjectionOut)(sequence As IEnumerable(Of TItem), projection As Func(Of TItem, TProjectionOut)) As IEnumerable(Of TItem)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Requires(projection IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of TItem))() IsNot Nothing)
+
+            Return Iterator Function()
+                       Dim seen = New HashSet(Of TProjectionOut)()
+                       For Each item In sequence
+                           If Not seen.Add(projection(item)) Then
+                               Yield item
+                           End If
+                       Next
+                   End Function()
+        End Function
+        '''<summary>Returns the same sequence but with items omitted unless they were previously encountered in the underlying sequence.</summary>
+        <Extension()> <Pure()>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of TItem))() IsNot Nothing")>
+        Public Function Duplicates(Of TItem)(sequence As IEnumerable(Of TItem)) As IEnumerable(Of TItem)
+            Contract.Requires(sequence IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of IEnumerable(Of TItem))() IsNot Nothing)
+            Return Iterator Function()
+                       Dim seen = New HashSet(Of TItem)()
+                       For Each item In sequence
+                           If Not seen.Add(item) Then
+                               Yield item
+                           End If
+                       Next
+                   End Function()
+        End Function
+
         '''<summary>Caches all the items in a sequence, preventing changes to the sequence from affecting the resulting sequence.</summary>
         <Extension()>
         Public Function Cache(Of T)(sequence As IEnumerable(Of T)) As IEnumerable(Of T)

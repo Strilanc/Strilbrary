@@ -1,9 +1,7 @@
-﻿Imports System.Threading
-
-Namespace Threading
-    '''<summary>Passes posted asynchronous calls to the thread pool.</summary>
+﻿Namespace Threading
+    '''<summary>Passes posted asynchronous calls to the default task factory.</summary>
     <DebuggerDisplay("{ToString()}")>
-    Public NotInheritable Class ThreadPooledSynchronizationContext
+    Public NotInheritable Class TaskedSynchronizationContext
         Inherits SynchronizationContext
 
         Public Overrides Sub Post(d As SendOrPostCallback, state As Object)

@@ -1,5 +1,4 @@
-﻿Imports System.Threading
-Imports Strilbrary.Values
+﻿Imports Strilbrary.Values
 
 Namespace Threading
     '''<remarks>Verification disabled due to missing task contracts</remarks>

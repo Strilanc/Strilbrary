@@ -1,15 +1,15 @@
 Imports Strilbrary.Values
 Imports Strilbrary.Exceptions
-Imports System.Threading
 
 Namespace Threading
-    '''<summary>Runs queued actions in order within a synchronization context, exposing the results as tasks.</summary>
+    '''<summary>Runs queued actions in order (without overlap) within a synchronization context, exposing the results as tasks.</summary>
     ''' <remarks>
     ''' Ensures that enqueued items are consumed by ensuring at all exit points that either:
     ''' - the queue is empty
     ''' - or exactly one consumer exists
     ''' - or another exit point will be hit [by another thread]
     ''' </remarks>
+    <DebuggerDisplay("{ToString()}")>
     Public NotInheritable Class CallQueue
         Inherits SynchronizationContext
 
@@ -84,7 +84,13 @@ Namespace Threading
             TryBeginConsuming()
         End Sub
         Public Overrides Function CreateCopy() As SynchronizationContext
-            Return New CallQueue(context.CreateCopy())
+            Dim c = context.CreateCopy()
+            Contract.Assume(c IsNot Nothing)
+            Return New CallQueue(c)
+        End Function
+
+        Public Overrides Function ToString() As String
+            Return "Context: {0}, Items: {1}".Frmt(context, queue)
         End Function
     End Class
 End Namespace

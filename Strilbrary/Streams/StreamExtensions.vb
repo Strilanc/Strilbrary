@@ -87,15 +87,13 @@ Namespace Streams
                                      Optional fileMode As IO.FileMode = IO.FileMode.CreateNew)
             Contract.Requires(stream IsNot Nothing)
             Contract.Requires(stream.CanRead)
-            Contract.Requires(fileName IsNot Nothing)
-            Using bufferedIn = New IO.BufferedStream(stream)
-                Using bufferedOut = New IO.BufferedStream(New IO.FileStream(fileName, fileMode, IO.FileAccess.Write))
-                    Do
-                        Dim i = stream.ReadByte()
-                        If i = -1 Then Exit Do
-                        bufferedOut.WriteByte(CByte(i))
-                    Loop
-                End Using
+            Contract.Requires(Not String.IsNullOrEmpty(fileName))
+            Using bufferedOut = New IO.BufferedStream(New IO.FileStream(fileName, fileMode, IO.FileAccess.Write))
+                Do
+                    Dim i = stream.ReadByte()
+                    If i = -1 Then Exit Do
+                    bufferedOut.WriteByte(CByte(i))
+                Loop
             End Using
         End Sub
 
@@ -249,7 +247,8 @@ Namespace Streams
             Contract.Requires(stream IsNot Nothing)
             Dim read = stream.Read(1)
             If read.Count <> 1 Then Return Nothing
-            Return read.Single
+            Contract.Assume(DirectCast(read, IEnumerable(Of Byte)).Count() = 1)
+            Return read.Single()
         End Function
 
         ''' <summary>

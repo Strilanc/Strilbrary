@@ -1,6 +1,4 @@
-﻿Imports System.Threading
-
-Namespace Threading
+﻿Namespace Threading
     Public Enum OnetimeLockState
         '''<summary>The lock was not acquired, but now may or may not be acquired.</summary>
         Unknown
