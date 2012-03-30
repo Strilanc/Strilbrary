@@ -175,7 +175,7 @@
     <Compile Include="Time\ProgramTimer.vb" />
     <Compile Include="Time\ITimer.vb" />
     <Compile Include="Time\RelativeTimer.vb" />
-    <Compile Include="Time\RealTimeTimer.vb" />
+    <Compile Include="Time\SystemTimer.vb" />
     <Compile Include="Time\ManualTimer.vb" />
     <Compile Include="Time\Time Extensions.vb" />
     <Compile Include="Values\BitBuffer.vb" />

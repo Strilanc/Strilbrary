@@ -82,7 +82,7 @@ Public Class TimeTest
     End Sub
 
     <TestMethod()>
-    Public Sub RelativeClockTest_ElapsedTime()
+    Public Sub RelativeTimerTest_ElapsedTime()
         Dim c = New ManualTimer()
         Dim r0 = c.Restarted()
         Assert.IsTrue(r0.Time = 0.Seconds)
@@ -97,7 +97,7 @@ Public Class TimeTest
         Assert.IsTrue(r1.StartingTimeOnParentTimer = 5.Seconds)
     End Sub
     <TestMethod()>
-    Public Sub RelativeClockTest_AsyncWaitUntil()
+    Public Sub RelativeTimerTest_AsyncWaitUntil()
         Dim c = New ManualTimer()
 
         Dim r0 = c.Restarted()
@@ -113,7 +113,7 @@ Public Class TimeTest
         WaitForTaskToSucceed(t)
     End Sub
     <TestMethod()>
-    Public Sub RelativeClockTest_Nested()
+    Public Sub RelativeTimerTest_Nested()
         Dim c = New ManualTimer()
         c.Advance(3.Seconds)
         Dim r0 = c.Restarted().Restarted().Restarted().Restarted()
@@ -121,7 +121,7 @@ Public Class TimeTest
         Assert.IsTrue(r0.Time = 5.Seconds)
     End Sub
     <TestMethod()>
-    Public Sub RelativeClockTest_NestedAsyncWaitUntil()
+    Public Sub RelativeTimerTest_NestedAsyncWaitUntil()
         Dim c = New ManualTimer()
         c.Advance(3.Seconds)
         Dim r0 = c.Restarted()
@@ -134,28 +134,28 @@ Public Class TimeTest
         WaitForTaskToSucceed(t)
     End Sub
     <TestMethod()>
-    Public Sub RelativeClockTest_NoNegative()
+    Public Sub RelativeTimerTest_NoNegative()
         ExpectException(Of ArgumentException)(Sub()
                                                   Dim r = New RelativeTimer(New ManualTimer(), New TimeSpan(-1))
                                               End Sub)
     End Sub
 
     <TestMethod()>
-    Public Sub PhysicalClockAsyncWaitUntilTest_Positive()
-        Dim c = New RealTimeTimer()
+    Public Sub SystemTimerAsyncWaitUntilTest_Positive()
+        Dim c = New SystemTimer()
         Dim f = c.At(100.Milliseconds)
         ExpectTaskToIdle(f, timeoutMilliseconds:=50) '[safety margin of 50ms; might still fail sometimes due to bad luck]
         WaitForTaskToSucceed(f)
     End Sub
     <TestMethod()>
-    Public Sub PhysicalClockAsyncWaitUntilTest_Instant()
-        Dim c = New RealTimeTimer()
+    Public Sub SystemTimerAsyncWaitUntilTest_Instant()
+        Dim c = New SystemTimer()
         Dim f = c.At(-1.Seconds)
         Assert.IsTrue(f.Status = TaskStatus.RanToCompletion)
     End Sub
     <TestMethod()>
-    Public Sub PhysicalClockTimeTest()
-        Dim c = New RealTimeTimer()
+    Public Sub SystemTimerTimeTest()
+        Dim c = New SystemTimer()
         Threading.Thread.Sleep(50)
         Dim m = c.Time
         Assert.IsTrue(m > 25.Milliseconds) '[safety margin of 25ms for poor accuracy of sleep]
@@ -201,7 +201,7 @@ Public Class TimeTest
         Assert.IsTrue(Not lock.WaitOne(millisecondsTimeout:=10))
     End Sub
     <TestMethod()>
-    Public Sub AsyncWaitTest()
+    Public Sub DelayTest()
         Dim c = New ManualTimer()
         c.Advance(5.Seconds)
         Dim t = c.Delay(3.Seconds)
@@ -212,7 +212,7 @@ Public Class TimeTest
     End Sub
 
     <TestMethod()>
-    Public Sub PauseSkippingClockElapsedTimeTest()
+    Public Sub PauseSkippingTimerElapsedTimeTest()
         Dim m = New ManualTimer()
         Dim c = New PauseSkippingTimer(m)
 
@@ -232,7 +232,7 @@ Public Class TimeTest
     End Sub
 
     <TestMethod()>
-    Public Sub PauseSkippingClockWaitTest()
+    Public Sub PauseSkippingTimerWaitTest()
         Dim m = New ManualTimer()
         Dim c = New PauseSkippingTimer(m)
 

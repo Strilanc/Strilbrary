@@ -5,6 +5,7 @@
         Inherits SynchronizationContext
 
         Public Overrides Sub Post(d As SendOrPostCallback, state As Object)
+            Contract.Assume(Task.Factory IsNot Nothing)
             Task.Factory.StartNew(Sub() d(state))
         End Sub
         Public Overrides Sub Send(d As SendOrPostCallback, state As Object)

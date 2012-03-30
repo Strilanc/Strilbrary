@@ -5,7 +5,7 @@ Namespace Time
     ''' <summary>
     ''' An <see cref="ITimer" /> that advances relative to actual real physical time.
     ''' </summary>
-    Public NotInheritable Class RealTimeTimer
+    Public NotInheritable Class SystemTimer
         Implements ITimer
         Private ReadOnly _timer As Stopwatch
 
@@ -19,7 +19,7 @@ Namespace Time
         End Sub
 
         Public Function At(time As TimeSpan) As Task Implements ITimer.At
-            Dim dt = time - Time
+            Dim dt = time - Me.Time
             If dt.Ticks <= 0 Then Return CompletedTask()
             Dim r = Task.Delay(dt)
             Contract.Assume(r IsNot Nothing)

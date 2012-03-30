@@ -18,7 +18,7 @@ Namespace Time
             Contract.Invariant(_lock IsNot Nothing)
         End Sub
 
-        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Me.ElapsedTime = Contract.OldValue(Me.ElapsedTime) + dt")>
+        <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Me.Time = Contract.OldValue(Me.Time) + duration")>
         Public Sub Advance(duration As TimeSpan)
             Contract.Requires(duration.Ticks >= 0)
             Contract.Ensures(Me.Time = Contract.OldValue(Me.Time) + duration)
@@ -46,7 +46,7 @@ Namespace Time
 
         Public Function At(time As TimeSpan) As Task Implements ITimer.At
             SyncLock _lock
-                If time <= Time Then Return CompletedTask()
+                If time <= Me.Time Then Return CompletedTask()
 
                 Dim result = New TaskCompletionSource(Of NoValue)
                 _waitQueue.Enqueue(Tuple.Create(time, result))

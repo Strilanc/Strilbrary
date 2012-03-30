@@ -25,10 +25,11 @@ Namespace Time
             Dim clock As ITimer = Nothing
             SyncLock _backingTimerLock
                 If Not _backingTimer.TryGetTarget(clock) Then
-                    clock = New PauseSkippingTimer(New RealTimeTimer())
+                    clock = New PauseSkippingTimer(New SystemTimer())
                     _backingTimer.SetTarget(clock)
                 End If
             End SyncLock
+            Contract.Assume(clock IsNot Nothing)
             Me._clock = clock.Restarted()
         End Sub
 

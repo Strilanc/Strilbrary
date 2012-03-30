@@ -285,7 +285,9 @@ Namespace Collections
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(sequence2 IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of T1, T2)))() IsNot Nothing)
-            Return Enumerable.Zip(sequence, sequence2, Function(e1, e2) Tuple.Create(e1, e2))
+            Dim result = Enumerable.Zip(sequence, sequence2, Function(e1, e2) Tuple.Create(e1, e2))
+            Contract.Assume(result IsNot Nothing)
+            Return result
         End Function
 
         '''<summary>Zips a sequence's elements with their positions in the sequence.</summary>
