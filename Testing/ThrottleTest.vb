@@ -8,7 +8,7 @@ Imports System.Threading
 Public Class ThrottleTest
     <TestMethod()>
     Public Sub RunTest()
-        Dim c = New ManualClock()
+        Dim c = New ManualTimer()
         Dim throttle = New Throttle(1.Milliseconds, c, New ThreadPooledSynchronizationContext())
 
         Dim lock = New ManualResetEvent(initialState:=False)
@@ -18,7 +18,7 @@ Public Class ThrottleTest
 
     <TestMethod()>
     Public Sub ThrottleTest()
-        Dim c = New ManualClock()
+        Dim c = New ManualTimer()
         Dim throttle = New Throttle(1.Milliseconds, c, New ThreadPooledSynchronizationContext())
 
         Dim lock = New ManualResetEvent(initialState:=False)
@@ -34,7 +34,7 @@ Public Class ThrottleTest
 
     <TestMethod()>
     Public Sub ReentrantTest()
-        Dim c = New ManualClock()
+        Dim c = New ManualTimer()
         Dim throttle = New Throttle(1.Milliseconds, c, New ThreadPooledSynchronizationContext())
 
         Dim lock = New ManualResetEvent(initialState:=False)

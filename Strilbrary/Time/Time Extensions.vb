@@ -4,48 +4,48 @@ Imports Strilbrary.Misc
 Namespace Time
     Public Module TimeExtensions
         '''<summary>
-        ''' Returns a clock which advances relative to the given clock.
-        ''' The new clock's time zero occurs at the given clock's current time.</summary>
+        ''' Returns a timer that advances relative to the given timer.
+        ''' The new timer's time zero occurs at the given timer's current time.</summary>
         <Extension()> <Pure()>
-        Public Function Restarted(this As IClock) As RelativeClock
+        Public Function Restarted(this As ITimer) As RelativeTimer
             Contract.Requires(this IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of RelativeClock)() IsNot Nothing)
-            Return New RelativeClock(parentClock:=this, timeOffsetFromParent:=-this.ElapsedTime)
+            Contract.Ensures(Contract.Result(Of RelativeTimer)() IsNot Nothing)
+            Return New RelativeTimer(parentTimer:=this, timeOffsetFromParent:=-this.Time)
         End Function
 
         ''' <summary>
-        ''' Returns a task which completes after the given amount of time has passed on the clock.
+        ''' Returns a task that completes after the given amount of time has passed on the timer.
         ''' The resulting task is instantly ready if the given time is non-positive.
         ''' </summary>
         <Extension()>
-        Public Function AsyncWait(clock As IClock, dt As TimeSpan) As Task
-            Contract.Requires(clock IsNot Nothing)
+        Public Function Delay(timer As ITimer, duration As TimeSpan) As Task
+            Contract.Requires(timer IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Return clock.AsyncWaitUntil(clock.ElapsedTime + dt)
+            Return timer.At(timer.Time + duration)
         End Function
 
         ''' <summary>
         ''' Begins periodically calling an action, and returns an IDisposable to end the repetition.
         ''' The first call happens after the period has elapsed (instead of immediately).
-        ''' The start times will not drift relative to the clock over time.
+        ''' The start times will not drift relative to the timer over time.
         ''' The duration of the action does not affect the period or start times.
         ''' The action may be started again while it is still running if it fails to complete within the period.
         ''' </summary>
         ''' <remarks>Beware repeating an action faster than the time it takes to complete.</remarks>
         <Extension()>
-        Public Function AsyncRepeat(clock As IClock,
+        Public Function AsyncRepeat(timer As ITimer,
                                     period As TimeSpan,
                                     action As Action) As IDisposable
-            Contract.Requires(clock IsNot Nothing)
+            Contract.Requires(timer IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IDisposable)() IsNot Nothing)
 
             Dim cts = New CancellationTokenSource()
-            Dim t = clock.ElapsedTime
+            Dim t = timer.Time
             Call Async Sub()
                      Do
                          t += period
-                         Await clock.AsyncWaitUntil(t)
+                         Await timer.At(t)
                          If cts.Token.IsCancellationRequested Then Return
                          Call action()
                      Loop
