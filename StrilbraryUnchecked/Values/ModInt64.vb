@@ -13,11 +13,13 @@
             Me._value = CULng(value)
         End Sub
 
+        <SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId:="unsigned")>
         Public ReadOnly Property UnsignedValue As UInt64
             Get
                 Return _value
             End Get
         End Property
+        <SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId:="signed")>
         Public ReadOnly Property SignedValue As Int64
             Get
                 Return CLng(_value)
@@ -57,10 +59,12 @@
         Public Shared Operator <>(value1 As ModInt64, value2 As ModInt64) As Boolean
             Return value1._value <> value2._value
         End Operator
+        <SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId:="64-offset")>
         Public Function ShiftRotateLeft(offset As Integer) As ModInt64
             offset = offset And (BitCount - 1)
             Return (_value << offset) Or (_value >> (BitCount - offset))
         End Function
+        <SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId:="64-offset")>
         Public Function ShiftRotateRight(offset As Integer) As ModInt64
             offset = offset And (BitCount - 1)
             Return (_value >> offset) Or (_value << (BitCount - offset))

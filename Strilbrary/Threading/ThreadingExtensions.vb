@@ -157,8 +157,8 @@ Namespace Threading
                     Return Not _forceReentry AndAlso SynchronizationContext.Current Is _context
                 End Get
             End Property
-            Public Sub OnCompleted(action As Action) Implements INotifyCompletion.OnCompleted
-                _context.Post(Sub() action(), Nothing)
+            Public Sub OnCompleted(continuation As Action) Implements INotifyCompletion.OnCompleted
+                _context.Post(Sub() continuation(), Nothing)
             End Sub
             <SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification:="Required to be an awaiter type.")>
             Public Sub GetResult()

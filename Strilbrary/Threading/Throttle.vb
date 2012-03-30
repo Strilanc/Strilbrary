@@ -26,6 +26,7 @@ Namespace Threading
         End Sub
 
         '''<summary>Sets the action to run when the cooldown finishes, or right away if not cooling down.</summary>
+        <SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId:="ToRun")>
         Public Async Sub SetActionToRun(action As Action)
             Await inQueue.AwaitableEntrance()
 

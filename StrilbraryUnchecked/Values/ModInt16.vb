@@ -13,11 +13,13 @@
             Me._value = CUShort(value)
         End Sub
 
+        <SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId:="unsigned")>
         Public ReadOnly Property UnsignedValue As UInt16
             Get
                 Return _value
             End Get
         End Property
+        <SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId:="signed")>
         Public ReadOnly Property SignedValue As Int16
             Get
                 Return CShort(_value)
@@ -57,10 +59,12 @@
         Public Shared Operator <>(value1 As ModInt16, value2 As ModInt16) As Boolean
             Return value1._value <> value2._value
         End Operator
+        <SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId:="16-offset")>
         Public Function ShiftRotateLeft(offset As Integer) As ModInt16
             offset = offset And (BitCount - 1)
             Return (_value << offset) Or (_value >> (BitCount - offset))
         End Function
+        <SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId:="16-offset")>
         Public Function ShiftRotateRight(offset As Integer) As ModInt16
             offset = offset And (BitCount - 1)
             Return (_value >> offset) Or (_value << (BitCount - offset))

@@ -162,6 +162,7 @@
     <Compile Include="Collections\LinqExtensions.vb" />
     <Compile Include="Exceptions\Exception Types.vb" />
     <Compile Include="Exceptions\Exception Extensions.vb" />
+    <Compile Include="GlobalSuppressions.vb" />
     <Compile Include="Misc\DelegatedDisposable.vb" />
     <Compile Include="Streams\EnumeratorStream.vb" />
     <Compile Include="Streams\Stream Interface Converters.vb" />
