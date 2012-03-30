@@ -137,6 +137,7 @@ Namespace Threading
         End Function
 
         Public Structure ContextAwaiter
+            Implements INotifyCompletion
             Private ReadOnly _context As SynchronizationContext
             Private ReadOnly _forceReentry As Boolean
             <ContractInvariantMethod()> Private Sub ObjectInvariant()
@@ -156,7 +157,7 @@ Namespace Threading
                     Return Not _forceReentry AndAlso SynchronizationContext.Current Is _context
                 End Get
             End Property
-            Public Sub OnCompleted(action As Action)
+            Public Sub OnCompleted(action As Action) Implements INotifyCompletion.OnCompleted
                 _context.Post(Sub() action(), Nothing)
             End Sub
             <SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification:="Required to be an awaiter type.")>
