@@ -4,6 +4,7 @@ Imports System.Collections.Generic
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports Strilbrary.Values
 Imports Strilbrary.Collections
+Imports LinqToCollections.List
 
 <TestClass()>
 Public Class LinqExtensionsTest
@@ -107,6 +108,80 @@ Public Class LinqExtensionsTest
         Assert.IsTrue({4, 2, -1, 3}.Min(Function(e1, e2) e1.CompareTo(e2)) = -1)
         Assert.IsTrue({-1}.Min(Function(e1, e2) e1.CompareTo(e2)) = -1)
         Assert.IsTrue({100, 10, 0}.Min(Function(e1, e2) If(e1 = 10, -1, If(e2 = 10, 1, 0))) = 10)
+    End Sub
+
+    <TestMethod()>
+    Public Sub MaxTest()
+        Assert.IsTrue(Strilbrary.Collections.LinqExtensions.Max({1, 3, 2}) = 3)
+        Assert.IsTrue(Strilbrary.Collections.LinqExtensions.Max({1, 3.0, Double.PositiveInfinity}) = Double.PositiveInfinity)
+    End Sub
+    <TestMethod()>
+    Public Sub MinTest()
+        Assert.IsTrue(Strilbrary.Collections.LinqExtensions.Min({1, 3, 2}) = 1)
+        Assert.IsTrue(Strilbrary.Collections.LinqExtensions.Min({3, 1, 2}) = 1)
+        Assert.IsTrue(Strilbrary.Collections.LinqExtensions.Min({1, 3.0, Double.PositiveInfinity}) = 1)
+    End Sub
+    <TestMethod()>
+    Public Sub ConcatRistTest()
+        Assert.IsTrue({1, 2, 3}.ToRist().Concat({4, 5}.ToRist()).SequenceEqual({1, 2, 3, 4, 5}))
+        Assert.IsTrue({1, 2, 3}.ToRist().Concat({4, 5}.ToRist())(4) = 5)
+    End Sub
+    <TestMethod()>
+    Public Sub AppendRistTest()
+        Assert.IsTrue({1, 2, 3}.ToRist().Append(4, 5).SequenceEqual({1, 2, 3, 4, 5}))
+        Assert.IsTrue({1, 2, 3}.ToRist().Append(4, 5)(4) = 5)
+    End Sub
+    <TestMethod()>
+    Public Sub PreppendRistTest()
+        Assert.IsTrue({1, 2, 3}.ToRist().Prepend(4, 5).SequenceEqual({4, 5, 1, 2, 3}))
+        Assert.IsTrue({1, 2, 3}.ToRist().Prepend(4, 5)(4) = 3)
+    End Sub
+    <TestMethod()>
+    Public Sub DistinctByTest()
+        Assert.IsTrue({1, 2, 3, 7, 10, 4, 5, 2, 7, 5, 11}.DistinctBy(Function(e) e Mod 5).SequenceEqual({1, 2, 3, 10, 4}))
+    End Sub
+    <TestMethod()>
+    Public Sub DuplicatesByTest()
+        Assert.IsTrue({1, 2, 3, 7, 10, 4, 5, 2, 7, 5, 11}.DuplicatesBy(Function(e) e Mod 5).SequenceEqual({7, 5, 2, 7, 5, 11}))
+    End Sub
+    <TestMethod()>
+    Public Sub DuplicatesTest()
+        Assert.IsTrue({1, 2, 3, 7, 10, 4, 5, 2, 7, 5, 11}.Duplicates().SequenceEqual({2, 7, 5}))
+    End Sub
+    <TestMethod()>
+    Public Sub PaddedToTest()
+        Assert.IsTrue({1, 2, 3}.PaddedTo(7, 2).SequenceEqual({1, 2, 3, 2, 2, 2, 2}))
+        Assert.IsTrue({1, 2, 3}.PaddedTo(1, 2).SequenceEqual({1, 2, 3}))
+        Assert.IsTrue({1, 2, 3}.PaddedTo(3, 2).SequenceEqual({1, 2, 3}))
+    End Sub
+    <TestMethod()>
+    Public Sub IndexOfTest()
+        Assert.IsTrue({1, 2, 3}.AsEnumerable().IndexOf(4) Is Nothing)
+        Assert.IsTrue({1, 2, 3}.AsEnumerable().IndexOf(2).Value = 1)
+    End Sub
+    <TestMethod()>
+    Public Sub DeinterleavedRistTest()
+        Assert.IsTrue({1, 2, 3}.ToRist().Deinterleaved(2).Count = 2)
+        Assert.IsTrue({1, 2, 3}.ToRist().Deinterleaved(2)(0).SequenceEqual({1, 3}))
+        Assert.IsTrue({1, 2, 3}.ToRist().Deinterleaved(2)(1).SequenceEqual({2}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.ToRist().Deinterleaved(3)(1).SequenceEqual({2, 5}))
+    End Sub
+    <TestMethod()>
+    Public Sub StepRistTest()
+        Assert.IsTrue({1, 2, 3, 4, 5}.ToRist().Step(2).SequenceEqual({1, 3, 5}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.ToRist().Step(3).SequenceEqual({1, 4}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.ToRist().Step(1).SequenceEqual({1, 2, 3, 4, 5}))
+    End Sub
+    <TestMethod()>
+    Public Sub PartitionedRistTest()
+        Assert.IsTrue({1, 2, 3}.ToRist().Partitioned(2).Count = 2)
+        Assert.IsTrue({1, 2, 3}.ToRist().Partitioned(2)(0).SequenceEqual({1, 2}))
+        Assert.IsTrue({1, 2, 3}.ToRist().Partitioned(2)(1).SequenceEqual({3}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.ToRist().Partitioned(3)(1).SequenceEqual({4, 5}))
+    End Sub
+    <TestMethod()>
+    Public Sub MakeRistTest()
+        Assert.IsTrue(MakeRist(1, 2, 3).SequenceEqual({1, 2, 3}))
     End Sub
 
     <TestMethod()>
