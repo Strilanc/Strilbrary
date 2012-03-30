@@ -11,7 +11,7 @@
     <AssemblyName>Strilbrary</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <PlatformTarget>x86</PlatformTarget>
     <OptionExplicit>On</OptionExplicit>
     <OptionCompare>Binary</OptionCompare>
@@ -47,7 +47,7 @@
     <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
     <CodeContractsLibPaths />
     <CodeContractsPlatformPath />
-    <CodeContractsExtraAnalysisOptions />
+    <CodeContractsExtraAnalysisOptions>-show:progress -outputwarnmasks -maxWarnings 10000 -sortwarns=false</CodeContractsExtraAnalysisOptions>
     <CodeContractsBaseLineFile />
     <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
     <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
@@ -56,6 +56,22 @@
     <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
+    <CodeContractsEnumObligations>False</CodeContractsEnumObligations>
+    <CodeContractsInferRequires>False</CodeContractsInferRequires>
+    <CodeContractsInferEnsures>False</CodeContractsInferEnsures>
+    <CodeContractsInferObjectInvariants>False</CodeContractsInferObjectInvariants>
+    <CodeContractsSuggestAssumptions>False</CodeContractsSuggestAssumptions>
+    <CodeContractsSuggestRequires>True</CodeContractsSuggestRequires>
+    <CodeContractsSuggestEnsures>False</CodeContractsSuggestEnsures>
+    <CodeContractsSuggestObjectInvariants>False</CodeContractsSuggestObjectInvariants>
+    <CodeContractsDisjunctiveRequires>False</CodeContractsDisjunctiveRequires>
+    <CodeContractsExtraRewriteOptions />
+    <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
+    <CodeContractsReferenceAssembly>Build</CodeContractsReferenceAssembly>
+    <CodeContractsAnalysisWarningLevel>2</CodeContractsAnalysisWarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
@@ -96,13 +112,12 @@
     <CodeContractsRuntimeSkipQuantifiers>True</CodeContractsRuntimeSkipQuantifiers>
     <CodeContractsEnumObligations>False</CodeContractsEnumObligations>
     <CodeContractsAnalysisWarningLevel>2</CodeContractsAnalysisWarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AsyncCtpLibrary">
-      <HintPath>..\..\..\..\..\Documents\Microsoft Visual Studio Async CTP\Samples\AsyncCtpLibrary.dll</HintPath>
-    </Reference>
-    <Reference Include="LinqToCollections">
-      <HintPath>..\..\..\..\..\Documents\Visual Studio 2010\Projects\LinqToCollections\LinqToCollections\bin\Release\LinqToCollections.dll</HintPath>
+    <Reference Include="LinqToCollections, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c72e4f29d452efcf, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\LinqToCollections\LinqToCollections\bin\Release\LinqToCollections.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
