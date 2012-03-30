@@ -220,9 +220,9 @@ Public Class LinqExtensionsTest
 
     <TestMethod()>
     Public Sub PartialAggregatesTest()
-        Assert.IsTrue(New Int32() {}.PartialAggregates(0, Function(acc, e) acc + e).SequenceEqual({}))
-        Assert.IsTrue({1, 2, 3, 4, 5}.PartialAggregates(0, Function(acc, e) acc + e).SequenceEqual({1, 3, 6, 10, 15}))
-        Assert.IsTrue({1, 2, 3, 4, 5, 0}.PartialAggregates(1, Function(acc, e) acc * e).SequenceEqual({1, 2, 6, 24, 120, 0}))
+        Assert.IsTrue(New Int32() {}.AggregateBack(0, Function(acc, e) acc + e).SequenceEqual({}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.AggregateBack(0, Function(acc, e) acc + e).SequenceEqual({1, 3, 6, 10, 15}))
+        Assert.IsTrue({1, 2, 3, 4, 5, 0}.AggregateBack(1, Function(acc, e) acc * e).SequenceEqual({1, 2, 6, 24, 120, 0}))
     End Sub
     <TestMethod()>
     Public Sub SkipLastTest()
@@ -248,8 +248,8 @@ Public Class LinqExtensionsTest
 
     <TestMethod()>
     Public Sub ZipWithPartialAggregatesTest()
-        Assert.IsTrue({1, 2, 3, 4, 5}.ZipWithPartialAggregates(0, Function(acc, e) acc + e).SequenceEqual({1, 2, 3, 4, 5}.Zip({1, 3, 6, 10, 15})))
-        Assert.IsTrue(New Int32() {}.ZipWithPartialAggregates(0, Function(acc, e) acc + e).SequenceEqual({}))
+        Assert.IsTrue({1, 2, 3, 4, 5}.ZipAggregateBack(0, Function(acc, e) acc + e).SequenceEqual({1, 2, 3, 4, 5}.Zip({1, 3, 6, 10, 15})))
+        Assert.IsTrue(New Int32() {}.ZipAggregateBack(0, Function(acc, e) acc + e).SequenceEqual({}))
     End Sub
 
     <TestMethod()>

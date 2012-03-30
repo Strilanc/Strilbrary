@@ -531,9 +531,9 @@ Namespace Collections
         <Extension()> <Pure()>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of TAccumulate))() IsNot Nothing")>
         <SuppressMessage("Microsoft.Contracts", "EnsuresInMethod-Contract.Result(Of IEnumerable(Of TAccumulate))().Count = sequence.Count")>
-        Public Function PartialAggregates(Of TValue, TAccumulate)(sequence As IEnumerable(Of TValue),
-                                                                  seed As TAccumulate,
-                                                                  func As Func(Of TAccumulate, TValue, TAccumulate)) As IEnumerable(Of TAccumulate)
+        Public Function AggregateBack(Of TValue, TAccumulate)(sequence As IEnumerable(Of TValue),
+                                                              seed As TAccumulate,
+                                                              func As Func(Of TAccumulate, TValue, TAccumulate)) As IEnumerable(Of TAccumulate)
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of TAccumulate))() IsNot Nothing)
@@ -552,14 +552,14 @@ Namespace Collections
         ''' The specified seed is used as the initial accumulator value, and is not included in the results.
         ''' </summary>
         <Extension()> <Pure()>
-        Public Function ZipWithPartialAggregates(Of TValue, TAggregate)(sequence As IEnumerable(Of TValue),
-                                                                        seed As TAggregate,
-                                                                        func As Func(Of TAggregate, TValue, TAggregate)) As IEnumerable(Of Tuple(Of TValue, TAggregate))
+        Public Function ZipAggregateBack(Of TValue, TAggregate)(sequence As IEnumerable(Of TValue),
+                                                                seed As TAggregate,
+                                                                func As Func(Of TAggregate, TValue, TAggregate)) As IEnumerable(Of Tuple(Of TValue, TAggregate))
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(func IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IEnumerable(Of Tuple(Of TValue, TAggregate)))() IsNot Nothing)
-            Return sequence.PartialAggregates(seed:=Tuple.Create([Default](Of TValue), seed),
-                                              func:=Function(acc, e) Tuple.Create(e, func(acc.Item2, e)))
+            Return sequence.AggregateBack(seed:=Tuple.Create([Default](Of TValue), seed),
+                                          func:=Function(acc, e) Tuple.Create(e, func(acc.Item2, e)))
         End Function
 
         '''<summary>Returns the first element of a sequence, or a specified default value if the sequence contains no elements.</summary>
