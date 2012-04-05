@@ -9,7 +9,7 @@ Public Class ThrottleTest
     <TestMethod()>
     Public Sub RunTest()
         Dim c = New ManualTimer()
-        Dim throttle = New Throttle(1.Milliseconds, c, New ThreadPooledSynchronizationContext())
+        Dim throttle = New Throttle(1.Milliseconds, c, New ThreadedSynchronizationContext())
 
         Dim lock = New ManualResetEvent(initialState:=False)
         throttle.SetActionToRun(Sub() lock.Set())
@@ -19,7 +19,7 @@ Public Class ThrottleTest
     <TestMethod()>
     Public Sub ThrottleTest()
         Dim c = New ManualTimer()
-        Dim throttle = New Throttle(1.Milliseconds, c, New ThreadPooledSynchronizationContext())
+        Dim throttle = New Throttle(1.Milliseconds, c, New ThreadedSynchronizationContext())
 
         Dim lock = New ManualResetEvent(initialState:=False)
         throttle.SetActionToRun(Sub() lock.Set())
@@ -35,7 +35,7 @@ Public Class ThrottleTest
     <TestMethod()>
     Public Sub ReentrantTest()
         Dim c = New ManualTimer()
-        Dim throttle = New Throttle(1.Milliseconds, c, New ThreadPooledSynchronizationContext())
+        Dim throttle = New Throttle(1.Milliseconds, c, New ThreadedSynchronizationContext())
 
         Dim lock = New ManualResetEvent(initialState:=False)
         throttle.SetActionToRun(Sub() throttle.SetActionToRun(Sub() lock.Set()))

@@ -8,11 +8,11 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("CommonLibrary")> 
-<Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("Microsoft")> 
-<Assembly: AssemblyProduct("CommonLibrary")> 
-<Assembly: AssemblyCopyright("Copyright © Microsoft 2009")> 
+<Assembly: AssemblyTitle("Strilbrary")> 
+<Assembly: AssemblyDescription("A library of misc functions")> 
+<Assembly: AssemblyCompany("")> 
+<Assembly: AssemblyProduct("")> 
+<Assembly: AssemblyCopyright("")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)> 
