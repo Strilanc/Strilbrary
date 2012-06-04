@@ -7,7 +7,7 @@ Namespace Threading
         Private _nextAction As Action
         Private _running As Boolean
         Private ReadOnly inQueue As CallQueue
-        Private ReadOnly _clock As ITimer
+        Private ReadOnly _clock As IClock
 
         <ContractInvariantMethod()>
         Private Sub ObjectInvariant()
@@ -16,7 +16,7 @@ Namespace Threading
             Contract.Invariant(_cooldown.Ticks >= 0)
         End Sub
 
-        Public Sub New(cooldown As TimeSpan, clock As ITimer, context As SynchronizationContext)
+        Public Sub New(cooldown As TimeSpan, clock As IClock, context As SynchronizationContext)
             Contract.Requires(cooldown.Ticks >= 0)
             Contract.Requires(clock IsNot Nothing)
             Contract.Requires(context IsNot Nothing)

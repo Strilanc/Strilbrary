@@ -3,35 +3,34 @@ Imports Strilbrary.Values
 
 Namespace Time
     '''<summary>
-    ''' An <see cref="ITimer" /> that advances relative to a backing timer, but drops any unexpectedly large jumps in the elapsed time.
-    ''' For example, if the system hibernates or the program is paused in a debugger and the backing timer advances in real time, those periods will not be counted in the elapsed time.
+    ''' An <see cref="IClock" /> that advances relative to a backing Clock, but drops any unexpectedly large jumps in the elapsed time.
+    ''' For example, if the system hibernates or the program is paused in a debugger and the backing Clock advances in real time, those periods will not be counted in the elapsed time.
     ''' </summary>
     ''' <remarks>
     ''' Uses a periodic callback to detect skips.
     ''' Uses a weak reference to allow garbage collection despite the periodic callbacks.
     ''' </remarks>
-    Public NotInheritable Class PauseSkippingTimer
-        Implements ITimer
+    Public NotInheritable Class PauseSkippingClock
+        Implements IClock
 
         Private Shared ReadOnly PausePeriod As TimeSpan = 5.Seconds
         Private Shared ReadOnly TickPeriod As TimeSpan = 3.Seconds
 
         Private ReadOnly _lock As New Object()
-        Private ReadOnly _backingTimer As ITimer
-        Private _lastBackingElapsedTime As TimeSpan
+        Private ReadOnly _backingClock As IClock
+        Private _lastBackingTime As Moment
         Private _lostTime As TimeSpan
 
         <ContractInvariantMethod()> Private Sub ObjectInvariant()
             Contract.Invariant(_lock IsNot Nothing)
-            Contract.Invariant(_backingTimer IsNot Nothing)
+            Contract.Invariant(_backingClock IsNot Nothing)
             Contract.Invariant(_lostTime.Ticks >= 0)
-            Contract.Invariant(_lastBackingElapsedTime.Ticks >= _lostTime.Ticks)
         End Sub
 
-        Public Sub New(backingTimer As ITimer)
-            Contract.Requires(backingTimer IsNot Nothing)
-            Me._backingTimer = backingTimer
-            Me._lastBackingElapsedTime = backingTimer.Time
+        Public Sub New(backingClock As IClock)
+            Contract.Requires(backingClock IsNot Nothing)
+            Me._backingClock = backingClock
+            Me._lastBackingTime = backingClock.Time
             Me._lostTime = 0.Seconds
             PeriodicPokeElapsedTime(New WeakReference(Me))
         End Sub
@@ -39,14 +38,14 @@ Namespace Time
         Private Shared Async Sub PeriodicPokeElapsedTime(weakMe As WeakReference)
             Do
                 'check if we've been collected
-                Dim [me] = DirectCast(weakMe.Target, PauseSkippingTimer)
+                Dim [me] = DirectCast(weakMe.Target, PauseSkippingClock)
                 If [me] Is Nothing Then Exit Do
 
                 'poke elapsed time to indicate program is not paused
-                [me].PeekPokeElapsedTime()
+                [me].PeekPokeTime()
 
                 'wait another period, being careful to allow garbage collection
-                Dim c = [me]._backingTimer
+                Dim c = [me]._backingClock
                 [me] = Nothing
                 Await c.Delay(TickPeriod)
             Loop
@@ -57,40 +56,36 @@ Namespace Time
         ''' Returns the new elapsed time, after adjusting for pauses.
         ''' Result increases monotonically.
         ''' </summary>
-        Private Function PeekPokeElapsedTime() As TimeSpan
-            Contract.Ensures(Contract.Result(Of TimeSpan)().Ticks >= 0)
+        Private Function PeekPokeTime() As Moment
             SyncLock _lock
-                Dim t = _backingTimer.Time
-                Dim dt = t - _lastBackingElapsedTime
+                Dim t = _backingClock.Time
+                Dim dt = t - _lastBackingTime
 
-                _lastBackingElapsedTime += dt
+                _lastBackingTime += dt
                 If dt > PausePeriod Then _lostTime += dt
 
                 Contract.Assume(_lostTime.Ticks >= 0)
-                Contract.Assume(_lastBackingElapsedTime.Ticks >= _lostTime.Ticks)
                 Contract.Assume((t - _lostTime).Ticks >= 0)
                 Return t - _lostTime
             End SyncLock
         End Function
 
-        Public ReadOnly Property Time() As TimeSpan Implements ITimer.Time
-            Get
-                Return PeekPokeElapsedTime()
-            End Get
-        End Property
+        Public Function Time() As Moment Implements IClock.Time
+            Return PeekPokeTime()
+        End Function
 
         <SuppressMessage("Microsoft.Contracts", "Ensures-Contract.Result(Of Task)() IsNot Nothing")>
-        Public Async Function At(time As TimeSpan) As Task Implements ITimer.At
-            'There may be a skipped pause on the backing timer during the wait, meaning we have to wait longer
+        Public Async Function At(time As Moment) As Task Implements IClock.At
+            'There may be a skipped pause on the backing Clock during the wait, meaning we have to wait longer
             'It might happen again and again, thus we need to loop-wait until the target time is actually reached
-            While PeekPokeElapsedTime() < time
+            While PeekPokeTime() < time
                 'atomic read
                 Dim lostTime As TimeSpan
                 SyncLock _lock
                     lostTime = _lostTime
                 End SyncLock
 
-                Await _backingTimer.At(time + lostTime)
+                Await _backingClock.At(time + lostTime)
             End While
         End Function
     End Class

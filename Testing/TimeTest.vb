@@ -25,17 +25,18 @@ Public Class TimeTest
 
     <TestMethod()>
     Public Sub ManualTimeTest()
-        Dim c = New ManualTimer()
-        Assert.IsTrue(c.Time = 0.Seconds)
+        Dim c = New ManualClock()
+        Dim z = c.Time()
+        Assert.IsTrue(c.Time - z = 0.Seconds)
         c.Advance(5.Seconds)
-        Assert.IsTrue(c.Time = 5.Seconds)
+        Assert.IsTrue(c.Time - z = 5.Seconds)
         c.Advance(4.Seconds)
-        Assert.IsTrue(c.Time = 9.Seconds)
+        Assert.IsTrue(c.Time - z = 9.Seconds)
     End Sub
     <TestMethod()>
     Public Sub ManualAsyncWaitUntilTest_Positive()
-        Dim c = New ManualTimer()
-        Dim f = c.At(3.Seconds)
+        Dim c = New ManualClock()
+        Dim f = c.At(c.Time() + 3.Seconds)
         ExpectTaskToIdle(f)
         c.Advance(2.Seconds)
         ExpectTaskToIdle(f)
@@ -44,10 +45,11 @@ Public Class TimeTest
     End Sub
     <TestMethod()>
     Public Sub ManualAsyncWaitUntilTest_Multiple()
-        Dim c = New ManualTimer()
-        Dim f2 = c.At(2.Seconds)
-        Dim f1 = c.At(1.Seconds)
-        Dim f3 = c.At(3.Seconds)
+        Dim c = New ManualClock()
+        Dim z = c.Time()
+        Dim f2 = c.At(z + 2.Seconds)
+        Dim f1 = c.At(z + 1.Seconds)
+        Dim f3 = c.At(z + 3.Seconds)
         c.Advance(500.Milliseconds)
         ExpectTaskToIdle(f1)
         ExpectTaskToIdle(f2)
@@ -64,9 +66,10 @@ Public Class TimeTest
     End Sub
     <TestMethod()>
     Public Sub ManualAsyncWaitUntilTest_Duplicate()
-        Dim c = New ManualTimer()
-        Dim f2 = c.At(1.Seconds)
-        Dim f1 = c.At(1.Seconds)
+        Dim c = New ManualClock()
+        Dim z = c.Time()
+        Dim f2 = c.At(z + 1.Seconds)
+        Dim f1 = c.At(z + 1.Seconds)
         c.Advance(500.Milliseconds)
         ExpectTaskToIdle(f1)
         ExpectTaskToIdle(f2)
@@ -76,37 +79,36 @@ Public Class TimeTest
     End Sub
     <TestMethod()>
     Public Sub ManualAsyncWaitUntilTest_Instant()
-        Dim c = New ManualTimer()
-        Dim f = c.At(-1.Seconds)
+        Dim c = New ManualClock()
+        Dim z = c.Time()
+        Dim f = c.At(z - 1.Seconds)
         Assert.IsTrue(f.Status = TaskStatus.RanToCompletion)
     End Sub
 
     <TestMethod()>
     Public Sub RelativeTimerTest_ElapsedTime()
-        Dim c = New ManualTimer()
-        Dim r0 = c.Restarted()
-        Assert.IsTrue(r0.Time = 0.Seconds)
+        Dim c = New ManualClock()
+        Dim r0 = c.StartTimer()
+        Assert.IsTrue(r0.ElapsedTime = 0.Seconds)
         c.Advance(5.Seconds)
-        Dim r1 = c.Restarted()
-        Assert.IsTrue(r0.Time = 5.Seconds)
-        Assert.IsTrue(r1.Time = 0.Seconds)
+        Dim r1 = c.StartTimer()
+        Assert.IsTrue(r0.ElapsedTime = 5.Seconds)
+        Assert.IsTrue(r1.ElapsedTime = 0.Seconds)
         c.Advance(3.Seconds)
-        Assert.IsTrue(r0.Time = 8.Seconds)
-        Assert.IsTrue(r1.Time = 3.Seconds)
-        Assert.IsTrue(r0.StartingTimeOnParentTimer = 0.Seconds)
-        Assert.IsTrue(r1.StartingTimeOnParentTimer = 5.Seconds)
+        Assert.IsTrue(r0.ElapsedTime = 8.Seconds)
+        Assert.IsTrue(r1.ElapsedTime = 3.Seconds)
     End Sub
     <TestMethod()>
     Public Sub RelativeTimerTest_AsyncWaitUntil()
-        Dim c = New ManualTimer()
+        Dim c = New ManualClock()
 
-        Dim r0 = c.Restarted()
+        Dim r0 = c.StartTimer()
         Dim t = r0.At(1.Seconds)
         ExpectTaskToIdle(t)
         c.Advance(2.Seconds)
         WaitForTaskToSucceed(t)
 
-        Dim r1 = c.Restarted()
+        Dim r1 = c.StartTimer()
         Dim t2 = r1.At(1.Seconds)
         ExpectTaskToIdle(t2)
         c.Advance(2.Seconds)
@@ -114,17 +116,17 @@ Public Class TimeTest
     End Sub
     <TestMethod()>
     Public Sub RelativeTimerTest_Nested()
-        Dim c = New ManualTimer()
+        Dim c = New ManualClock()
         c.Advance(3.Seconds)
-        Dim r0 = c.Restarted().Restarted().Restarted().Restarted()
+        Dim r0 = c.StartTimer().Restarted().Restarted().Restarted()
         c.Advance(5.Seconds)
-        Assert.IsTrue(r0.Time = 5.Seconds)
+        Assert.IsTrue(r0.ElapsedTime = 5.Seconds)
     End Sub
     <TestMethod()>
     Public Sub RelativeTimerTest_NestedAsyncWaitUntil()
-        Dim c = New ManualTimer()
+        Dim c = New ManualClock()
         c.Advance(3.Seconds)
-        Dim r0 = c.Restarted()
+        Dim r0 = c.StartTimer()
         c.Advance(3.Seconds)
 
         Dim r1 = r0.Restarted()
@@ -133,37 +135,32 @@ Public Class TimeTest
         c.Advance(2.Seconds)
         WaitForTaskToSucceed(t)
     End Sub
-    <TestMethod()>
-    Public Sub RelativeTimerTest_NoNegative()
-        ExpectException(Of ArgumentException)(Sub()
-                                                  Dim r = New RelativeTimer(New ManualTimer(), New TimeSpan(-1))
-                                              End Sub)
-    End Sub
 
     <TestMethod()>
     Public Sub SystemTimerAsyncWaitUntilTest_Positive()
-        Dim c = New SystemTimer()
-        Dim f = c.At(100.Milliseconds)
+        Dim c = New SystemClock()
+        Dim f = c.Delay(100.Milliseconds)
         ExpectTaskToIdle(f, timeoutMilliseconds:=50) '[safety margin of 50ms; might still fail sometimes due to bad luck]
         WaitForTaskToSucceed(f)
     End Sub
     <TestMethod()>
     Public Sub SystemTimerAsyncWaitUntilTest_Instant()
-        Dim c = New SystemTimer()
-        Dim f = c.At(-1.Seconds)
+        Dim c = New SystemClock()
+        Dim f = c.Delay(-1.Seconds)
         Assert.IsTrue(f.Status = TaskStatus.RanToCompletion)
     End Sub
     <TestMethod()>
     Public Sub SystemTimerTimeTest()
-        Dim c = New SystemTimer()
+        Dim c = New SystemClock()
+        Dim z = c.Time
         Threading.Thread.Sleep(50)
-        Dim m = c.Time
+        Dim m = c.Time - z
         Assert.IsTrue(m > 25.Milliseconds) '[safety margin of 25ms for poor accuracy of sleep]
     End Sub
 
     <TestMethod()>
     Public Sub AsyncRepeatTest_Partial()
-        Dim c = New ManualTimer()
+        Dim c = New ManualClock()
         Dim lock = New Threading.AutoResetEvent(initialState:=False)
         c.AsyncRepeat(period:=2.Seconds, action:=AddressOf lock.Set)
 
@@ -175,7 +172,7 @@ Public Class TimeTest
     End Sub
     <TestMethod()>
     Public Sub AsyncRepeatTest_Multi()
-        Dim c = New ManualTimer()
+        Dim c = New ManualClock()
         Dim t = 0
         Dim locks = New List(Of Threading.AutoResetEvent)()
         For i = 0 To 5 - 1
@@ -193,7 +190,7 @@ Public Class TimeTest
     End Sub
     <TestMethod()>
     Public Sub AsyncRepeatTest_Dispose()
-        Dim c = New ManualTimer()
+        Dim c = New ManualClock()
         Dim lock = New Threading.AutoResetEvent(initialState:=False)
         Dim d = c.AsyncRepeat(period:=2.Seconds, action:=AddressOf lock.Set)
         d.Dispose()
@@ -202,7 +199,7 @@ Public Class TimeTest
     End Sub
     <TestMethod()>
     Public Sub DelayTest()
-        Dim c = New ManualTimer()
+        Dim c = New ManualClock()
         c.Advance(5.Seconds)
         Dim t = c.Delay(3.Seconds)
         c.Advance(2.Seconds)
@@ -213,32 +210,34 @@ Public Class TimeTest
 
     <TestMethod()>
     Public Sub PauseSkippingTimerElapsedTimeTest()
-        Dim m = New ManualTimer()
-        Dim c = New PauseSkippingTimer(m)
+        Dim m = New ManualClock()
+        Dim z = m.Time()
+        Dim c = New PauseSkippingClock(m)
 
         'test normal operation
-        Assert.IsTrue(c.Time = 0.Seconds)
-        Assert.IsTrue(c.Time = 0.Seconds)
+        Assert.IsTrue(c.Time - z = 0.Seconds)
+        Assert.IsTrue(c.Time - z = 0.Seconds)
         m.Advance(1.Seconds)
-        Assert.IsTrue(c.Time = 1.Seconds)
+        Assert.IsTrue(c.Time - z = 1.Seconds)
         m.Advance(0.Seconds)
-        Assert.IsTrue(c.Time = 1.Seconds)
+        Assert.IsTrue(c.Time - z = 1.Seconds)
         m.Advance(1.Seconds)
-        Assert.IsTrue(c.Time = 2.Seconds)
+        Assert.IsTrue(c.Time - z = 2.Seconds)
 
         'test pause detection
         m.Advance(100.Seconds)
-        Assert.IsTrue(c.Time = 2.Seconds)
+        Assert.IsTrue(c.Time - z = 2.Seconds)
     End Sub
 
     <TestMethod()>
     Public Sub PauseSkippingTimerWaitTest()
-        Dim m = New ManualTimer()
-        Dim c = New PauseSkippingTimer(m)
+        Dim m = New ManualClock()
+        Dim z = m.Time()
+        Dim c = New PauseSkippingClock(m)
 
-        Assert.IsTrue(c.At(0.Seconds).Status = TaskStatus.RanToCompletion)
-        Dim t1 = c.At(1.Seconds)
-        Dim t5 = c.At(5.Seconds)
+        Assert.IsTrue(c.At(z + 0.Seconds).Status = TaskStatus.RanToCompletion)
+        Dim t1 = c.At(z + 1.Seconds)
+        Dim t5 = c.At(z + 5.Seconds)
 
         ExpectTaskToIdle(t1)
         ExpectTaskToIdle(t5)

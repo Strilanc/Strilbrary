@@ -96,7 +96,7 @@ Namespace Collections
                         projection As Func(Of TInput, TComparable)) As TInput
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(projection IsNot Nothing)
-            Contract.Requires(sequence.Any)
+            Contract.Requires(sequence.Any())
             Return (From item In sequence
                     Let image = projection(item)
                     ).Max(Function(e1, e2) e1.image.CompareTo(e2.image)
@@ -111,7 +111,7 @@ Namespace Collections
                         projection As Func(Of TInput, TComparable)) As TInput
             Contract.Requires(sequence IsNot Nothing)
             Contract.Requires(projection IsNot Nothing)
-            Contract.Requires(sequence.Any)
+            Contract.Requires(sequence.Any())
             Return (From item In sequence
                     Let image = projection(item)
                     ).Min(Function(e1, e2) e1.image.CompareTo(e2.image)

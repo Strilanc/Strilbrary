@@ -3,14 +3,15 @@ Imports Strilbrary.Misc
 
 Namespace Time
     Public Module TimeExtensions
-        '''<summary>
-        ''' Returns a timer that advances relative to the given timer.
-        ''' The new timer's time zero occurs at the given timer's current time.</summary>
+        ''' <summary>
+        ''' Returns a timer that advances relative to the given clock.
+        ''' The new timer's time zero occurs at the given clock's current time.
+        ''' </summary>
         <Extension()> <Pure()>
-        Public Function Restarted(this As ITimer) As RelativeTimer
-            Contract.Requires(this IsNot Nothing)
-            Contract.Ensures(Contract.Result(Of RelativeTimer)() IsNot Nothing)
-            Return New RelativeTimer(parentTimer:=this, timeOffsetFromParent:=-this.Time)
+        Public Function StartTimer(clock As IClock) As ClockTimer
+            Contract.Requires(clock IsNot Nothing)
+            Contract.Ensures(Contract.Result(Of ClockTimer)() IsNot Nothing)
+            Return New ClockTimer(clock, clock.Time())
         End Function
 
         ''' <summary>
@@ -18,10 +19,10 @@ Namespace Time
         ''' The resulting task is instantly ready if the given time is non-positive.
         ''' </summary>
         <Extension()>
-        Public Function Delay(timer As ITimer, duration As TimeSpan) As Task
-            Contract.Requires(timer IsNot Nothing)
+        Public Function Delay(clock As IClock, duration As TimeSpan) As Task
+            Contract.Requires(clock IsNot Nothing)
             Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
-            Return timer.At(timer.Time + duration)
+            Return clock.At(clock.Time() + duration)
         End Function
 
         ''' <summary>
@@ -33,19 +34,19 @@ Namespace Time
         ''' </summary>
         ''' <remarks>Beware repeating an action faster than the time it takes to complete.</remarks>
         <Extension()>
-        Public Function AsyncRepeat(timer As ITimer,
+        Public Function AsyncRepeat(clock As IClock,
                                     period As TimeSpan,
                                     action As Action) As IDisposable
-            Contract.Requires(timer IsNot Nothing)
+            Contract.Requires(clock IsNot Nothing)
             Contract.Requires(action IsNot Nothing)
             Contract.Ensures(Contract.Result(Of IDisposable)() IsNot Nothing)
 
             Dim cts = New CancellationTokenSource()
-            Dim t = timer.Time
+            Dim t = clock.Time()
             Call Async Sub()
                      Do
                          t += period
-                         Await timer.At(t)
+                         Await clock.At(t)
                          If cts.Token.IsCancellationRequested Then Return
                          Call action()
                      Loop
