@@ -66,7 +66,7 @@
             Return Me = other
         End Function
         Public Function CompareTo(other As Moment) As Integer Implements IComparable(Of Moment).CompareTo
-            Contract.Requires(Of InvalidOperationException)(Object.Equals(Me.Basis, other.Basis))
+            If Not Object.Equals(Me.Basis, other.Basis) Then Throw New InvalidOperationException("Not Object.Equals(Me.Basis, other.Basis)")
             Return Me.Ticks.CompareTo(other.Ticks)
         End Function
     End Structure

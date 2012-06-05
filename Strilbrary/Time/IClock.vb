@@ -10,6 +10,7 @@
         ''' Returns the clock's time.
         ''' The result is volatile but never decreases (may increase between calls).
         ''' </summary>
+        <Pure>
         Function Time() As Moment
 
         <ContractClassFor(GetType(IClock))>
@@ -20,6 +21,7 @@
                 Contract.Ensures(Contract.Result(Of Task)() IsNot Nothing)
                 Throw New NotSupportedException
             End Function
+            <Pure>
             Public Function Time() As Moment Implements IClock.Time
                 Contract.Ensures(Object.Equals(Me, Contract.Result(Of Moment)().Basis))
                 Throw New NotSupportedException

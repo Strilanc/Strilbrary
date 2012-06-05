@@ -164,6 +164,10 @@ Namespace Threading
             Public Sub GetResult()
             End Sub
         End Structure
+        <Extension>
+        Public Function GetAwaiter(queue As CallQueue) As ContextAwaiter
+            Return queue.AwaitableEntrance()
+        End Function
         '''<summary>Returns an awaitable object that, when await-ed, resumes execution within the given context.</summary>        
         '''<param name="forceReentry">Determines if awaiting the result completes immediately when within the desired context.</param>
         <Extension()> <Pure()>
