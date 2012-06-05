@@ -16,7 +16,7 @@
             Return Me
         End Function
         Public Overrides Function ToString() As String
-            Return "ThreadPooledSynchronizationContext"
+            Return "TaskedSynchronizationContext"
         End Function
     End Class
 End Namespace

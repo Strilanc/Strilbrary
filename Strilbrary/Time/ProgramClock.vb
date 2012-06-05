@@ -32,11 +32,11 @@ Namespace Time
         End Sub
 
         Public Function At(time As Moment) As Task Implements IClock.At
-            Return _clock.At(time)
+            Return _clock.At(New Moment(time.Ticks, _clock))
         End Function
 
         Public Function Time() As Moment Implements IClock.Time
-            Return _clock.Time()
+            Return New Moment(_clock.Time().Ticks, Me)
         End Function
     End Class
 End Namespace

@@ -66,7 +66,7 @@ Namespace Time
 
                 Contract.Assume(_lostTime.Ticks >= 0)
                 Contract.Assume((t - _lostTime).Ticks >= 0)
-                Return t - _lostTime
+                Return New Moment((t - _lostTime).Ticks, Me)
             End SyncLock
         End Function
 
@@ -85,7 +85,7 @@ Namespace Time
                     lostTime = _lostTime
                 End SyncLock
 
-                Await _backingClock.At(time + lostTime)
+                Await _backingClock.At(New Moment((time + lostTime).Ticks, _backingClock))
             End While
         End Function
     End Class
